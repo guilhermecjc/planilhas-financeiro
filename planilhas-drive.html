@@ -383,7 +383,7 @@ const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleuserco
 const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets.readonly';
 
 const PARALLEL=10;
-const LS_KEY='cf_gs_cache_v5';
+const LS_KEY='cf_gs_cache_v6';
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
@@ -450,7 +450,9 @@ async function loadFiles(){
     let pageToken=null,page=0;
     do{
       const result=await fetchFilesPage(pageToken);
-      allFiles.push(...result.files);
+      const existingIds=new Set(allFiles.map(f=>f.id));
+      const newFiles=result.files.filter(f=>!existingIds.has(f.id));
+      allFiles.push(...newFiles);
       pageToken=result.nextToken;
       page++;
       filterFiles();
@@ -475,7 +477,8 @@ async function fetchFilesPage(pageToken){
     +`&pageSize=1000`
     +`&orderBy=modifiedTime+desc`
     +`&includeItemsFromAllDrives=true`
-    +`&supportsAllDrives=true`;
+    +`&supportsAllDrives=true`
+    +`&corpora=allDrives`;
   if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
   const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
   if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
