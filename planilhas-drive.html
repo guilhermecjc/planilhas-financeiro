@@ -482,10 +482,10 @@ async function loadFiles(){
 // ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
 async function fetchFilesPage(pageToken){
   const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
+  // orderBy removido: com corpora=allDrives causa duplicatas entre páginas
   let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
     +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
     +`&pageSize=1000`
-    +`&orderBy=modifiedTime+desc`
     +`&includeItemsFromAllDrives=true`
     +`&supportsAllDrives=true`
     +`&corpora=allDrives`;
