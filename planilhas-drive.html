@@ -19,7 +19,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
 
-/* ── HEADER ── */
 header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;border-bottom:1px solid var(--b);box-shadow:var(--sh)}
 .logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--t);letter-spacing:-.2px}
 .logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#1a73e8,#1557b0);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -34,36 +33,33 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .blogout{display:none;background:none;border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
 .blogout:hover{border-color:var(--red);color:var(--red)}
 
-/* ── LOGIN ── */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:20px;background:linear-gradient(135deg,#e8f0fe 0%,#f1f3f4 100%)}
 .login-card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:44px 40px;width:100%;max-width:400px;text-align:center;box-shadow:var(--sh2);animation:cardIn .4s cubic-bezier(.16,1,.3,1) both}
 .lglyph{width:64px;height:64px;margin:0 auto 20px;background:linear-gradient(135deg,rgba(26,115,232,.12),rgba(21,87,176,.12));border:1px solid rgba(26,115,232,.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px}
 .login-card h1{font-size:22px;font-weight:700;color:var(--t);margin-bottom:7px}
 .login-card .lsub{font-size:13px;color:var(--m);line-height:1.5;margin-bottom:28px}
 .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--b2);border-radius:8px;padding:11px 20px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--t);cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
-.gbtn:hover{box-shadow:var(--sh2);border-color:var(--b2)}
+.gbtn:hover{box-shadow:var(--sh2)}
 .gbtn:active{transform:scale(.98)}
 .glogo{width:18px;height:18px;flex-shrink:0}
 .lnote{margin-top:14px;font-size:11px;color:var(--m)}
 
-/* ── APP ── */
 .app{display:none;height:calc(100vh - 56px)}
 .app.on{display:flex}
 
-/* ── LEFT PANEL ── */
 .lpanel{width:300px;flex-shrink:0;border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;background:#fff}
 .lpanel-head{padding:12px 10px 10px;border-bottom:1px solid var(--b);flex-shrink:0}
 
-/* Sync bar */
-.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px}
+.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px;flex-wrap:wrap}
 .sync-ico{font-size:12px;flex-shrink:0}
-.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .sync-btn{background:none;border:none;cursor:pointer;color:var(--a);font-size:13px;line-height:1;padding:2px 4px;border-radius:4px;transition:all .15s;flex-shrink:0}
 .sync-btn:hover{background:rgba(26,115,232,.1)}
-.sync-btn.spin{animation:rot .7s linear infinite}
-.sync-prog{height:2px;background:rgba(26,115,232,.15);border-radius:2px;margin-top:4px;overflow:hidden;display:none}
+.sync-btn.spin svg{animation:rot .7s linear infinite}
+.sync-prog{height:2px;background:rgba(26,115,232,.12);border-radius:2px;margin-top:5px;width:100%;overflow:hidden;display:none}
 .sync-prog.show{display:block}
 .sync-prog-fill{height:100%;background:var(--a);border-radius:2px;transition:width .3s ease}
+.sync-prog-fill.indeterminate{width:40%!important;animation:indeterminate 1.4s ease-in-out infinite}
 
 .panel-label{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .sinput-wrap{position:relative;margin-bottom:7px}
@@ -73,14 +69,14 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .sinput::placeholder{color:var(--m)}
 .sort-row{display:flex;gap:6px}
 .sselect{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--t);font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;padding:6px 8px;border-radius:7px;outline:none;cursor:pointer}
+.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
+.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
 
 .fcount{font-size:10px;color:var(--m);padding:6px 10px 0;font-family:'JetBrains Mono',monospace}
 .fcount strong{color:var(--a)}
-
 .flist{flex:1;overflow-y:auto;padding:3px 4px}
 .flist::-webkit-scrollbar{width:4px}
 .flist::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
-
 .fitem{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background .1s;border:1px solid transparent;margin-bottom:1px}
 .fitem:hover{background:var(--bg)}
 .fitem.active{background:#e8f0fe;border-color:rgba(26,115,232,.2)}
@@ -91,30 +87,21 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .fmeta{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .1s;font-size:11px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
-
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
 
-/* Global search button */
-.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
-.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
-
-/* ── RIGHT PANEL ── */
 .rpanel{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .rpanel::-webkit-scrollbar{width:6px}
 .rpanel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
-
 .dempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--m);padding:40px}
 .dempty-ico{font-size:44px;opacity:.4}
 .dempty-title{font-size:15px;font-weight:700;color:var(--m2)}
 .dempty-sub{font-size:12px;color:var(--m);text-align:center;line-height:1.5;max-width:260px}
-
 .dloading{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px}
 .dspinner{width:32px;height:32px;border:2px solid var(--b);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .dloading-txt{font-size:13px;font-weight:500;color:var(--m)}
 
-/* ── DETAIL HEADER ── */
 .dhead{padding:12px 16px 10px;border-bottom:1px solid var(--b);flex-shrink:0;position:sticky;top:0;background:#fff;z-index:20;box-shadow:var(--sh)}
 .dhead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
 .dtitle-wrap{flex:1;min-width:0}
@@ -124,7 +111,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .btn-open{display:flex;align-items:center;gap:6px;background:var(--a);color:#fff;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:7px 13px;border:none;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .btn-open:hover{background:var(--a2)}
 
-/* ── TABS ── */
 .tabs-row{display:flex;gap:3px;margin-bottom:9px;flex-wrap:wrap}
 .tab{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;transition:all .12s;white-space:nowrap}
 .tab:hover{background:#fff;color:var(--t)}
@@ -132,7 +118,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .tab-ico{width:13px;height:13px;background:rgba(15,123,77,.15);border-radius:3px;display:flex;align-items:center;justify-content:center}
 .tab-ico svg{width:8px;height:8px}
 
-/* ── FILTERS ── */
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
 .fg{display:flex;flex-direction:column;gap:3px;flex:1;min-width:130px}
 .flabel{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.7px}
@@ -142,10 +127,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .clearbtn{background:var(--bg);border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:6px 11px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .clearbtn:hover{border-color:var(--red);color:var(--red)}
 
-/* ── CONTENT ── */
 .dcontent{padding:12px 16px;flex:1}
-
-/* ── METRIC CARDS ── */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .mc{background:#fff;border:1px solid var(--b);border-radius:8px;padding:10px 13px;position:relative;overflow:hidden;box-shadow:var(--sh)}
 .mc-line{position:absolute;left:0;top:20%;bottom:20%;width:2px;border-radius:0 2px 2px 0}
@@ -160,32 +142,24 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .mc:nth-child(3) .mc-val{color:var(--gold);font-size:12px;padding-top:3px}
 .mc:nth-child(4) .mc-val{color:#9c27b0;font-size:13px;padding-top:2px}
 
-/* ── TABLE ── */
 .twrap{background:#fff;border:1px solid var(--b);border-radius:8px;overflow:hidden;box-shadow:var(--sh);margin-bottom:4px}
 .tscroll{overflow-x:auto}
 .tscroll::-webkit-scrollbar{height:4px}
 .tscroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
 .ttable{width:100%;border-collapse:collapse;min-width:500px;font-size:12px}
-
-/* Sheets-style header */
 .ttable thead tr{background:var(--bg2);border-bottom:1px solid var(--b)}
 .ttable thead th{padding:7px 10px;font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-right:1px solid var(--b);user-select:none}
 .ttable thead th:last-child{border-right:none}
 .ttable thead th.th-rota{text-align:center;width:52px}
-
-/* Sheets-style rows */
-.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s;cursor:default}
+.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s}
 .ttable tbody tr:last-child{border-bottom:none}
 .ttable tbody tr:hover{background:#f8f9fa}
 .ttable tbody tr:nth-child(even){background:#fafafa}
 .ttable tbody tr:nth-child(even):hover{background:#f1f3f4}
-.ttable tbody tr.selected{background:#e8f0fe!important}
 .ttable tbody tr.gs-hl{background:#e6f4ea!important;border-left:3px solid var(--a3)}
 .ttable tbody td{padding:6px 10px;color:var(--t);border-right:1px solid rgba(0,0,0,.06);vertical-align:middle;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ttable tbody td:last-child{border-right:none}
 .ttable tbody td.td-rota{text-align:center;padding:5px 6px;width:52px}
-
-/* Cell types */
 .c-prop{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--a);font-weight:600}
 .c-date{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--m)}
 .c-text{color:var(--t);font-size:12px}
@@ -193,23 +167,17 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .c-eng{color:var(--gold);font-size:11.5px;font-weight:600}
 .c-addr{color:var(--m);font-size:11px}
 .c-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m)}
-
-/* Rota button — compact */
 .btn-rota{display:inline-flex;align-items:center;justify-content:center;gap:3px;background:rgba(24,128,56,.08);border:1px solid rgba(24,128,56,.25);color:var(--a3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
-.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4);box-shadow:0 1px 4px rgba(24,128,56,.15)}
+.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4)}
 .btn-rota.no-addr{opacity:.35;cursor:not-allowed}
-.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25);box-shadow:none}
-
-/* Footer total row */
+.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25)}
 .ttable tfoot tr{background:var(--bg2);border-top:1px solid var(--b)}
 .ttable tfoot td{padding:6px 10px;font-weight:700;font-size:11px;color:var(--m2)}
 .total-val{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800}
-
 .norows{text-align:center;padding:48px;color:var(--m)}
 .norows-ico{font-size:32px;margin-bottom:8px;opacity:.5}
 .norows-txt{font-size:13px;font-weight:500;color:var(--m2)}
 
-/* ── PAGER ── */
 .pager{display:flex;justify-content:center;align-items:center;gap:4px;padding:12px 16px 24px}
 .pg{background:#fff;border:1px solid var(--b);color:var(--m);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .12s}
 .pg:hover{border-color:var(--a);color:var(--a)}
@@ -217,7 +185,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .pg:disabled{opacity:.25;cursor:not-allowed}
 .pg.dots{border:none;background:none;color:var(--m);cursor:default}
 
-/* ══ GLOBAL SEARCH MODAL ══ */
 .gs-overlay{position:fixed;inset:0;background:rgba(32,33,36,.45);backdrop-filter:blur(4px);z-index:900;display:none;align-items:flex-start;justify-content:center;padding-top:70px}
 .gs-overlay.open{display:flex;animation:fadeIn .12s ease}
 .gs-modal{background:#fff;border:1px solid var(--b);border-radius:12px;width:100%;max-width:500px;box-shadow:0 20px 48px rgba(32,33,36,.22);overflow:hidden;animation:slideDown .18s cubic-bezier(.16,1,.3,1)}
@@ -262,6 +229,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes indeterminate{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
 
 @media(max-width:768px){
   .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
@@ -306,9 +274,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
   <div class="lpanel">
     <div class="lpanel-head">
       <div class="panel-label">Planilhas</div>
-
-      <!-- Sync bar -->
-      <div class="sync-bar" id="sync-bar">
+      <div class="sync-bar">
         <span class="sync-ico">🔄</span>
         <span class="sync-txt" id="sync-txt">Aguardando...</span>
         <button class="sync-btn" id="sync-btn" onclick="reload()" title="Sincronizar agora">
@@ -316,7 +282,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
         </button>
         <div class="sync-prog" id="sync-prog"><div class="sync-prog-fill" id="sync-prog-fill" style="width:0%"></div></div>
       </div>
-
       <div class="sinput-wrap">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="sinput" id="fq" type="text" placeholder="Buscar planilha..." oninput="filterFiles()"/>
@@ -336,7 +301,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
     </div>
     <div class="fcount" id="fcount"></div>
     <div class="flist">
-      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
+      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt" id="floading-txt">Carregando...</div></div>
       <div id="fitems"></div>
     </div>
   </div>
@@ -378,7 +343,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
           <button class="clearbtn" onclick="clearFilters()">✕ Limpar</button>
         </div>
       </div>
-
       <div class="dcontent">
         <div class="metrics">
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="m-total">—</div></div>
@@ -401,7 +365,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
   </div>
 </div>
 
-<!-- GLOBAL SEARCH -->
 <div class="gs-overlay" id="gs-overlay" onclick="gsOverlayClick(event)">
   <div class="gs-modal">
     <div class="gs-bar">
@@ -452,10 +415,9 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 
 <script>
 const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleusercontent.com';
-const FOLDER_ID='1xgSiwX9tT7Cg8pZJkqAr2_3e-gH7Jcau';
 const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 const PARALLEL=10;
-const LS_KEY='cf_gs_cache_v3';
+const LS_KEY='cf_gs_cache_v4';
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
@@ -512,30 +474,36 @@ function showApp(){
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
-// ── FILES — busca recursiva por todas as páginas e subpastas ──────
+// ── FILES — todo o Meu Drive, todas as páginas ──────────
 async function loadFiles(){
-  setSyncState('loading',0,'Buscando planilhas...');
-  $('floading').style.display='flex';$('fitems').innerHTML='';
+  allFiles=[];
+  setSyncState('loading',null,'Conectando ao Drive...');
+  $('floading').style.display='flex';
+  $('floading-txt').textContent='Buscando planilhas...';
+  $('fitems').innerHTML='';
 
   try{
-    const files=[];
-    // Collect all folder IDs to search (root + subfolders)
-    const folderIds=await getAllSubfolders(FOLDER_ID);
-    const totalFolders=folderIds.length;
-    let foldersDone=0;
+    let pageToken=null;
+    let page=0;
 
-    for(const folderId of folderIds){
-      const folderFiles=await getAllFilesInFolder(folderId);
-      files.push(...folderFiles);
-      foldersDone++;
-      const pct=Math.round((foldersDone/totalFolders)*100);
-      setSyncState('loading',pct,`${files.length} planilhas encontradas...`);
-      filterFiles(); // update list in real time
-    }
+    do{
+      // Fetch one page
+      const result=await fetchFilesPage(pageToken);
+      allFiles.push(...result.files);
+      pageToken=result.nextToken;
+      page++;
 
-    allFiles=files;
+      // Update UI in real time
+      filterFiles();
+      setSyncState('loading',null,`${allFiles.length} planilhas encontradas...`);
+      $('floading-txt').textContent=`${allFiles.length} planilhas encontradas...`;
+
+    }while(pageToken); // keep going until API returns no more pages
+
     filterFiles();
-    setSyncState('done',100,`${allFiles.length} planilhas · atualizado agora`);
+    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
+
   }catch(e){
     $('fitems').innerHTML=`<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
     setSyncState('error',0,'Erro ao carregar');
@@ -543,41 +511,15 @@ async function loadFiles(){
   $('floading').style.display='none';
 }
 
-// Get all subfolder IDs recursively
-async function getAllSubfolders(rootId){
-  const all=[rootId];
-  const queue=[rootId];
-  while(queue.length>0){
-    const parentId=queue.shift();
-    const q=encodeURIComponent(`'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-    const url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1000`;
-    try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)continue;
-      const d=await r.json();
-      for(const f of(d.files||[])){all.push(f.id);queue.push(f.id);}
-    }catch(e){}
-  }
-  return all;
-}
-
-// Get ALL spreadsheet files in a folder, handling pagination properly
-async function getAllFilesInFolder(folderId){
-  const files=[];
-  let pageToken=null;
-  do{
-    const q=encodeURIComponent(`'${folderId}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
-    let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
-    if(pageToken)url+=`&pageToken=${pageToken}`;
-    try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)break;
-      const d=await r.json();
-      files.push(...(d.files||[]));
-      pageToken=d.nextPageToken||null;
-    }catch(e){break;}
-  }while(pageToken); // keep going until NO more pages
-  return files;
+// Fetch one page — searches ALL of My Drive, no folder filter
+async function fetchFilesPage(pageToken){
+  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
+  let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc&corpora=user`;
+  if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+  const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok)throw new Error(`Erro na API do Drive (${r.status})`);
+  const d=await r.json();
+  return{files:d.files||[],nextToken:d.nextPageToken||null};
 }
 
 function setSyncState(state,pct,txt){
@@ -587,11 +529,18 @@ function setSyncState(state,pct,txt){
   const btn=$('sync-btn');
   if(state==='loading'){
     prog.classList.add('show');
-    fill.style.width=pct+'%';
-    btn.classList.add('spin');
+    btn.querySelector('svg').style.animation='rot .7s linear infinite';
+    if(pct===null){
+      fill.classList.add('indeterminate');
+      fill.style.width='';
+    }else{
+      fill.classList.remove('indeterminate');
+      fill.style.width=pct+'%';
+    }
   }else{
     prog.classList.remove('show');
-    btn.classList.remove('spin');
+    fill.classList.remove('indeterminate');
+    btn.querySelector('svg').style.animation='';
   }
 }
 
@@ -612,7 +561,7 @@ function filterFiles(){
   });
   $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> de ${allFiles.length} planilhas`;
   $('fitems').innerHTML=filtFiles.map((f,i)=>`
-    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .15s ease ${Math.min(i*.01,.3)}s both">
+    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .12s ease ${Math.min(i*.008,.25)}s both">
       <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
       <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
       <div class="farrow">›</div>
@@ -796,7 +745,7 @@ function renderTable(){
         ?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`
         :`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`
       :'';
-    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .12s ease ${Math.min(i*.008,.3)}s both">
+    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .1s ease ${Math.min(i*.006,.25)}s both">
       ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}
       ${rota}
     </tr>`;
