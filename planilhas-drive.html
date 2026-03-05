@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Financeira</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="https://accounts.google.com/gsi/client" onload="initGoogle()"></script>
 <style>
 :root{
   --bg:#f1f3f4;--bg2:#e8eaed;--bg3:#fff;
@@ -18,6 +18,8 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
 header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;border-bottom:1px solid var(--b);box-shadow:var(--sh)}
 .logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--t);letter-spacing:-.2px}
 .logo-mark{width:28px;height:28px;background:linear-gradient(135deg,#1a73e8,#1557b0);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px}
@@ -31,29 +33,38 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .uname{font-size:12px;font-weight:600;color:var(--t);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .blogout{display:none;background:none;border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:4px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
 .blogout:hover{border-color:var(--red);color:var(--red)}
+
+/* ── LOGIN ── */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 56px);padding:20px;background:linear-gradient(135deg,#e8f0fe 0%,#f1f3f4 100%)}
 .login-card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:44px 40px;width:100%;max-width:400px;text-align:center;box-shadow:var(--sh2);animation:cardIn .4s cubic-bezier(.16,1,.3,1) both}
 .lglyph{width:64px;height:64px;margin:0 auto 20px;background:linear-gradient(135deg,rgba(26,115,232,.12),rgba(21,87,176,.12));border:1px solid rgba(26,115,232,.2);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px}
 .login-card h1{font-size:22px;font-weight:700;color:var(--t);margin-bottom:7px}
 .login-card .lsub{font-size:13px;color:var(--m);line-height:1.5;margin-bottom:28px}
 .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--b2);border-radius:8px;padding:11px 20px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--t);cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
-.gbtn:hover{box-shadow:var(--sh2)}
+.gbtn:hover{box-shadow:var(--sh2);border-color:var(--b2)}
 .gbtn:active{transform:scale(.98)}
 .glogo{width:18px;height:18px;flex-shrink:0}
 .lnote{margin-top:14px;font-size:11px;color:var(--m)}
+
+/* ── APP ── */
 .app{display:none;height:calc(100vh - 56px)}
 .app.on{display:flex}
+
+/* ── LEFT PANEL ── */
 .lpanel{width:300px;flex-shrink:0;border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;background:#fff}
 .lpanel-head{padding:12px 10px 10px;border-bottom:1px solid var(--b);flex-shrink:0}
-.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px;flex-wrap:wrap}
+
+/* Sync bar */
+.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px}
 .sync-ico{font-size:12px;flex-shrink:0}
-.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sync-btn{background:none;border:none;cursor:pointer;color:var(--a);font-size:13px;line-height:1;padding:2px 4px;border-radius:4px;transition:all .15s;flex-shrink:0}
 .sync-btn:hover{background:rgba(26,115,232,.1)}
-.sync-prog{height:2px;background:rgba(26,115,232,.12);border-radius:2px;margin-top:5px;width:100%;overflow:hidden;display:none}
+.sync-btn.spin{animation:rot .7s linear infinite}
+.sync-prog{height:2px;background:rgba(26,115,232,.15);border-radius:2px;margin-top:4px;overflow:hidden;display:none}
 .sync-prog.show{display:block}
 .sync-prog-fill{height:100%;background:var(--a);border-radius:2px;transition:width .3s ease}
-.sync-prog-fill.indeterminate{width:40%!important;animation:indeterminate 1.4s ease-in-out infinite}
+
 .panel-label{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .sinput-wrap{position:relative;margin-bottom:7px}
 .sinput-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--m);pointer-events:none;width:13px;height:13px}
@@ -62,13 +73,14 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .sinput::placeholder{color:var(--m)}
 .sort-row{display:flex;gap:6px}
 .sselect{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--t);font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;padding:6px 8px;border-radius:7px;outline:none;cursor:pointer}
-.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
-.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
+
 .fcount{font-size:10px;color:var(--m);padding:6px 10px 0;font-family:'JetBrains Mono',monospace}
 .fcount strong{color:var(--a)}
+
 .flist{flex:1;overflow-y:auto;padding:3px 4px}
 .flist::-webkit-scrollbar{width:4px}
 .flist::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+
 .fitem{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:6px;cursor:pointer;transition:background .1s;border:1px solid transparent;margin-bottom:1px}
 .fitem:hover{background:var(--bg)}
 .fitem.active{background:#e8f0fe;border-color:rgba(26,115,232,.2)}
@@ -79,19 +91,30 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .fmeta{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .1s;font-size:11px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
+
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
+
+/* Global search button */
+.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
+.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
+
+/* ── RIGHT PANEL ── */
 .rpanel{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .rpanel::-webkit-scrollbar{width:6px}
 .rpanel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
+
 .dempty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--m);padding:40px}
 .dempty-ico{font-size:44px;opacity:.4}
 .dempty-title{font-size:15px;font-weight:700;color:var(--m2)}
 .dempty-sub{font-size:12px;color:var(--m);text-align:center;line-height:1.5;max-width:260px}
+
 .dloading{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:12px}
 .dspinner{width:32px;height:32px;border:2px solid var(--b);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .dloading-txt{font-size:13px;font-weight:500;color:var(--m)}
+
+/* ── DETAIL HEADER ── */
 .dhead{padding:12px 16px 10px;border-bottom:1px solid var(--b);flex-shrink:0;position:sticky;top:0;background:#fff;z-index:20;box-shadow:var(--sh)}
 .dhead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
 .dtitle-wrap{flex:1;min-width:0}
@@ -100,12 +123,16 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .engineer-badge{display:inline-flex;align-items:center;gap:5px;background:#e8f0fe;border:1px solid rgba(26,115,232,.2);border-radius:12px;padding:3px 9px;font-size:11px;font-weight:600;color:var(--a);margin-top:5px}
 .btn-open{display:flex;align-items:center;gap:6px;background:var(--a);color:#fff;font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:7px 13px;border:none;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
 .btn-open:hover{background:var(--a2)}
+
+/* ── TABS ── */
 .tabs-row{display:flex;gap:3px;margin-bottom:9px;flex-wrap:wrap}
 .tab{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--b);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--m);cursor:pointer;transition:all .12s;white-space:nowrap}
 .tab:hover{background:#fff;color:var(--t)}
 .tab.active{background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)}
 .tab-ico{width:13px;height:13px;background:rgba(15,123,77,.15);border-radius:3px;display:flex;align-items:center;justify-content:center}
 .tab-ico svg{width:8px;height:8px}
+
+/* ── FILTERS ── */
 .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end}
 .fg{display:flex;flex-direction:column;gap:3px;flex:1;min-width:130px}
 .flabel{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.7px}
@@ -114,7 +141,11 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .finput::placeholder{color:var(--m)}
 .clearbtn{background:var(--bg);border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:6px 11px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
 .clearbtn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── CONTENT ── */
 .dcontent{padding:12px 16px;flex:1}
+
+/* ── METRIC CARDS ── */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
 .mc{background:#fff;border:1px solid var(--b);border-radius:8px;padding:10px 13px;position:relative;overflow:hidden;box-shadow:var(--sh)}
 .mc-line{position:absolute;left:0;top:20%;bottom:20%;width:2px;border-radius:0 2px 2px 0}
@@ -128,24 +159,33 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .mc:nth-child(2) .mc-val{color:var(--a3)}
 .mc:nth-child(3) .mc-val{color:var(--gold);font-size:12px;padding-top:3px}
 .mc:nth-child(4) .mc-val{color:#9c27b0;font-size:13px;padding-top:2px}
+
+/* ── TABLE ── */
 .twrap{background:#fff;border:1px solid var(--b);border-radius:8px;overflow:hidden;box-shadow:var(--sh);margin-bottom:4px}
 .tscroll{overflow-x:auto}
 .tscroll::-webkit-scrollbar{height:4px}
 .tscroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
 .ttable{width:100%;border-collapse:collapse;min-width:500px;font-size:12px}
+
+/* Sheets-style header */
 .ttable thead tr{background:var(--bg2);border-bottom:1px solid var(--b)}
 .ttable thead th{padding:7px 10px;font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-right:1px solid var(--b);user-select:none}
 .ttable thead th:last-child{border-right:none}
 .ttable thead th.th-rota{text-align:center;width:52px}
-.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s}
+
+/* Sheets-style rows */
+.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s;cursor:default}
 .ttable tbody tr:last-child{border-bottom:none}
 .ttable tbody tr:hover{background:#f8f9fa}
 .ttable tbody tr:nth-child(even){background:#fafafa}
 .ttable tbody tr:nth-child(even):hover{background:#f1f3f4}
+.ttable tbody tr.selected{background:#e8f0fe!important}
 .ttable tbody tr.gs-hl{background:#e6f4ea!important;border-left:3px solid var(--a3)}
 .ttable tbody td{padding:6px 10px;color:var(--t);border-right:1px solid rgba(0,0,0,.06);vertical-align:middle;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ttable tbody td:last-child{border-right:none}
 .ttable tbody td.td-rota{text-align:center;padding:5px 6px;width:52px}
+
+/* Cell types */
 .c-prop{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--a);font-weight:600}
 .c-date{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--m)}
 .c-text{color:var(--t);font-size:12px}
@@ -153,22 +193,31 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .c-eng{color:var(--gold);font-size:11.5px;font-weight:600}
 .c-addr{color:var(--m);font-size:11px}
 .c-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m)}
+
+/* Rota button — compact */
 .btn-rota{display:inline-flex;align-items:center;justify-content:center;gap:3px;background:rgba(24,128,56,.08);border:1px solid rgba(24,128,56,.25);color:var(--a3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
-.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4)}
+.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4);box-shadow:0 1px 4px rgba(24,128,56,.15)}
 .btn-rota.no-addr{opacity:.35;cursor:not-allowed}
-.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25)}
+.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25);box-shadow:none}
+
+/* Footer total row */
 .ttable tfoot tr{background:var(--bg2);border-top:1px solid var(--b)}
 .ttable tfoot td{padding:6px 10px;font-weight:700;font-size:11px;color:var(--m2)}
 .total-val{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800}
+
 .norows{text-align:center;padding:48px;color:var(--m)}
 .norows-ico{font-size:32px;margin-bottom:8px;opacity:.5}
 .norows-txt{font-size:13px;font-weight:500;color:var(--m2)}
+
+/* ── PAGER ── */
 .pager{display:flex;justify-content:center;align-items:center;gap:4px;padding:12px 16px 24px}
 .pg{background:#fff;border:1px solid var(--b);color:var(--m);font-family:'JetBrains Mono',monospace;font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .12s}
 .pg:hover{border-color:var(--a);color:var(--a)}
 .pg.on{background:var(--a);color:#fff;border-color:var(--a)}
 .pg:disabled{opacity:.25;cursor:not-allowed}
 .pg.dots{border:none;background:none;color:var(--m);cursor:default}
+
+/* ══ GLOBAL SEARCH MODAL ══ */
 .gs-overlay{position:fixed;inset:0;background:rgba(32,33,36,.45);backdrop-filter:blur(4px);z-index:900;display:none;align-items:flex-start;justify-content:center;padding-top:70px}
 .gs-overlay.open{display:flex;animation:fadeIn .12s ease}
 .gs-modal{background:#fff;border:1px solid var(--b);border-radius:12px;width:100%;max-width:500px;box-shadow:0 20px 48px rgba(32,33,36,.22);overflow:hidden;animation:slideDown .18s cubic-bezier(.16,1,.3,1)}
@@ -206,13 +255,14 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .gs-footer{padding:8px 16px 12px;font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace;border-top:1px solid var(--b);display:flex;justify-content:space-between;align-items:center}
 .gs-clear-cache{background:none;border:none;font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace;cursor:pointer;text-decoration:underline;padding:0}
 .gs-clear-cache:hover{color:var(--red)}
+
 @keyframes cardIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 @keyframes rot{to{transform:rotate(360deg)}}
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes indeterminate{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+
 @media(max-width:768px){
   .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
   .app{flex-direction:column}
@@ -224,6 +274,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 </style>
 </head>
 <body>
+
 <header>
   <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
   <div class="hright">
@@ -255,7 +306,9 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
   <div class="lpanel">
     <div class="lpanel-head">
       <div class="panel-label">Planilhas</div>
-      <div class="sync-bar">
+
+      <!-- Sync bar -->
+      <div class="sync-bar" id="sync-bar">
         <span class="sync-ico">🔄</span>
         <span class="sync-txt" id="sync-txt">Aguardando...</span>
         <button class="sync-btn" id="sync-btn" onclick="reload()" title="Sincronizar agora">
@@ -263,6 +316,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
         </button>
         <div class="sync-prog" id="sync-prog"><div class="sync-prog-fill" id="sync-prog-fill" style="width:0%"></div></div>
       </div>
+
       <div class="sinput-wrap">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
         <input class="sinput" id="fq" type="text" placeholder="Buscar planilha..." oninput="filterFiles()"/>
@@ -282,7 +336,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
     </div>
     <div class="fcount" id="fcount"></div>
     <div class="flist">
-      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt" id="floading-txt">Carregando...</div></div>
+      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
       <div id="fitems"></div>
     </div>
   </div>
@@ -294,6 +348,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
       <div class="dempty-sub">Clique em qualquer planilha para visualizar as vistorias com filtros avançados.</div>
     </div>
     <div class="dloading" id="dloading"><div class="dspinner"></div><div class="dloading-txt" id="dloading-txt">Lendo planilha...</div></div>
+
     <div id="dcontent" style="display:none;flex:1;flex-direction:column">
       <div class="dhead">
         <div class="dhead-top">
@@ -312,11 +367,18 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
         </div>
         <div class="tabs-row" id="tabs-row"></div>
         <div class="filters">
-          <div class="fg"><div class="flabel">Nº Proposta</div><input class="finput" id="f-prop" type="text" placeholder="Ex: 20241016-0440" oninput="filterRows()"/></div>
-          <div class="fg"><div class="flabel">Mês / Ano</div><select class="finput" id="f-mes" onchange="filterRows()"><option value="">Todos os meses</option></select></div>
+          <div class="fg">
+            <div class="flabel">Nº Proposta</div>
+            <input class="finput" id="f-prop" type="text" placeholder="Ex: 20241016-0440" oninput="filterRows()"/>
+          </div>
+          <div class="fg">
+            <div class="flabel">Mês / Ano</div>
+            <select class="finput" id="f-mes" onchange="filterRows()"><option value="">Todos os meses</option></select>
+          </div>
           <button class="clearbtn" onclick="clearFilters()">✕ Limpar</button>
         </div>
       </div>
+
       <div class="dcontent">
         <div class="metrics">
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="m-total">—</div></div>
@@ -324,13 +386,22 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Valor Total</div><div class="mc-val" id="m-valor">—</div></div>
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Período</div><div class="mc-val" id="m-period">—</div></div>
         </div>
-        <div class="twrap"><div class="tscroll"><table class="ttable"><thead id="thead"><tr></tr></thead><tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table></div></div>
+        <div class="twrap">
+          <div class="tscroll">
+            <table class="ttable">
+              <thead id="thead"><tr></tr></thead>
+              <tbody id="tbody"></tbody>
+              <tfoot id="tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
         <div class="pager" id="dpager"></div>
       </div>
     </div>
   </div>
 </div>
 
+<!-- GLOBAL SEARCH -->
 <div class="gs-overlay" id="gs-overlay" onclick="gsOverlayClick(event)">
   <div class="gs-modal">
     <div class="gs-bar">
@@ -353,7 +424,10 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
     <div class="gs-cache-info" id="gs-cache-info"></div>
     <div class="gs-found" id="gs-found">
       <div class="gs-found-ico">✅</div>
-      <div class="gs-found-body"><div class="gs-found-title" id="gs-found-title">—</div><div class="gs-found-sub" id="gs-found-sub">—</div></div>
+      <div class="gs-found-body">
+        <div class="gs-found-title" id="gs-found-title">—</div>
+        <div class="gs-found-sub" id="gs-found-sub">—</div>
+      </div>
       <button class="gs-found-btn" onclick="gsOpenFound()">Abrir →</button>
     </div>
     <div class="gs-notfound" id="gs-notfound">
@@ -378,12 +452,10 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 
 <script>
 const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleusercontent.com';
-
-// ✅ CORREÇÃO 1: escopo drive completo para acessar todos os drives compartilhados
-const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets.readonly';
-
+const FOLDER_ID='1xgSiwX9tT7Cg8pZJkqAr2_3e-gH7Jcau';
+const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 const PARALLEL=10;
-const LS_KEY='cf_gs_cache_v6';
+const LS_KEY='cf_gs_cache_v3';
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
@@ -397,7 +469,7 @@ const RPP=50;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-window.addEventListener('load', ()=>{ if(typeof google!=='undefined') initGoogle(); else document.querySelector('script[src*=accounts\.google]').addEventListener('load',initGoogle); });
+// ── AUTH ────────────────────────────────────────────────
 function initGoogle(){
   tokenClient=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID,scope:SCOPES,
@@ -440,77 +512,91 @@ function showApp(){
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
-// ── FILES — varre TODO o Drive, todas as páginas ─────────
-let _loadId=0; // cancela cargas concorrentes
-
+// ── FILES — busca recursiva por todas as páginas e subpastas ──────
 async function loadFiles(){
-  const myId=++_loadId; // id desta execução
-  allFiles=[];
-  filtFiles=[];
-  setSyncState('loading',null,'Conectando ao Drive...');
-  $('floading').style.display='flex';
-  $('floading-txt').textContent='Buscando planilhas...';
-  $('fitems').innerHTML='';
+  setSyncState('loading',0,'Buscando planilhas...');
+  $('floading').style.display='flex';$('fitems').innerHTML='';
+
   try{
-    const seen=new Map(); // id → arquivo, garante unicidade global
-    let pageToken=null,page=0;
-    do{
-      if(_loadId!==myId)return; // outra carga iniciou, abandona esta
-      const result=await fetchFilesPage(pageToken);
-      if(_loadId!==myId)return;
-      for(const f of result.files){
-        if(!seen.has(f.id))seen.set(f.id,f);
-      }
-      allFiles=[...seen.values()];
-      pageToken=result.nextToken;
-      page++;
-      filterFiles();
-      setSyncState('loading',null,`${allFiles.length} planilhas · pág. ${page}...`);
-      $('floading-txt').textContent=`${allFiles.length} planilhas encontradas...`;
-    }while(pageToken);
-    if(_loadId!==myId)return;
+    const files=[];
+    // Collect all folder IDs to search (root + subfolders)
+    const folderIds=await getAllSubfolders(FOLDER_ID);
+    const totalFolders=folderIds.length;
+    let foldersDone=0;
+
+    for(const folderId of folderIds){
+      const folderFiles=await getAllFilesInFolder(folderId);
+      files.push(...folderFiles);
+      foldersDone++;
+      const pct=Math.round((foldersDone/totalFolders)*100);
+      setSyncState('loading',pct,`${files.length} planilhas encontradas...`);
+      filterFiles(); // update list in real time
+    }
+
+    allFiles=files;
     filterFiles();
-    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
+    setSyncState('done',100,`${allFiles.length} planilhas · atualizado agora`);
   }catch(e){
-    if(_loadId!==myId)return;
     $('fitems').innerHTML=`<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
     setSyncState('error',0,'Erro ao carregar');
   }
-  if(_loadId===myId)$('floading').style.display='none';
+  $('floading').style.display='none';
 }
 
-// ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
-async function fetchFilesPage(pageToken){
-  // sharedWithMe como filtro de query — único jeito confiável sem duplicatas
-  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`);
-  let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
-    +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
-    +`&pageSize=1000`
-    +`&orderBy=modifiedTime+desc`;
-  if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
-  const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
-  const d=await r.json();
-  return{files:d.files||[],nextToken:d.nextPageToken||null};
+// Get all subfolder IDs recursively
+async function getAllSubfolders(rootId){
+  const all=[rootId];
+  const queue=[rootId];
+  while(queue.length>0){
+    const parentId=queue.shift();
+    const q=encodeURIComponent(`'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+    const url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1000`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)continue;
+      const d=await r.json();
+      for(const f of(d.files||[])){all.push(f.id);queue.push(f.id);}
+    }catch(e){}
+  }
+  return all;
+}
+
+// Get ALL spreadsheet files in a folder, handling pagination properly
+async function getAllFilesInFolder(folderId){
+  const files=[];
+  let pageToken=null;
+  do{
+    const q=encodeURIComponent(`'${folderId}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
+    let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
+    if(pageToken)url+=`&pageToken=${pageToken}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken); // keep going until NO more pages
+  return files;
 }
 
 function setSyncState(state,pct,txt){
   $('sync-txt').textContent=txt;
-  const prog=$('sync-prog'),fill=$('sync-prog-fill'),svg=$('sync-btn').querySelector('svg');
+  const prog=$('sync-prog');
+  const fill=$('sync-prog-fill');
+  const btn=$('sync-btn');
   if(state==='loading'){
     prog.classList.add('show');
-    if(svg)svg.style.animation='rot .7s linear infinite';
-    if(pct===null){fill.classList.add('indeterminate');fill.style.width='';}
-    else{fill.classList.remove('indeterminate');fill.style.width=pct+'%';}
+    fill.style.width=pct+'%';
+    btn.classList.add('spin');
   }else{
-    prog.classList.remove('show');fill.classList.remove('indeterminate');
-    if(svg)svg.style.animation='';
+    prog.classList.remove('show');
+    btn.classList.remove('spin');
   }
 }
+
 async function reload(){
   allFiles=[];filtFiles=[];
-  filterFiles(); // limpa lista imediatamente
   await loadFiles();
 }
 
@@ -526,16 +612,19 @@ function filterFiles(){
   });
   $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> de ${allFiles.length} planilhas`;
   $('fitems').innerHTML=filtFiles.map((f,i)=>`
-    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .12s ease ${Math.min(i*.008,.25)}s both">
+    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .15s ease ${Math.min(i*.01,.3)}s both">
       <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
       <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
       <div class="farrow">›</div>
     </div>`).join('');
 }
 
+// ── SELECT FILE ──────────────────────────────────────────
 async function selectFile(id,name,url){
   curFileId=id;curFileUrl=url;filterFiles();
-  $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
+  $('dempty').style.display='none';
+  $('dloading').style.display='flex';
+  $('dcontent').style.display='none';
   $('dloading-txt').textContent='Lendo estrutura...';
   try{
     const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
@@ -546,7 +635,8 @@ async function selectFile(id,name,url){
     $('dfilename').textContent=name;
     renderTabs();await loadTabData(id,curTab);
   }catch(e){
-    $('dloading').style.display='none';$('dempty').style.display='flex';
+    $('dloading').style.display='none';
+    $('dempty').style.display='flex';
     $('dempty').querySelector('.dempty-ico').textContent='⚠️';
     $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
     $('dempty').querySelector('.dempty-sub').textContent=e.message;
@@ -568,13 +658,16 @@ async function loadTabData(id,tab){
   try{
     const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(tab)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
     if(!r.ok)throw new Error('Erro ao ler aba');
-    processData((await r.json()).values||[]);
+    const d=await r.json();
+    processData(d.values||[]);
   }catch(e){
-    $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
+    $('dloading').style.display='none';
+    $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
     $('tbody').innerHTML=`<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
   }
 }
 
+// ── PROCESS DATA ─────────────────────────────────────────
 function processData(values){
   let engineer='';
   for(let i=0;i<Math.min(values.length,6);i++){
@@ -666,8 +759,10 @@ function filterRows(){
   renderTable();renderPager();
 }
 
+// ── ROTA ──────────────────────────────────────────────────
 function buildAddress(row){
-  const addr=String(row.endereco||'').trim(),city=String(row.cidade||'').trim();
+  const addr=String(row.endereco||'').trim();
+  const city=String(row.cidade||'').trim();
   if(!addr&&!city)return'';
   return[addr,city].filter(Boolean).join(', ');
 }
@@ -677,31 +772,47 @@ function openRota(idx){
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`,'_blank');
 }
 
+// ── RENDER TABLE ──────────────────────────────────────────
 function renderTable(){
   const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
   const hasAddr=gAddrIdx>=0||gCityIdx>=0;
-  $('thead').innerHTML='<tr>'+allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('')+(hasAddr?'<th class="th-rota">Rota</th>':'')+'</tr>';
+
+  $('thead').innerHTML='<tr>'+
+    allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('')+
+    (hasAddr?'<th class="th-rota">Rota</th>':'')+
+  '</tr>';
+
   if(slice.length===0){
     $('tbody').innerHTML=`<tr><td colspan="${allHeaders.length+(hasAddr?1:0)}" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>`;
     $('tfoot').innerHTML='';return;
   }
+
   const hl=gsLastFoundProp?gsLastFoundProp.toLowerCase():'';
   $('tbody').innerHTML=slice.map((r,i)=>{
     const isHL=hl&&String(r.proposta).toLowerCase()===hl;
     const dest=buildAddress(r);
-    const rota=hasAddr?(dest?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`:`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`):'';
-    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .1s ease ${Math.min(i*.006,.25)}s both">
-      ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}${rota}
+    const rota=hasAddr
+      ?dest
+        ?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`
+        :`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`
+      :'';
+    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .12s ease ${Math.min(i*.008,.3)}s both">
+      ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}
+      ${rota}
     </tr>`;
   }).join('');
+
   const vci=allHeaders.findIndex(h=>h.cls==='c-val');
   if(vci>=0){
     const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
-    $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
-      if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length} registros</td>`;
-      if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;
-      return'<td></td>';
-    }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
+    $('tfoot').innerHTML='<tr>'+
+      allHeaders.map((h,i)=>{
+        if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length} registros</td>`;
+        if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;
+        return'<td></td>';
+      }).join('')+
+      (hasAddr?'<td></td>':'')+
+    '</tr>';
   }else $('tfoot').innerHTML='';
 }
 function renderPager(){
@@ -718,7 +829,9 @@ function renderPager(){
 function goPage(p){dpage=p;renderTable();renderPager();$('rpanel').scrollTop=0;}
 function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=curFileUrl;a.target='_blank';a.click();}}
 
-// ══ GLOBAL SEARCH ══════════════════════════════════════
+// ══════════════════════════════════════════════════════
+//  GLOBAL SEARCH
+// ══════════════════════════════════════════════════════
 let gsDebounce=null,gsSearchId=0,gsFoundResult=null,gsPendingProp=null,gsLastFoundProp=null;
 const PROP_KW=['PROPOSTA','N°','NUMERO','NUM'];
 const HDR_KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO'];
@@ -775,6 +888,7 @@ async function runGlobalSearch(query,searchId){
   $('gs-found').classList.remove('show');
   $('gs-notfound').classList.remove('show');
   $('gs-cache-info').classList.remove('show');
+
   for(let i=0;i<files.length&&!found;i+=PARALLEL){
     if(gsSearchId!==searchId)return;
     const batch=files.slice(i,i+PARALLEL);
