@@ -8,32 +8,18 @@
 <script src="https://accounts.google.com/gsi/client" onload="initGoogle()"></script>
 <style>
 :root{
-  --bg:#f0f2f7;
-  --bg2:#e8eaf2;
-  --card:#ffffff;
-  --b:#e0e4ef;
-  --b2:#c8cedf;
-  --t:#1a1f36;
-  --m:#6b7494;
-  --m2:#3d4466;
-  --a:#3a6bff;
-  --a2:#6c2fe0;
-  --a3:#07b87a;
-  --gold:#d4960a;
-  --red:#e03055;
+  --bg:#f0f2f7;--bg2:#e8eaf2;
+  --b:#e0e4ef;--b2:#c8cedf;
+  --t:#1a1f36;--m:#6b7494;--m2:#3d4466;
+  --a:#3a6bff;--a2:#6c2fe0;--a3:#07b87a;
+  --gold:#d4960a;--red:#e03055;
   --shadow:0 2px 12px rgba(60,80,160,.09);
   --shadow-lg:0 8px 32px rgba(60,80,160,.13);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
 
-/* ─ HEADER ─ */
-header{
-  position:sticky;top:0;z-index:300;height:62px;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 28px;background:#fff;border-bottom:1px solid var(--b);
-  box-shadow:0 2px 8px rgba(60,80,160,.07);
-}
+header{position:sticky;top:0;z-index:300;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:#fff;border-bottom:1px solid var(--b);box-shadow:0 2px 8px rgba(60,80,160,.07)}
 .logo{display:flex;align-items:center;gap:11px;font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--t)}
 .logo-mark{width:32px;height:32px;background:linear-gradient(135deg,var(--a),var(--a2));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 4px 12px rgba(58,107,255,.3)}
 .hright{display:flex;align-items:center;gap:9px}
@@ -45,9 +31,8 @@ header{
 .uavatar{width:27px;height:27px;border-radius:50%;border:2px solid var(--a);object-fit:cover}
 .uname{font-size:12px;font-weight:600;color:var(--t);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .blogout{display:none;background:none;border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:5px 11px;border-radius:8px;cursor:pointer;transition:all .2s}
-.blogout:hover{border-color:var(--red);color:var(--red);background:rgba(224,48,85,.05)}
+.blogout:hover{border-color:var(--red);color:var(--red)}
 
-/* ─ LOGIN ─ */
 .login-wrap{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 62px);padding:24px;background:linear-gradient(135deg,#eef1ff 0%,#f5f7ff 100%)}
 .login-card{background:#fff;border:1px solid var(--b);border-radius:28px;padding:52px 44px;width:100%;max-width:420px;text-align:center;box-shadow:var(--shadow-lg);animation:cardIn .6s cubic-bezier(.16,1,.3,1) both}
 .lglyph{width:76px;height:76px;margin:0 auto 24px;background:linear-gradient(135deg,rgba(58,107,255,.12),rgba(108,47,224,.12));border:1px solid rgba(58,107,255,.25);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px}
@@ -59,11 +44,9 @@ header{
 .glogo{width:20px;height:20px;flex-shrink:0}
 .lnote{margin-top:18px;font-size:12px;color:var(--m);line-height:1.6}
 
-/* ─ APP ─ */
 .app{display:none;position:relative;z-index:1;height:calc(100vh - 62px)}
 .app.on{display:flex}
 
-/* ─ LEFT PANEL ─ */
 .lpanel{width:340px;flex-shrink:0;border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;background:#fff}
 .lpanel-head{padding:18px 14px 14px;border-bottom:1px solid var(--b);flex-shrink:0}
 .panel-label{font-size:11px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:1.1px;margin-bottom:13px}
@@ -75,8 +58,13 @@ header{
 .sort-row{display:flex;gap:8px}
 .sselect{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--t);font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:7px 11px;border-radius:10px;outline:none;cursor:pointer}
 .rbtn{background:var(--bg);border:1px solid var(--b);color:var(--m);border-radius:10px;padding:7px 9px;cursor:pointer;display:flex;align-items:center;transition:all .2s;flex-shrink:0}
-.rbtn:hover{border-color:var(--a3);color:var(--a3);background:rgba(7,184,122,.06)}
+.rbtn:hover{border-color:var(--a3);color:var(--a3)}
 .rbtn.spin svg{animation:rot .8s linear infinite}
+
+/* GLOBAL SEARCH BUTTON */
+.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,rgba(58,107,255,.08),rgba(108,47,224,.08));border:1px solid rgba(58,107,255,.22);color:var(--a);font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer;transition:all .2s;margin-top:10px}
+.gsearch-btn:hover{background:linear-gradient(135deg,rgba(58,107,255,.16),rgba(108,47,224,.16));border-color:rgba(58,107,255,.38);transform:translateY(-1px)}
+
 .fcount{font-size:11px;color:var(--m);padding:9px 14px 0;font-family:'JetBrains Mono',monospace}
 .fcount strong{color:var(--m2)}
 .flist{flex:1;overflow-y:auto;padding:6px 8px}
@@ -92,11 +80,10 @@ header{
 .fmeta{font-size:10.5px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .15s;font-size:13px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
-.fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;gap:10px;color:var(--m)}
+.fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;gap:10px}
 .fspinner{width:26px;height:26px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .75s linear infinite}
 .fstate-txt{font-size:13px;font-weight:500;color:var(--m2)}
 
-/* ─ RIGHT PANEL ─ */
 .rpanel{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .rpanel::-webkit-scrollbar{width:6px}
 .rpanel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
@@ -104,11 +91,10 @@ header{
 .dempty-ico{font-size:52px;opacity:.5}
 .dempty-title{font-size:17px;font-weight:700;color:var(--m2)}
 .dempty-sub{font-size:13px;color:var(--m);text-align:center;line-height:1.6;max-width:280px}
-.dloading{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;padding:80px;color:var(--m)}
+.dloading{display:none;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:14px;padding:80px}
 .dspinner{width:38px;height:38px;border:3px solid var(--b);border-top-color:var(--a);border-radius:50%;animation:rot .75s linear infinite}
 .dloading-txt{font-size:14px;font-weight:500;color:var(--m2)}
 
-/* ─ DETAIL HEADER ─ */
 .dhead{padding:20px 24px 16px;border-bottom:1px solid var(--b);flex-shrink:0;position:sticky;top:0;background:#fff;z-index:20;box-shadow:0 2px 8px rgba(60,80,160,.05)}
 .dhead-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}
 .dtitle-wrap{flex:1;min-width:0}
@@ -118,7 +104,6 @@ header{
 .btn-open{display:flex;align-items:center;gap:7px;background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;font-family:'Outfit',sans-serif;font-weight:700;font-size:13px;padding:9px 16px;border:none;border-radius:11px;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(58,107,255,.3);flex-shrink:0}
 .btn-open:hover{opacity:.9;transform:translateY(-1px)}
 
-/* ─ TABS ─ */
 .tabs-row{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
 .tab{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--b);border-radius:9px;padding:6px 13px;font-size:12px;font-weight:600;color:var(--m2);cursor:pointer;transition:all .18s;white-space:nowrap}
 .tab:hover{border-color:var(--b2);color:var(--t);background:#fff}
@@ -126,7 +111,6 @@ header{
 .tab-ico{width:16px;height:16px;background:rgba(15,123,77,.15);border-radius:4px;display:flex;align-items:center;justify-content:center}
 .tab-ico svg{width:10px;height:10px}
 
-/* ─ FILTERS ─ */
 .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
 .fg{display:flex;flex-direction:column;gap:5px;flex:1;min-width:140px}
 .flabel{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.8px}
@@ -134,12 +118,9 @@ header{
 .finput:focus{border-color:rgba(58,107,255,.5);background:#fff;box-shadow:0 0 0 3px rgba(58,107,255,.08)}
 .finput::placeholder{color:var(--m)}
 .clearbtn{background:var(--bg);border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;padding:8px 13px;border-radius:10px;cursor:pointer;transition:all .2s;white-space:nowrap}
-.clearbtn:hover{border-color:var(--red);color:var(--red);background:rgba(224,48,85,.05)}
+.clearbtn:hover{border-color:var(--red);color:var(--red)}
 
-/* ─ CONTENT ─ */
 .dcontent{padding:18px 24px;flex:1}
-
-/* ─ METRIC CARDS ─ */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
 .mc{background:#fff;border:1px solid var(--b);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;transition:all .2s;box-shadow:var(--shadow)}
 .mc:hover{border-color:var(--b2);box-shadow:var(--shadow-lg);transform:translateY(-1px)}
@@ -155,7 +136,6 @@ header{
 .mc:nth-child(3) .mc-val{color:var(--gold);font-size:15px;padding-top:5px}
 .mc:nth-child(4) .mc-val{color:var(--a2);font-size:16px;padding-top:4px}
 
-/* ─ TABLE ─ */
 .twrap{background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:4px}
 .tscroll{overflow-x:auto;width:100%}
 .tscroll::-webkit-scrollbar{height:5px}
@@ -167,6 +147,7 @@ header{
 .ttable tbody tr{border-bottom:1px solid var(--b);transition:background .12s;animation:fi .18s ease both}
 .ttable tbody tr:last-child{border-bottom:none}
 .ttable tbody tr:hover{background:rgba(58,107,255,.04)}
+.ttable tbody tr.gs-highlight-row{background:rgba(58,107,255,.07);border-left:3px solid var(--a)}
 .ttable tbody td{padding:11px 14px;font-size:12.5px;color:var(--t);border-right:1px solid rgba(0,0,0,.04);vertical-align:middle;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ttable tbody td:last-child{border-right:none}
 .c-prop{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--a);font-weight:600}
@@ -184,7 +165,6 @@ header{
 .norows-ico{font-size:38px;margin-bottom:10px;opacity:.5}
 .norows-txt{font-size:14px;font-weight:500;color:var(--m2)}
 
-/* ─ PAGER ─ */
 .pager{display:flex;justify-content:center;align-items:center;gap:5px;padding:18px 24px 32px}
 .pg{background:#fff;border:1px solid var(--b);color:var(--m2);font-family:'JetBrains Mono',monospace;font-size:12px;padding:7px 12px;border-radius:9px;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(60,80,160,.06)}
 .pg:hover{border-color:var(--a);color:var(--a)}
@@ -192,16 +172,63 @@ header{
 .pg:disabled{opacity:.25;cursor:not-allowed;box-shadow:none}
 .pg.dots{border:none;background:none;color:var(--m);cursor:default;box-shadow:none}
 
+/* ══ GLOBAL SEARCH MODAL ══ */
+.gs-overlay{position:fixed;inset:0;background:rgba(10,14,30,.4);backdrop-filter:blur(6px);z-index:900;display:none;align-items:flex-start;justify-content:center;padding-top:80px}
+.gs-overlay.open{display:flex;animation:fadeIn .15s ease}
+.gs-modal{background:#fff;border:1px solid var(--b);border-radius:22px;width:100%;max-width:540px;box-shadow:0 24px 64px rgba(30,40,100,.18);overflow:hidden;animation:slideDown .2s cubic-bezier(.16,1,.3,1)}
+
+.gs-bar{display:flex;align-items:center;gap:12px;padding:18px 20px}
+.gs-icon{color:var(--a);flex-shrink:0}
+.gs-input{flex:1;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:17px;font-weight:500;color:var(--t);background:transparent}
+.gs-input::placeholder{color:var(--m)}
+.gs-close{background:var(--bg);border:1px solid var(--b);color:var(--m);border-radius:8px;padding:4px 9px;font-size:11px;font-weight:700;cursor:pointer;font-family:'JetBrains Mono',monospace;flex-shrink:0}
+.gs-close:hover{border-color:var(--red);color:var(--red)}
+
+.gs-divider{height:1px;background:var(--b);margin:0}
+
+/* Status area */
+.gs-status{padding:13px 20px;display:flex;align-items:center;gap:10px;min-height:48px}
+.gs-spinner{width:16px;height:16px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .65s linear infinite;flex-shrink:0;display:none}
+.gs-status-txt{font-size:13px;color:var(--m);font-weight:500;flex:1}
+.gs-status-file{font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:260px}
+
+/* Progress bar */
+.gs-prog-wrap{padding:0 20px 14px;display:none}
+.gs-prog-wrap.show{display:block}
+.gs-prog-track{height:3px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.gs-prog-fill{height:100%;background:linear-gradient(90deg,var(--a),var(--a2));border-radius:3px;transition:width .25s ease}
+
+/* Found banner */
+.gs-found{display:none;margin:0 20px 16px;background:rgba(7,184,122,.08);border:1px solid rgba(7,184,122,.25);border-radius:12px;padding:12px 16px;align-items:center;gap:10px}
+.gs-found.show{display:flex;animation:fi .2s ease}
+.gs-found-ico{font-size:20px;flex-shrink:0}
+.gs-found-body{flex:1;min-width:0}
+.gs-found-title{font-size:13px;font-weight:700;color:var(--t);margin-bottom:2px}
+.gs-found-sub{font-size:11.5px;color:var(--m);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs-found-btn{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;border:none;font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;padding:8px 14px;border-radius:9px;cursor:pointer;white-space:nowrap;box-shadow:0 4px 12px rgba(58,107,255,.3);transition:all .2s;flex-shrink:0}
+.gs-found-btn:hover{opacity:.88;transform:translateY(-1px)}
+
+/* Not found */
+.gs-notfound{display:none;margin:0 20px 16px;background:rgba(224,48,85,.06);border:1px solid rgba(224,48,85,.2);border-radius:12px;padding:12px 16px;align-items:center;gap:10px}
+.gs-notfound.show{display:flex;animation:fi .2s ease}
+.gs-notfound-txt{font-size:13px;font-weight:600;color:var(--red)}
+
+.gs-footer{padding:10px 20px 14px;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;border-top:1px solid var(--b)}
+
 @keyframes cardIn{from{opacity:0;transform:scale(.95) translateY(18px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes fi{from{opacity:0}to{opacity:1}}
 @keyframes rot{to{transform:rotate(360deg)}}
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
 
 @media(max-width:820px){
   .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:260px}
   .app{flex-direction:column}
   .metrics{grid-template-columns:1fr 1fr}
   .mc:nth-child(3),.mc:nth-child(4){display:none}
+  .gs-overlay{padding-top:20px;align-items:flex-end}
+  .gs-modal{border-radius:20px 20px 0 0;max-width:100%}
 }
 </style>
 </head>
@@ -210,7 +237,7 @@ header{
 <header>
   <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
   <div class="hright">
-    <div class="cbadge" id="cbadge"><div class="cdot" id="cdot"></div><span id="clabel">offline</span></div>
+    <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
     <div class="upill" id="upill"><img class="uavatar" id="uavatar" src="" alt=""/><span class="uname" id="uname"></span></div>
     <button class="blogout" id="blogout" onclick="logout()">↩ Sair</button>
   </div>
@@ -253,9 +280,13 @@ header{
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
         </button>
       </div>
+      <button class="gsearch-btn" onclick="openGlobalSearch()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Buscar Nº Proposta em Tudo
+      </button>
     </div>
     <div class="fcount" id="fcount"></div>
-    <div class="flist" id="flist">
+    <div class="flist">
       <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
       <div id="fitems"></div>
     </div>
@@ -300,7 +331,6 @@ header{
           <button class="clearbtn" onclick="clearFilters()">✕ Limpar</button>
         </div>
       </div>
-
       <div class="dcontent">
         <div class="metrics">
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total linhas</div><div class="mc-val" id="m-total">—</div></div>
@@ -308,7 +338,6 @@ header{
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Valor Total</div><div class="mc-val" id="m-valor">—</div></div>
           <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Período</div><div class="mc-val" id="m-period">—</div></div>
         </div>
-
         <div class="twrap">
           <div class="tscroll">
             <table class="ttable">
@@ -321,6 +350,50 @@ header{
         <div class="pager" id="dpager"></div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- ══ GLOBAL SEARCH MODAL ══ -->
+<div class="gs-overlay" id="gs-overlay" onclick="gsOverlayClick(event)">
+  <div class="gs-modal">
+
+    <div class="gs-bar">
+      <svg class="gs-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="gs-input" id="gs-input" type="text" placeholder="Digite o Nº da Proposta..." oninput="gsOnInput()" onkeydown="gsKeyDown(event)" autocomplete="off" spellcheck="false"/>
+      <button class="gs-close" onclick="closeGlobalSearch()">ESC</button>
+    </div>
+
+    <div class="gs-divider"></div>
+
+    <div class="gs-status" id="gs-status">
+      <div class="gs-spinner" id="gs-spinner"></div>
+      <div>
+        <div class="gs-status-txt" id="gs-status-txt">Digite o número da proposta para buscar em todas as planilhas</div>
+        <div class="gs-status-file" id="gs-status-file"></div>
+      </div>
+    </div>
+
+    <div class="gs-prog-wrap" id="gs-prog-wrap">
+      <div class="gs-prog-track"><div class="gs-prog-fill" id="gs-prog-fill" style="width:0%"></div></div>
+    </div>
+
+    <!-- FOUND -->
+    <div class="gs-found" id="gs-found">
+      <div class="gs-found-ico">✅</div>
+      <div class="gs-found-body">
+        <div class="gs-found-title" id="gs-found-title">Proposta encontrada!</div>
+        <div class="gs-found-sub" id="gs-found-sub">—</div>
+      </div>
+      <button class="gs-found-btn" id="gs-found-btn" onclick="gsOpenFound()">Abrir Planilha →</button>
+    </div>
+
+    <!-- NOT FOUND -->
+    <div class="gs-notfound" id="gs-notfound">
+      <span style="font-size:18px">😶</span>
+      <div class="gs-notfound-txt" id="gs-notfound-txt">Nenhuma proposta encontrada</div>
+    </div>
+
+    <div class="gs-footer" id="gs-footer"></div>
   </div>
 </div>
 
@@ -349,25 +422,22 @@ const RPP = 50;
 const $ = id => document.getElementById(id);
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+// ── AUTH ────────────────────────────────────────────────
 function initGoogle() {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID, scope: SCOPES,
     callback: async r => {
       if (r.error) return;
       accessToken = r.access_token;
-      await fetchUser();
-      showApp();
-      await loadFiles();
+      await fetchUser(); showApp(); await loadFiles();
     }
   });
 }
-
 function doLogin() {
-  if (typeof google === 'undefined') return alert('Aguarde o carregamento...');
+  if (typeof google === 'undefined') return alert('Aguarde...');
   if (!tokenClient) initGoogle();
   tokenClient.requestAccessToken({ prompt: 'consent' });
 }
-
 function logout() {
   if (accessToken) google.accounts.oauth2.revoke(accessToken);
   accessToken = null; allFiles = []; filtFiles = [];
@@ -376,271 +446,233 @@ function logout() {
   $('upill').style.display = 'none'; $('blogout').style.display = 'none';
   setOnline(false);
 }
-
 async function fetchUser() {
   try {
-    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + accessToken } });
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers:{Authorization:'Bearer '+accessToken} });
     const u = await r.json();
-    $('uname').textContent = u.name || u.email || '';
+    $('uname').textContent = u.name||u.email||'';
     if (u.picture) $('uavatar').src = u.picture;
     setOnline(true);
-  } catch(e) {}
+  } catch(e){}
 }
-
 function setOnline(on) {
-  $('cbadge').className = 'cbadge' + (on ? ' live' : '');
-  $('clabel').textContent = on ? 'online' : 'offline';
+  $('cbadge').className = 'cbadge'+(on?' live':'');
+  $('clabel').textContent = on?'online':'offline';
 }
-
 function showApp() {
-  $('login-wrap').style.display = 'none';
-  $('app').style.display = 'flex';
-  $('app').classList.add('on');
-  $('upill').style.display = 'flex';
-  $('blogout').style.display = 'block';
+  $('login-wrap').style.display='none';
+  $('app').style.display='flex'; $('app').classList.add('on');
+  $('upill').style.display='flex'; $('blogout').style.display='block';
 }
 
+// ── FILES ────────────────────────────────────────────────
 async function loadFiles() {
-  $('floading').style.display = 'flex'; $('fitems').innerHTML = '';
+  $('floading').style.display='flex'; $('fitems').innerHTML='';
   try {
-    const files = []; let token = null;
+    const files=[]; let token=null;
     do {
-      const q = encodeURIComponent(`'${FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
-      let url = `https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
-      if (token) url += '&pageToken=' + token;
-      const r = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
-      if (!r.ok) throw new Error('Erro ao listar arquivos');
-      const d = await r.json();
-      files.push(...(d.files || []));
-      token = d.nextPageToken || null;
-    } while (token);
-    allFiles = files; filterFiles();
+      const q=encodeURIComponent(`'${FOLDER_ID}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
+      let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
+      if(token) url+='&pageToken='+token;
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok) throw new Error('Erro ao listar arquivos');
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      token=d.nextPageToken||null;
+    } while(token);
+    allFiles=files; filterFiles();
   } catch(e) {
-    $('fitems').innerHTML = `<div class="fstate"><div style="font-size:28px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
+    $('fitems').innerHTML=`<div class="fstate"><div style="font-size:28px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
   }
-  $('floading').style.display = 'none';
+  $('floading').style.display='none';
 }
-
-async function reload() {
-  $('rbtn').classList.add('spin'); await loadFiles(); $('rbtn').classList.remove('spin');
-}
-
-function filterFiles() {
-  const q = $('fq').value.toLowerCase().trim();
-  const s = $('fsort').value;
-  filtFiles = allFiles.filter(f => !q || f.name.toLowerCase().includes(q));
-  filtFiles.sort((a,b) => {
-    if (s==='name_az') return a.name.localeCompare(b.name,'pt-BR');
-    if (s==='name_za') return b.name.localeCompare(a.name,'pt-BR');
-    if (s==='date_new') return new Date(b.modifiedTime)-new Date(a.modifiedTime);
-    if (s==='date_old') return new Date(a.modifiedTime)-new Date(b.modifiedTime);
+async function reload(){$('rbtn').classList.add('spin');await loadFiles();$('rbtn').classList.remove('spin');}
+function filterFiles(){
+  const q=$('fq').value.toLowerCase().trim(), s=$('fsort').value;
+  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q));
+  filtFiles.sort((a,b)=>{
+    if(s==='name_az') return a.name.localeCompare(b.name,'pt-BR');
+    if(s==='name_za') return b.name.localeCompare(a.name,'pt-BR');
+    if(s==='date_new') return new Date(b.modifiedTime)-new Date(a.modifiedTime);
+    if(s==='date_old') return new Date(a.modifiedTime)-new Date(b.modifiedTime);
     return 0;
   });
-  $('fcount').innerHTML = `<strong>${filtFiles.length}</strong> planilhas`;
-  $('fitems').innerHTML = filtFiles.map((f,i) => `
+  $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> planilhas`;
+  $('fitems').innerHTML=filtFiles.map((f,i)=>`
     <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .2s ease ${Math.min(i*.018,.4)}s both">
       <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
-      <div class="finfo">
-        <div class="fname">${esc(f.name)}</div>
-        <div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div>
-      </div>
+      <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
       <div class="farrow">›</div>
     </div>`).join('');
 }
 
-async function selectFile(id, name, url) {
-  curFileId = id; curFileUrl = url;
-  filterFiles();
-  $('dempty').style.display = 'none';
-  $('dloading').style.display = 'flex';
-  $('dcontent').style.display = 'none';
-  $('dloading-txt').textContent = 'Lendo estrutura da planilha...';
-  try {
-    const metaR = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`, { headers: { Authorization: 'Bearer ' + accessToken } });
-    if (!metaR.ok) throw new Error('Não foi possível acessar esta planilha');
-    const meta = await metaR.json();
-    sheetTabs = (meta.sheets||[]).map(s => s.properties.title);
-    curTab = sheetTabs[0] || 'Plan1';
-    $('dfilename').textContent = name;
-    renderTabs();
-    await loadTabData(id, curTab);
-  } catch(e) {
-    $('dloading').style.display = 'none';
-    $('dempty').style.display = 'flex';
-    $('dempty').querySelector('.dempty-ico').textContent = '⚠️';
-    $('dempty').querySelector('.dempty-title').textContent = 'Erro ao carregar';
-    $('dempty').querySelector('.dempty-sub').textContent = e.message;
+// ── SELECT FILE ──────────────────────────────────────────
+async function selectFile(id,name,url){
+  curFileId=id; curFileUrl=url; filterFiles();
+  $('dempty').style.display='none';
+  $('dloading').style.display='flex';
+  $('dcontent').style.display='none';
+  $('dloading-txt').textContent='Lendo estrutura da planilha...';
+  try{
+    const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!metaR.ok) throw new Error('Não foi possível acessar esta planilha');
+    const meta=await metaR.json();
+    sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
+    curTab=sheetTabs[0]||'Plan1';
+    $('dfilename').textContent=name;
+    renderTabs(); await loadTabData(id,curTab);
+  }catch(e){
+    $('dloading').style.display='none';
+    $('dempty').style.display='flex';
+    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
+    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
+    $('dempty').querySelector('.dempty-sub').textContent=e.message;
   }
 }
-
-function renderTabs() {
-  $('tabs-row').innerHTML = sheetTabs.map(t => `
+function renderTabs(){
+  $('tabs-row').innerHTML=sheetTabs.map(t=>`
     <div class="tab ${t===curTab?'active':''}" onclick="switchTab('${esc(t)}')">
       <div class="tab-ico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>${esc(t)}
     </div>`).join('');
 }
-
-async function switchTab(tabName) {
-  curTab = tabName; renderTabs();
-  $('dloading-txt').textContent = `Lendo aba "${tabName}"...`;
-  $('dloading').style.display = 'flex';
-  $('dcontent').style.display = 'none';
-  await loadTabData(curFileId, tabName);
+async function switchTab(tabName){
+  curTab=tabName; renderTabs();
+  $('dloading-txt').textContent=`Lendo aba "${tabName}"...`;
+  $('dloading').style.display='flex'; $('dcontent').style.display='none';
+  await loadTabData(curFileId,tabName);
 }
-
-async function loadTabData(id, tab) {
-  try {
-    const dataR = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(tab)}?majorDimension=ROWS`, { headers: { Authorization: 'Bearer ' + accessToken } });
-    if (!dataR.ok) throw new Error('Erro ao ler aba');
-    const data = await dataR.json();
-    processData(data.values || []);
-  } catch(e) {
-    $('dloading').style.display = 'none';
-    $('dcontent').style.display = 'flex';
-    $('dcontent').style.flexDirection = 'column';
-    $('tbody').innerHTML = `<tr><td colspan="99" style="padding:52px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
+async function loadTabData(id,tab){
+  try{
+    const dataR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(tab)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!dataR.ok) throw new Error('Erro ao ler aba');
+    const data=await dataR.json();
+    processData(data.values||[]);
+  }catch(e){
+    $('dloading').style.display='none';
+    $('dcontent').style.display='flex'; $('dcontent').style.flexDirection='column';
+    $('tbody').innerHTML=`<tr><td colspan="99" style="padding:52px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
   }
 }
 
-function processData(values) {
-  // Detect engineer in header area
-  let engineer = '';
-  for (let i = 0; i < Math.min(values.length, 6); i++) {
-    for (const cell of (values[i]||[])) {
-      const cm = String(cell||'').match(/Profissional[:\s]+(.+)/i);
-      if (cm) { engineer = cm[1].trim(); break; }
+// ── PROCESS DATA ─────────────────────────────────────────
+function processData(values){
+  let engineer='';
+  for(let i=0;i<Math.min(values.length,6);i++){
+    for(const cell of (values[i]||[])){
+      const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);
+      if(cm){engineer=cm[1].trim();break;}
     }
-    if (engineer) break;
+    if(engineer) break;
   }
-  if (engineer) { $('eng-badge').style.display = 'inline-flex'; $('eng-name').textContent = engineer; }
-  else { $('eng-badge').style.display = 'none'; }
+  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;}
+  else{$('eng-badge').style.display='none';}
 
-  // Find best header row (most filled cells + keyword bonus)
-  const keywords = ['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
-  let hIdx = 0, bestScore = -1;
-  for (let i = 0; i < Math.min(values.length, 15); i++) {
-    const row = (values[i]||[]).map(c => String(c||'').toUpperCase());
-    const filled = row.filter(c => c.trim()).length;
-    const kwHits = row.filter(c => keywords.some(k => c.includes(k))).length;
-    const score = filled + kwHits * 3;
-    if (score > bestScore) { bestScore = score; hIdx = i; }
+  const keywords=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
+  let hIdx=0,bestScore=-1;
+  for(let i=0;i<Math.min(values.length,15);i++){
+    const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
+    const score=row.filter(c=>c.trim()).length+row.filter(c=>keywords.some(k=>c.includes(k))).length*3;
+    if(score>bestScore){bestScore=score;hIdx=i;}
   }
+  allHeaders=(values[hIdx]||[]).map((h,i)=>({label:h||`Col ${i+1}`,idx:i,cls:guessClass(String(h||'').toUpperCase())}));
+  while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim()) allHeaders.pop();
 
-  // All columns from header row
-  allHeaders = (values[hIdx]||[]).map((h,i) => ({ label: h || `Col ${i+1}`, idx: i, cls: guessClass(String(h||'').toUpperCase()) }));
-  // Trim trailing empty
-  while (allHeaders.length > 0 && !String(allHeaders[allHeaders.length-1].label).trim()) allHeaders.pop();
+  const hUpper=allHeaders.map(h=>String(h.label).toUpperCase());
+  const find=(...kws)=>hUpper.findIndex(h=>kws.some(k=>h.includes(k)));
+  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
+  const dateIdx=find('DATA');
+  const valIdx=find('VALOR');
 
-  // All data rows (non-empty)
-  const hUpper = allHeaders.map(h => String(h.label).toUpperCase());
-  const find = (...kws) => hUpper.findIndex(h => kws.some(k => h.includes(k)));
-  const propIdx = find('PROPOSTA','N°','NUMERO','NUM');
-  const dateIdx = find('DATA');
-  const valIdx  = find('VALOR');
+  allRows=(values.slice(hIdx+1)||[])
+    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
+    .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):''}));
 
-  allRows = (values.slice(hIdx+1)||[])
-    .filter(r => r && r.some(c => c !== undefined && c !== null && String(c).trim() !== ''))
-    .map(r => ({
-      raw: r,
-      proposta: propIdx >= 0 ? (r[propIdx]||'') : '',
-      data:     dateIdx >= 0 ? (r[dateIdx]||'') : '',
-      valor:    valIdx  >= 0 ? (r[valIdx] ||'') : '',
-    }));
+  const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
+  months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
+  const fm=$('f-mes');
+  fm.innerHTML='<option value="">Todos os meses</option>';
+  months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
 
-  // Month filter
-  const months = [...new Set(allRows.map(r => extractMY(r.data)).filter(Boolean))];
-  months.sort((a,b) => { const [ma,ya]=a.split('/'); const [mb,yb]=b.split('/'); return new Date(ya,ma-1)-new Date(yb,mb-1); });
-  const fm = $('f-mes');
-  fm.innerHTML = '<option value="">Todos os meses</option>';
-  months.forEach(m => { const o=document.createElement('option'); o.value=m; o.textContent=m; fm.appendChild(o); });
+  $('dloading').style.display='none';
+  $('dcontent').style.display='flex'; $('dcontent').style.flexDirection='column';
 
-  $('dloading').style.display = 'none';
-  $('dcontent').style.display = 'flex';
-  $('dcontent').style.flexDirection = 'column';
+  // If coming from global search, apply proposta filter
+  if(gsPendingProp){
+    $('f-prop').value=gsPendingProp;
+    gsPendingProp=null;
+  }
   clearFilters();
 }
 
-function guessClass(upper) {
-  if (upper.includes('PROPOSTA')||upper.includes('N°')||upper.includes('NUMERO')) return 'c-prop';
-  if (upper.includes('DATA')) return 'c-date';
-  if (upper.includes('VALOR')) return 'c-val';
-  if (upper.includes('ENGENHEIRO')||upper.includes('PROFISSIONAL')||upper.includes('RESPONSAVEL')) return 'c-eng';
-  if (upper.includes('ENDEREÇO')||upper.includes('ENDERECO')||upper.includes('END')) return 'c-addr';
-  if (upper.includes('CPF')||upper.includes('CEP')||upper.includes('CNPJ')) return 'c-num';
+function guessClass(upper){
+  if(upper.includes('PROPOSTA')||upper.includes('N°')||upper.includes('NUMERO')) return 'c-prop';
+  if(upper.includes('DATA')) return 'c-date';
+  if(upper.includes('VALOR')) return 'c-val';
+  if(upper.includes('ENGENHEIRO')||upper.includes('PROFISSIONAL')||upper.includes('RESPONSAVEL')) return 'c-eng';
+  if(upper.includes('ENDEREÇO')||upper.includes('ENDERECO')||upper.includes('END')) return 'c-addr';
+  if(upper.includes('CPF')||upper.includes('CEP')||upper.includes('CNPJ')) return 'c-num';
   return 'c-text';
 }
-
-function extractMY(dateStr) {
-  const s = String(dateStr||'').trim();
-  const m1 = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
-  if (m1) { const mm=m1[2].padStart(2,'0'); const yy=m1[3].length===2?'20'+m1[3]:m1[3]; return `${mm}/${yy}`; }
-  const m2 = s.match(/^(\d{2})\/(\d{4})$/);
-  if (m2) return `${m2[1]}/${m2[2]}`;
+function extractMY(dateStr){
+  const s=String(dateStr||'').trim();
+  const m1=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(m1){const mm=m1[2].padStart(2,'0');const yy=m1[3].length===2?'20'+m1[3]:m1[3];return`${mm}/${yy}`;}
+  const m2=s.match(/^(\d{2})\/(\d{4})$/);
+  if(m2) return`${m2[1]}/${m2[2]}`;
   return null;
 }
-
-function parseVal(v) {
-  if (!v) return 0;
-  const n = String(v).replace(/[R$\s.]/g,'').replace(',','.');
-  const parsed = parseFloat(n);
-  return isNaN(parsed) ? 0 : parsed;
+function parseVal(v){
+  if(!v) return 0;
+  const n=String(v).replace(/[R$\s.]/g,'').replace(',','.');
+  const p=parseFloat(n);return isNaN(p)?0:p;
 }
-
-function fmtBRL(n) { return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
-
-function clearFilters() { $('f-prop').value=''; $('f-mes').value=''; filterRows(); }
-
-function filterRows() {
-  const prop = $('f-prop').value.toLowerCase().trim();
-  const mes  = $('f-mes').value;
-  filtRows = allRows.filter(r => {
-    if (prop && !String(r.proposta).toLowerCase().includes(prop)) return false;
-    if (mes  && extractMY(r.data) !== mes) return false;
+function fmtBRL(n){return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function clearFilters(){
+  // Don't clear proposta if it was set by global search
+  if(!gsPendingProp) $('f-prop').value='';
+  $('f-mes').value='';
+  filterRows();
+}
+function filterRows(){
+  const prop=$('f-prop').value.toLowerCase().trim(),mes=$('f-mes').value;
+  filtRows=allRows.filter(r=>{
+    if(prop&&!String(r.proposta).toLowerCase().includes(prop)) return false;
+    if(mes&&extractMY(r.data)!==mes) return false;
     return true;
   });
-  dpage = 1;
-  $('m-total').textContent = allRows.length;
-  $('m-filt').textContent  = filtRows.length;
-  const total = filtRows.reduce((sum,r) => sum + parseVal(r.valor), 0);
-  $('m-valor').textContent = total > 0 ? fmtBRL(total) : '—';
-  const dates = [...new Set(filtRows.map(r=>extractMY(r.data)).filter(Boolean))];
-  $('m-period').textContent = dates.length===0?'—':dates.length===1?dates[0]:`${dates.length} meses`;
-  renderTable(); renderPager();
+  dpage=1;
+  $('m-total').textContent=allRows.length;$('m-filt').textContent=filtRows.length;
+  const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
+  $('m-valor').textContent=total>0?fmtBRL(total):'—';
+  const dates=[...new Set(filtRows.map(r=>extractMY(r.data)).filter(Boolean))];
+  $('m-period').textContent=dates.length===0?'—':dates.length===1?dates[0]:`${dates.length} meses`;
+  renderTable();renderPager();
 }
-
-function renderTable() {
-  const start = (dpage-1)*RPP;
-  const slice = filtRows.slice(start, start+RPP);
-
-  $('thead').innerHTML = '<tr>' + allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('') + '</tr>';
-
-  if (slice.length === 0) {
-    $('tbody').innerHTML = `<tr><td colspan="${allHeaders.length}" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>`;
-    $('tfoot').innerHTML = '';
-    return;
+function renderTable(){
+  const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
+  $('thead').innerHTML='<tr>'+allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('')+'</tr>';
+  if(slice.length===0){
+    $('tbody').innerHTML=`<tr><td colspan="${allHeaders.length}" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>`;
+    $('tfoot').innerHTML='';return;
   }
-
-  $('tbody').innerHTML = slice.map((r,i) => `
-    <tr style="animation-delay:${Math.min(i*.012,.4)}s">
+  // Check if any row matches the global search prop (for highlight)
+  const highlightProp=gsLastFoundProp?gsLastFoundProp.toLowerCase():'';
+  $('tbody').innerHTML=slice.map((r,i)=>{
+    const isHL=highlightProp&&String(r.proposta).toLowerCase()===highlightProp;
+    return`<tr class="${isHL?'gs-highlight-row':''}" style="animation-delay:${Math.min(i*.012,.4)}s">
       ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}
-    </tr>`).join('');
-
-  const valColIdx = allHeaders.findIndex(h=>h.cls==='c-val');
-  if (valColIdx >= 0) {
-    const total = filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
-    $('tfoot').innerHTML = '<tr>' + allHeaders.map((h,i)=>{
-      if (i===0) return `<td class="total-label">TOTAL (${filtRows.length} reg.)</td>`;
-      if (i===valColIdx) return `<td class="total-val">${fmtBRL(total)}</td>`;
-      return '<td></td>';
-    }).join('') + '</tr>';
-  } else { $('tfoot').innerHTML=''; }
+    </tr>`;
+  }).join('');
+  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
+  if(vci>=0){
+    const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
+    $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{if(i===0)return`<td class="total-label">TOTAL (${filtRows.length} reg.)</td>`;if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;return'<td></td>';}).join('')+'</tr>';
+  }else{$('tfoot').innerHTML='';}
 }
-
-function renderPager() {
-  const total = Math.ceil(filtRows.length/RPP);
-  const c = $('dpager');
-  if (total<=1){c.innerHTML='';return;}
-  let h = `<button class="pg" onclick="goPage(${dpage-1})" ${dpage===1?'disabled':''}>‹</button>`;
+function renderPager(){
+  const total=Math.ceil(filtRows.length/RPP),c=$('dpager');
+  if(total<=1){c.innerHTML='';return;}
+  let h=`<button class="pg" onclick="goPage(${dpage-1})" ${dpage===1?'disabled':''}>‹</button>`;
   for(let i=1;i<=total;i++){
     if(i===1||i===total||Math.abs(i-dpage)<=1) h+=`<button class="pg ${i===dpage?'on':''}" onclick="goPage(${i})">${i}</button>`;
     else if(Math.abs(i-dpage)===2) h+=`<button class="pg dots" disabled>…</button>`;
@@ -648,9 +680,203 @@ function renderPager() {
   h+=`<button class="pg" onclick="goPage(${dpage+1})" ${dpage===total?'disabled':''}>›</button>`;
   c.innerHTML=h;
 }
-
 function goPage(p){dpage=p;renderTable();renderPager();$('rpanel').scrollTop=0;}
 function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=curFileUrl;a.target='_blank';a.click();}}
+
+// ══════════════════════════════════════════════════════
+//  GLOBAL SEARCH — Nº PROPOSTA
+// ══════════════════════════════════════════════════════
+let gsDebounce=null;
+let gsAbort=false;
+let gsRunning=false;
+let gsFoundResult=null;   // {file, tabName, proposta}
+let gsPendingProp=null;   // proposta number to filter after sheet loads
+let gsLastFoundProp=null; // for row highlight
+const gsCache={};         // fileId -> [{name, values[]}]
+
+function openGlobalSearch(){
+  $('gs-overlay').classList.add('open');
+  gsResetUI();
+  setTimeout(()=>$('gs-input').focus(),80);
+  document.addEventListener('keydown',gsEscListener);
+}
+function closeGlobalSearch(){
+  $('gs-overlay').classList.remove('open');
+  gsAbort=true;
+  document.removeEventListener('keydown',gsEscListener);
+}
+function gsEscListener(e){if(e.key==='Escape')closeGlobalSearch();}
+function gsOverlayClick(e){if(e.target===$('gs-overlay'))closeGlobalSearch();}
+function gsKeyDown(e){
+  if(e.key==='Escape'){closeGlobalSearch();return;}
+  if(e.key==='Enter'&&gsFoundResult){gsOpenFound();return;}
+}
+
+function gsResetUI(){
+  $('gs-input').value='';
+  $('gs-spinner').style.display='none';
+  $('gs-status-txt').textContent='Digite o número da proposta para buscar em todas as planilhas';
+  $('gs-status-file').textContent='';
+  $('gs-prog-wrap').classList.remove('show');
+  $('gs-prog-fill').style.width='0%';
+  $('gs-found').classList.remove('show');
+  $('gs-notfound').classList.remove('show');
+  $('gs-footer').textContent='';
+  gsFoundResult=null;
+}
+
+function gsOnInput(){
+  clearTimeout(gsDebounce);
+  const q=$('gs-input').value.trim();
+  $('gs-found').classList.remove('show');
+  $('gs-notfound').classList.remove('show');
+  $('gs-footer').textContent='';
+
+  if(q.length<3){
+    $('gs-spinner').style.display='none';
+    $('gs-prog-wrap').classList.remove('show');
+    $('gs-status-txt').textContent='Digite pelo menos 3 caracteres';
+    $('gs-status-file').textContent='';
+    gsAbort=true;
+    return;
+  }
+  $('gs-status-txt').textContent='Aguardando...';
+  $('gs-status-file').textContent='';
+  gsDebounce=setTimeout(()=>runGlobalSearch(q),400);
+}
+
+async function runGlobalSearch(query){
+  if(gsRunning){gsAbort=true;await new Promise(r=>setTimeout(r,80));}
+  gsAbort=false;gsRunning=true;gsFoundResult=null;
+
+  const q=query.toLowerCase().trim();
+  const files=allFiles;
+  if(!files.length){
+    $('gs-status-txt').textContent='Nenhuma planilha carregada';
+    gsRunning=false;return;
+  }
+
+  $('gs-spinner').style.display='block';
+  $('gs-prog-wrap').classList.add('show');
+  $('gs-prog-fill').style.width='0%';
+  $('gs-found').classList.remove('show');
+  $('gs-notfound').classList.remove('show');
+
+  const t0=Date.now();
+  const keywords=['PROPOSTA','N°','NUMERO','NUM'];
+
+  for(let fi=0;fi<files.length;fi++){
+    if(gsAbort) break;
+    const file=files[fi];
+
+    // Update progress
+    const pct=Math.round((fi/files.length)*100);
+    $('gs-prog-fill').style.width=pct+'%';
+    $('gs-status-txt').textContent=`Varrendo ${fi+1} de ${files.length} planilhas...`;
+    $('gs-status-file').textContent=file.name;
+
+    try{
+      // Load tabs (use cache)
+      let tabs;
+      if(gsCache[file.id]){
+        tabs=gsCache[file.id];
+      }else{
+        const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
+        if(!metaR.ok){continue;}
+        const meta=await metaR.json();
+        const tabNames=(meta.sheets||[]).map(s=>s.properties.title);
+        tabs=[];
+        for(const tabName of tabNames){
+          if(gsAbort) break;
+          const dataR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}/values/${encodeURIComponent(tabName)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
+          if(!dataR.ok) continue;
+          const data=await dataR.json();
+          tabs.push({name:tabName,values:data.values||[]});
+        }
+        gsCache[file.id]=tabs;
+      }
+
+      // Search proposta column in each tab
+      for(const tab of tabs){
+        if(gsAbort) break;
+        const values=tab.values;
+
+        // Find header row
+        let hIdx=0,bestScore=-1;
+        for(let i=0;i<Math.min(values.length,15);i++){
+          const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
+          const score=row.filter(c=>c.trim()).length+row.filter(c=>['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR'].some(k=>c.includes(k))).length*3;
+          if(score>bestScore){bestScore=score;hIdx=i;}
+        }
+        const hUpper=(values[hIdx]||[]).map(c=>String(c||'').toUpperCase());
+        const propIdx=hUpper.findIndex(h=>keywords.some(k=>h.includes(k)));
+        if(propIdx<0) continue;
+
+        // Search data rows
+        for(let ri=hIdx+1;ri<values.length;ri++){
+          const row=values[ri]||[];
+          const cellVal=String(row[propIdx]||'').toLowerCase().trim();
+          if(!cellVal) continue;
+          if(cellVal===q||cellVal.includes(q)){
+            // FOUND!
+            gsFoundResult={
+              file,
+              tabName:tab.name,
+              proposta:String(row[propIdx]),
+              row,
+              headers:values[hIdx]||[]
+            };
+            gsAbort=true;
+            break;
+          }
+        }
+        if(gsFoundResult) break;
+      }
+      if(gsFoundResult) break;
+    }catch(e){/* skip */}
+  }
+
+  $('gs-prog-fill').style.width='100%';
+  $('gs-spinner').style.display='none';
+  const elapsed=((Date.now()-t0)/1000).toFixed(1);
+
+  if(gsFoundResult&&!($('gs-input').value.trim().toLowerCase()!==q)){
+    // Show found banner
+    $('gs-status-txt').textContent='Proposta localizada com sucesso!';
+    $('gs-status-file').textContent='';
+    $('gs-found-title').textContent=`Proposta ${gsFoundResult.proposta}`;
+    $('gs-found-sub').textContent=`📄 ${gsFoundResult.file.name}  ·  Aba: ${gsFoundResult.tabName}`;
+    $('gs-found').classList.add('show');
+    $('gs-footer').textContent=`Busca concluída em ${elapsed}s`;
+  } else if(!gsAbort){
+    $('gs-status-txt').textContent='Busca concluída — nenhum resultado';
+    $('gs-status-file').textContent='';
+    $('gs-notfound').querySelector('.gs-notfound-txt').textContent=
+      `Nenhuma proposta encontrada para "${query}" em ${files.length} planilhas`;
+    $('gs-notfound').classList.add('show');
+    $('gs-footer').textContent=`${files.length} planilhas varridas em ${elapsed}s`;
+  }
+
+  gsRunning=false;
+}
+
+async function gsOpenFound(){
+  if(!gsFoundResult) return;
+  const {file,tabName,proposta}=gsFoundResult;
+  gsLastFoundProp=proposta;
+  gsPendingProp=proposta;
+  closeGlobalSearch();
+  await selectFile(file.id,file.name,file.webViewLink||'');
+  // Switch to correct tab if needed
+  if(tabName&&sheetTabs.includes(tabName)&&tabName!==curTab){
+    await switchTab(tabName);
+  }
+  // Apply proposta filter
+  $('f-prop').value=proposta;
+  filterRows();
+  // Scroll to top of right panel
+  $('rpanel').scrollTop=0;
+}
 </script>
 </body>
 </html>
