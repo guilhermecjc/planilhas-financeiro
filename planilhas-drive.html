@@ -481,14 +481,12 @@ async function loadFiles(){
 
 // ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
 async function fetchFilesPage(pageToken){
-  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
-  // orderBy removido: com corpora=allDrives causa duplicatas entre páginas
+  // sharedWithMe=true: apenas planilhas compartilhadas, paginação estável sem duplicatas
+  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe=true`);
   let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
     +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
     +`&pageSize=1000`
-    +`&includeItemsFromAllDrives=true`
-    +`&supportsAllDrives=true`
-    +`&corpora=allDrives`;
+    +`&orderBy=modifiedTime+desc`;
   if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
   const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
   if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
