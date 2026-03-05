@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Financeira</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" onload="initGoogle()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --bg:#f1f3f4;--bg2:#e8eaed;--bg3:#fff;
@@ -397,6 +397,7 @@ const RPP=50;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+window.addEventListener('load', ()=>{ if(typeof google!=='undefined') initGoogle(); else document.querySelector('script[src*=accounts\.google]').addEventListener('load',initGoogle); });
 function initGoogle(){
   tokenClient=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID,scope:SCOPES,
@@ -481,8 +482,8 @@ async function loadFiles(){
 
 // ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
 async function fetchFilesPage(pageToken){
-  // sharedWithMe=true: apenas planilhas compartilhadas, paginação estável sem duplicatas
-  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe=true`);
+  // sharedWithMe como filtro de query — único jeito confiável sem duplicatas
+  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`);
   let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
     +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
     +`&pageSize=1000`
