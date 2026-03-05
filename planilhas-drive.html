@@ -378,9 +378,12 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 
 <script>
 const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleusercontent.com';
-const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
+
+// ✅ CORREÇÃO 1: escopo drive completo para acessar todos os drives compartilhados
+const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets.readonly';
+
 const PARALLEL=10;
-const LS_KEY='cf_gs_cache_v7';
+const LS_KEY='cf_gs_cache_v6';
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
@@ -390,18 +393,11 @@ let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
 let dpage=1;
 const RPP=50;
-let _loadId=0;
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// Aguarda Google Identity Services carregar
-function waitForGoogle(cb){
-  if(typeof google!=='undefined'&&google.accounts){cb();return;}
-  setTimeout(()=>waitForGoogle(cb),100);
-}
-window.addEventListener('load',()=>waitForGoogle(initGoogle));
-
+window.addEventListener('load', ()=>{ if(typeof google!=='undefined') initGoogle(); else document.querySelector('script[src*=accounts\.google]').addEventListener('load',initGoogle); });
 function initGoogle(){
   tokenClient=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID,scope:SCOPES,
@@ -413,10 +409,9 @@ function initGoogle(){
   });
 }
 function doLogin(){
-  waitForGoogle(()=>{
-    if(!tokenClient)initGoogle();
-    tokenClient.requestAccessToken({prompt:'consent'});
-  });
+  if(typeof google==='undefined')return alert('Aguarde...');
+  if(!tokenClient)initGoogle();
+  tokenClient.requestAccessToken({prompt:'consent'});
 }
 function logout(){
   if(accessToken)google.accounts.oauth2.revoke(accessToken);
@@ -445,27 +440,35 @@ function showApp(){
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
+// ── FILES — varre TODO o Drive, todas as páginas ─────────
+let _loadId=0; // cancela cargas concorrentes
+
 async function loadFiles(){
-  const myId=++_loadId;
-  allFiles=[];filtFiles=[];
+  const myId=++_loadId; // id desta execução
+  allFiles=[];
+  filtFiles=[];
   setSyncState('loading',null,'Conectando ao Drive...');
   $('floading').style.display='flex';
   $('floading-txt').textContent='Buscando planilhas...';
   $('fitems').innerHTML='';
   try{
-    // Busca em paralelo: Meu Drive + Compartilhados comigo
-    // Dois requests separados garantem paginação limpa sem duplicatas
-    const [myFiles, sharedFiles] = await Promise.all([
-      fetchAllPages(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and 'me' in owners`, myId),
-      fetchAllPages(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`, myId)
-    ]);
+    const seen=new Map(); // id → arquivo, garante unicidade global
+    let pageToken=null,page=0;
+    do{
+      if(_loadId!==myId)return; // outra carga iniciou, abandona esta
+      const result=await fetchFilesPage(pageToken);
+      if(_loadId!==myId)return;
+      for(const f of result.files){
+        if(!seen.has(f.id))seen.set(f.id,f);
+      }
+      allFiles=[...seen.values()];
+      pageToken=result.nextToken;
+      page++;
+      filterFiles();
+      setSyncState('loading',null,`${allFiles.length} planilhas · pág. ${page}...`);
+      $('floading-txt').textContent=`${allFiles.length} planilhas encontradas...`;
+    }while(pageToken);
     if(_loadId!==myId)return;
-    // Merge sem duplicatas por ID
-    const seen=new Map();
-    for(const f of [...myFiles,...sharedFiles]){
-      if(!seen.has(f.id))seen.set(f.id,f);
-    }
-    allFiles=[...seen.values()];
     filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
@@ -477,27 +480,19 @@ async function loadFiles(){
   if(_loadId===myId)$('floading').style.display='none';
 }
 
-// Busca todas as páginas de uma query específica
-async function fetchAllPages(query, myId){
-  const result=[];
-  let pageToken=null, page=0;
-  const q=encodeURIComponent(query);
-  do{
-    if(_loadId!==myId)return result;
-    let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
-      +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
-      +`&pageSize=1000`;
-    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
-    const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
-    const d=await r.json();
-    result.push(...(d.files||[]));
-    pageToken=d.nextPageToken||null;
-    page++;
-    setSyncState('loading',null,`${result.length} planilhas encontradas · pág ${page}...`);
-    $('floading-txt').textContent=`${result.length} planilhas...`;
-  }while(pageToken);
-  return result;
+// ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
+async function fetchFilesPage(pageToken){
+  // sharedWithMe como filtro de query — único jeito confiável sem duplicatas
+  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`);
+  let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
+    +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
+    +`&pageSize=1000`
+    +`&orderBy=modifiedTime+desc`;
+  if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+  const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
+  const d=await r.json();
+  return{files:d.files||[],nextToken:d.nextPageToken||null};
 }
 
 function setSyncState(state,pct,txt){
@@ -513,7 +508,11 @@ function setSyncState(state,pct,txt){
     if(svg)svg.style.animation='';
   }
 }
-async function reload(){allFiles=[];filtFiles=[];filterFiles();await loadFiles();}
+async function reload(){
+  allFiles=[];filtFiles=[];
+  filterFiles(); // limpa lista imediatamente
+  await loadFiles();
+}
 
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
@@ -527,7 +526,7 @@ function filterFiles(){
   });
   $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> de ${allFiles.length} planilhas`;
   $('fitems').innerHTML=filtFiles.map((f,i)=>`
-    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink||'')}')">
+    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .12s ease ${Math.min(i*.008,.25)}s both">
       <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
       <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
       <div class="farrow">›</div>
@@ -587,6 +586,7 @@ function processData(values){
   }
   if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;}
   else $('eng-badge').style.display='none';
+
   const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
   let hIdx=0,best=-1;
   for(let i=0;i<Math.min(values.length,15);i++){
@@ -596,6 +596,7 @@ function processData(values){
   }
   allHeaders=(values[hIdx]||[]).map((h,i)=>({label:h||`Col ${i+1}`,idx:i,cls:guessClass(String(h||'').toUpperCase())}));
   while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim())allHeaders.pop();
+
   const hU=allHeaders.map(h=>String(h.label).toUpperCase());
   const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
   const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
@@ -603,14 +604,24 @@ function processData(values){
   const valIdx=find('VALOR');
   gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
   gCityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
+
   allRows=(values.slice(hIdx+1)||[])
     .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
-    .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):'',endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',cidade:gCityIdx>=0?(r[gCityIdx]||''):''}));
+    .map(r=>({
+      raw:r,
+      proposta:propIdx>=0?(r[propIdx]||''):'',
+      data:dateIdx>=0?(r[dateIdx]||''):'',
+      valor:valIdx>=0?(r[valIdx]||''):'',
+      endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',
+      cidade:gCityIdx>=0?(r[gCityIdx]||''):'',
+    }));
+
   const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
   months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
   const fm=$('f-mes');
   fm.innerHTML='<option value="">Todos os meses</option>';
   months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
+
   $('dloading').style.display='none';
   $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
   if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
@@ -654,6 +665,7 @@ function filterRows(){
   $('m-period').textContent=dates.length===0?'—':dates.length===1?dates[0]:`${dates.length} meses`;
   renderTable();renderPager();
 }
+
 function buildAddress(row){
   const addr=String(row.endereco||'').trim(),city=String(row.cidade||'').trim();
   if(!addr&&!city)return'';
@@ -664,6 +676,7 @@ function openRota(idx){
   const dest=buildAddress(r);if(!dest)return;
   window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`,'_blank');
 }
+
 function renderTable(){
   const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
   const hasAddr=gAddrIdx>=0||gCityIdx>=0;
@@ -677,7 +690,7 @@ function renderTable(){
     const isHL=hl&&String(r.proposta).toLowerCase()===hl;
     const dest=buildAddress(r);
     const rota=hasAddr?(dest?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`:`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`):'';
-    return`<tr class="${isHL?'gs-hl':''}">
+    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .1s ease ${Math.min(i*.006,.25)}s both">
       ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}${rota}
     </tr>`;
   }).join('');
@@ -709,6 +722,7 @@ function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=c
 let gsDebounce=null,gsSearchId=0,gsFoundResult=null,gsPendingProp=null,gsLastFoundProp=null;
 const PROP_KW=['PROPOSTA','N°','NUMERO','NUM'];
 const HDR_KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO'];
+
 function lsLoad(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}');}catch{return{};}}
 function lsSave(cache){
   try{localStorage.setItem(LS_KEY,JSON.stringify(cache));}catch{
@@ -716,6 +730,7 @@ function lsSave(cache){
   }
 }
 function gsClearCache(){localStorage.removeItem(LS_KEY);$('gs-cache-info').classList.remove('show');$('gs-footer-txt').textContent='Cache limpo';}
+
 async function gsLoadFile(file,cache){
   const cacheKey=file.id+'_'+file.modifiedTime;
   if(cache[cacheKey])return{cached:true,data:cache[cacheKey]};
@@ -746,6 +761,7 @@ async function gsLoadFile(file,cache){
     return{cached:false,data:result};
   }catch{return null;}
 }
+
 async function runGlobalSearch(query,searchId){
   const q=query.toLowerCase().trim();
   const files=allFiles;
@@ -800,6 +816,7 @@ async function runGlobalSearch(query,searchId){
     $('gs-footer-txt').textContent=`${files.length} planilhas · ${elapsed}s`;
   }
 }
+
 function openGlobalSearch(){$('gs-overlay').classList.add('open');gsResetUI();setTimeout(()=>$('gs-input').focus(),80);document.addEventListener('keydown',gsEscListener);}
 function closeGlobalSearch(){$('gs-overlay').classList.remove('open');gsSearchId++;document.removeEventListener('keydown',gsEscListener);}
 function gsEscListener(e){if(e.key==='Escape')closeGlobalSearch();}
