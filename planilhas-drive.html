@@ -440,33 +440,43 @@ function showApp(){
 }
 
 // ── FILES — varre TODO o Drive, todas as páginas ─────────
+let _loadId=0; // cancela cargas concorrentes
+
 async function loadFiles(){
+  const myId=++_loadId; // id desta execução
   allFiles=[];
+  filtFiles=[];
   setSyncState('loading',null,'Conectando ao Drive...');
   $('floading').style.display='flex';
   $('floading-txt').textContent='Buscando planilhas...';
   $('fitems').innerHTML='';
   try{
+    const seen=new Map(); // id → arquivo, garante unicidade global
     let pageToken=null,page=0;
     do{
+      if(_loadId!==myId)return; // outra carga iniciou, abandona esta
       const result=await fetchFilesPage(pageToken);
-      const existingIds=new Set(allFiles.map(f=>f.id));
-      const newFiles=result.files.filter(f=>!existingIds.has(f.id));
-      allFiles.push(...newFiles);
+      if(_loadId!==myId)return;
+      for(const f of result.files){
+        if(!seen.has(f.id))seen.set(f.id,f);
+      }
+      allFiles=[...seen.values()];
       pageToken=result.nextToken;
       page++;
       filterFiles();
       setSyncState('loading',null,`${allFiles.length} planilhas · pág. ${page}...`);
       $('floading-txt').textContent=`${allFiles.length} planilhas encontradas...`;
     }while(pageToken);
+    if(_loadId!==myId)return;
     filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
   }catch(e){
+    if(_loadId!==myId)return;
     $('fitems').innerHTML=`<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
     setSyncState('error',0,'Erro ao carregar');
   }
-  $('floading').style.display='none';
+  if(_loadId===myId)$('floading').style.display='none';
 }
 
 // ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
@@ -499,7 +509,11 @@ function setSyncState(state,pct,txt){
     if(svg)svg.style.animation='';
   }
 }
-async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
+async function reload(){
+  allFiles=[];filtFiles=[];
+  filterFiles(); // limpa lista imediatamente
+  await loadFiles();
+}
 
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
