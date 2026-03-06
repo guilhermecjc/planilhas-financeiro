@@ -15,7 +15,45 @@
   --gold:#e37400;--red:#d93025;
   --sh:0 1px 3px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.1);
   --sh2:0 2px 6px rgba(60,64,67,.2),0 1px 3px rgba(60,64,67,.15);
+  --tbl-fs:12px;
 }
+body.dark{
+  --bg:#1a1b1e;--bg2:#25262b;--bg3:#2c2d32;
+  --b:#373a40;--b2:#4a4d57;
+  --t:#e8eaed;--m:#9aa0a6;--m2:#bdc1c6;
+  --sh:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --sh2:0 2px 6px rgba(0,0,0,.5),0 2px 4px rgba(0,0,0,.3);
+}
+body.dark header{background:#25262b}
+body.dark .lpanel{background:#25262b}
+body.dark .fitem:hover{background:#2c2d32}
+body.dark .fitem.active{background:#1c2c4a;border-color:rgba(26,115,232,.4)}
+body.dark .dhead{background:#25262b}
+body.dark .ttable thead tr{background:#2c2d32}
+body.dark .ttable tbody tr:hover{background:#2c2d32}
+body.dark .ttable tbody tr:nth-child(even){background:#222327}
+body.dark .ttable tbody tr:nth-child(even):hover{background:#2c2d32}
+body.dark .ttable tfoot tr{background:#2c2d32}
+body.dark .twrap{background:#25262b;border-color:#373a40}
+body.dark .mc{background:#25262b}
+body.dark .tab{background:#2c2d32;border-color:#373a40;color:var(--m)}
+body.dark .tab.active{background:#1c2c4a;border-color:rgba(26,115,232,.4);color:#8ab4f8}
+body.dark .finput,.dark .sinput,.dark .sselect,.dark .desl-input,.dark .desl-km{background:#2c2d32;border-color:#373a40;color:var(--t)}
+body.dark .clearbtn,.dark .gsearch-btn{background:#2c2d32;border-color:#373a40;color:var(--m)}
+body.dark .login-card{background:#25262b}
+body.dark .gbtn{background:#2c2d32;border-color:#373a40;color:var(--t)}
+body.dark .gs-modal,.dark .desl-modal{background:#25262b;border-color:#373a40}
+body.dark .gs-input{color:var(--t);background:transparent}
+body.dark .gs-footer,.dark .desl-footer{background:#2c2d32}
+body.dark .desl-vitem{background:#2c2d32;border-color:#373a40}
+body.dark .desl-vitem:hover{background:#33353b}
+body.dark .desl-vitem.checked{background:#1c2c4a;border-color:rgba(26,115,232,.4)}
+body.dark .desl-resultado{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25)}
+body.dark .sync-bar{background:rgba(26,115,232,.08);border-color:rgba(26,115,232,.2)}
+body.dark .rpanel{background:#1a1b1e}
+body.dark .login-wrap{background:linear-gradient(135deg,#1c2c4a 0%,#1a1b1e 100%)}
+*{transition:background-color .2s ease,border-color .2s ease,color .15s ease}
+.ttable{font-size:var(--tbl-fs)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
 header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;border-bottom:1px solid var(--b);box-shadow:var(--sh)}
@@ -279,6 +317,12 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
   <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
   <div class="hright">
     <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
+    <div style="display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:3px 5px">
+      <button onclick="setFontSize(-1)" title="Diminuir fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A−</button>
+      <span id="fs-label" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--m);min-width:24px;text-align:center">12</span>
+      <button onclick="setFontSize(1)" title="Aumentar fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A+</button>
+    </div>
+    <button id="dark-btn" onclick="toggleDark()" title="Alternar modo escuro" style="background:none;border:1px solid var(--b);color:var(--m);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">🌙</button>
     <div class="upill" id="upill"><img class="uavatar" id="uavatar" src="" alt=""/><span class="uname" id="uname"></span></div>
     <button class="blogout" id="blogout" onclick="logout()">↩ Sair</button>
   </div>
@@ -1189,6 +1233,35 @@ function deslLimpar(){
   });
   $('desl-resultado-wrap').style.display='none';
 }
+
+// DARK MODE
+function toggleDark(){
+  const isDark=document.body.classList.toggle('dark');
+  localStorage.setItem('cf_dark',isDark?'1':'0');
+  document.getElementById('dark-btn').textContent=isDark?'☀️':'🌙';
+}
+function initDark(){
+  const saved=localStorage.getItem('cf_dark');
+  if(saved==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
+}
+
+// FONT SIZE
+let curFontSize=parseInt(localStorage.getItem('cf_fs')||'12');
+function initFontSize(){
+  document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');
+  const lbl=document.getElementById('fs-label');
+  if(lbl)lbl.textContent=curFontSize;
+}
+function setFontSize(delta){
+  curFontSize=Math.min(18,Math.max(9,curFontSize+delta));
+  document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');
+  localStorage.setItem('cf_fs',curFontSize);
+  const lbl=document.getElementById('fs-label');
+  if(lbl)lbl.textContent=curFontSize;
+}
+// Inicializar ao carregar
+initDark();
+initFontSize();
 </script>
 </body>
 </html>
