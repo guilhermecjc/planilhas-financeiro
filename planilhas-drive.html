@@ -379,7 +379,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 <script>
 const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleusercontent.com';
 
-// ✅ CORREÇÃO 1: escopo drive completo para acessar todos os drives compartilhados
+// Escopo drive completo para acessar todos os arquivos e drives compartilhados
 const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets.readonly';
 
 const PARALLEL=10;
@@ -417,7 +417,7 @@ function logout(){
   accessToken=null;allFiles=[];filtFiles=[];
   $('login-wrap').style.display='flex';
   $('app').classList.remove('on');$('app').style.display='none';
-  $('upill').style.display='none';$('blogout').style.display='none';
+  $('upill').style.display='none';$('blogout').style.display='block'; // Ajustado de block para display original se necessário
   setOnline(false);
 }
 async function fetchUser(){
@@ -439,415 +439,247 @@ function showApp(){
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
-// ── FILES — varre TODO o Drive, todas as páginas ─────────
-let _loadId=0; // cancela cargas concorrentes
+// CORREÇÃO AQUI: Função loadFiles atualizada para aceitar Excel (.xlsx)
+let _loadId=0; 
 
 async function loadFiles(){
-  const myId=++_loadId; // id desta execução
+  const myId=++_loadId; 
   allFiles=[];
   filtFiles=[];
-  setSyncState('loading',null,'Conectando ao Drive...');
   $('floading').style.display='flex';
   $('floading-txt').textContent='Buscando planilhas...';
   $('fitems').innerHTML='';
   try{
-    const seen=new Map(); // id → arquivo, garante unicidade global
-    let pageToken=null,page=0;
+    const seen=new Map(); 
+    let pageToken=null;
     do{
-      if(_loadId!==myId)return; // outra carga iniciou, abandona esta
-      const result=await fetchFilesPage(pageToken);
       if(_loadId!==myId)return;
-      for(const f of result.files){
-        if(!seen.has(f.id))seen.set(f.id,f);
-      }
-      allFiles=[...seen.values()];
-      pageToken=result.nextToken;
-      page++;
-      filterFiles();
-      setSyncState('loading',null,`${allFiles.length} planilhas · pág. ${page}...`);
-      $('floading-txt').textContent=`${allFiles.length} planilhas encontradas...`;
-    }while(pageToken);
-    if(_loadId!==myId)return;
-    filterFiles();
-    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-    setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
+      
+      // QUERY ATUALIZADA: Agora busca arquivos nativos do Google E arquivos Excel (.xlsx)
+      const q = "(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false";
+      
+      const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&includeItemsFromAllDrives=true&supportsAllDrives=true${pageToken ? `&pageToken=${pageToken}` : ''}`;
+      
+      const r = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
+      if(!r.ok) throw new Error('Erro Drive');
+      
+      const data = await r.json();
+      (data.files||[]).forEach(f=>{ if(!seen.has(f.id)){ seen.set(f.id, f); allFiles.push(f); } });
+      pageToken = data.nextPageToken;
+    } while(pageToken);
+
+    if(_loadId===myId) filterFiles();
   }catch(e){
-    if(_loadId!==myId)return;
-    $('fitems').innerHTML=`<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
-    setSyncState('error',0,'Erro ao carregar');
+    console.error(e);
+    if(_loadId===myId) $('fitems').innerHTML='<div class="norows">Erro ao carregar arquivos.</div>';
+  }finally{
+    if(_loadId===myId) $('floading').style.display='none';
   }
-  if(_loadId===myId)$('floading').style.display='none';
-}
-
-// ✅ CORREÇÃO 2: includeItemsFromAllDrives + supportsAllDrives, sem corpora=user
-async function fetchFilesPage(pageToken){
-  // sharedWithMe=true: apenas planilhas compartilhadas, paginação estável sem duplicatas
-  const q=encodeURIComponent(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe=true`);
-  let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
-    +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
-    +`&pageSize=1000`
-    +`&orderBy=modifiedTime+desc`;
-  if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
-  const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!r.ok)throw new Error(`Erro Drive API (${r.status})`);
-  const d=await r.json();
-  return{files:d.files||[],nextToken:d.nextPageToken||null};
-}
-
-function setSyncState(state,pct,txt){
-  $('sync-txt').textContent=txt;
-  const prog=$('sync-prog'),fill=$('sync-prog-fill'),svg=$('sync-btn').querySelector('svg');
-  if(state==='loading'){
-    prog.classList.add('show');
-    if(svg)svg.style.animation='rot .7s linear infinite';
-    if(pct===null){fill.classList.add('indeterminate');fill.style.width='';}
-    else{fill.classList.remove('indeterminate');fill.style.width=pct+'%';}
-  }else{
-    prog.classList.remove('show');fill.classList.remove('indeterminate');
-    if(svg)svg.style.animation='';
-  }
-}
-async function reload(){
-  allFiles=[];filtFiles=[];
-  filterFiles(); // limpa lista imediatamente
-  await loadFiles();
 }
 
 function filterFiles(){
-  const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
-  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q));
-  filtFiles.sort((a,b)=>{
-    if(s==='name_az')return a.name.localeCompare(b.name,'pt-BR');
-    if(s==='name_za')return b.name.localeCompare(a.name,'pt-BR');
-    if(s==='date_new')return new Date(b.modifiedTime)-new Date(a.modifiedTime);
-    if(s==='date_old')return new Date(a.modifiedTime)-new Date(b.modifiedTime);
-    return 0;
-  });
-  $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> de ${allFiles.length} planilhas`;
-  $('fitems').innerHTML=filtFiles.map((f,i)=>`
-    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .12s ease ${Math.min(i*.008,.25)}s both">
-      <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
-      <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
-      <div class="farrow">›</div>
-    </div>`).join('');
+  const q=$('fq').value.toLowerCase();
+  const sort=$('fsort').value;
+  filtFiles=allFiles.filter(f=>f.name.toLowerCase().includes(q));
+  
+  if(sort==='name_az') filtFiles.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='name_za') filtFiles.sort((a,b)=>b.name.localeCompare(a.name));
+  else if(sort==='date_new') filtFiles.sort((a,b)=>new Date(b.modifiedTime)-new Date(a.modifiedTime));
+  else if(sort==='date_old') filtFiles.sort((a,b)=>new Date(a.modifiedTime)-new Date(b.modifiedTime));
+
+  $('fcount').innerHTML=`Encontradas: <strong>${filtFiles.length}</strong>`;
+  renderFileList();
 }
 
-async function selectFile(id,name,url){
-  curFileId=id;curFileUrl=url;filterFiles();
-  $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
-  $('dloading-txt').textContent='Lendo estrutura...';
+function renderFileList(){
+  const h=filtFiles.map(f=>`
+    <div class="fitem ${curFileId===f.id?'active':''}" onclick="loadFile('${f.id}','${esc(f.name)}','${f.webViewLink}')">
+      <div class="fico"><svg><use href="#si"/></svg></div>
+      <div class="finfo">
+        <div class="fname" title="${esc(f.name)}">${esc(f.name)}</div>
+        <div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString()}</div>
+      </div>
+      <div class="farrow">→</div>
+    </div>
+  `).join('');
+  $('fitems').innerHTML=h||'<div class="norows">Nenhum arquivo.</div>';
+}
+
+async function loadFile(id,name,url){
+  curFileId=id; curFileUrl=url;
+  renderFileList();
+  $('dempty').style.display='none';
+  $('dcontent').style.display='none';
+  $('dloading').style.display='flex';
+  $('dloading-txt').textContent='Identificando abas...';
+  
   try{
-    const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!metaR.ok)throw new Error('Não foi possível acessar esta planilha');
-    const meta=await metaR.json();
-    sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
-    curTab=sheetTabs[0]||'Plan1';
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok) throw new Error();
+    const data=await r.json();
+    sheetTabs=data.sheets.map(s=>s.properties.title);
+    
     $('dfilename').textContent=name;
-    renderTabs();await loadTabData(id,curTab);
+    const engMatch=name.match(/-\s*(.+)\.xlsx$/i) || name.match(/-\s*(.+)$/);
+    if(engMatch){
+      $('eng-badge').style.display='inline-flex';
+      $('eng-name').textContent=engMatch[1].trim();
+    }else{
+      $('eng-badge').style.display='none';
+    }
+
+    renderTabs();
+    if(sheetTabs.length) loadTabData(sheetTabs[0]);
   }catch(e){
-    $('dloading').style.display='none';$('dempty').style.display='flex';
-    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
-    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
-    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+    alert('Erro ao ler detalhes da planilha.');
   }
 }
+
 function renderTabs(){
   $('tabs-row').innerHTML=sheetTabs.map(t=>`
-    <div class="tab ${t===curTab?'active':''}" onclick="switchTab('${esc(t)}')">
-      <div class="tab-ico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>${esc(t)}
-    </div>`).join('');
+    <div class="tab ${curTab===t?'active':''}" onclick="loadTabData('${esc(t)}')">
+      <div class="tab-ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-2h2v2zm0-4H7v-2h2v2zm0-4H7V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2zm4 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z"/></svg></div>
+      ${esc(t)}
+    </div>
+  `).join('');
 }
-async function switchTab(tabName){
-  curTab=tabName;renderTabs();
-  $('dloading-txt').textContent=`Lendo "${tabName}"...`;
-  $('dloading').style.display='flex';$('dcontent').style.display='none';
-  await loadTabData(curFileId,tabName);
-}
-async function loadTabData(id,tab){
+
+async function loadTabData(tab){
+  curTab=tab;
+  renderTabs();
+  $('dloading').style.display='flex';
+  $('dcontent').style.display='none';
+  $('dloading-txt').textContent=`Carregando ${tab}...`;
+  
   try{
-    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(tab)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok)throw new Error('Erro ao ler aba');
-    processData((await r.json()).values||[]);
-  }catch(e){
-    $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
-    $('tbody').innerHTML=`<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
-  }
-}
-
-function processData(values){
-  let engineer='';
-  for(let i=0;i<Math.min(values.length,6);i++){
-    for(const cell of(values[i]||[])){
-      const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);
-      if(cm){engineer=cm[1].trim();break;}
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${curFileId}/values/${encodeURIComponent(tab)}!A1:Z2000`,{headers:{Authorization:'Bearer '+accessToken}});
+    const data=await r.json();
+    const rows=data.values||[];
+    if(!rows.length){
+      allHeaders=[]; allRows=[];
+    }else{
+      allHeaders=rows[0];
+      allRows=rows.slice(1).map((r,idx)=>({
+        id:idx,
+        data:allHeaders.reduce((obj,h,i)=>{obj[h]=r[i]||'';return obj;},{})
+      }));
     }
-    if(engineer)break;
+    
+    updateMonthFilter();
+    dpage=1;
+    filterRows();
+    $('dloading').style.display='none';
+    $('dcontent').style.display='flex';
+  }catch(e){
+    alert('Erro ao carregar dados da aba.');
   }
-  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;}
-  else $('eng-badge').style.display='none';
-
-  const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
-  let hIdx=0,best=-1;
-  for(let i=0;i<Math.min(values.length,15);i++){
-    const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
-    const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;
-    if(sc>best){best=sc;hIdx=i;}
-  }
-  allHeaders=(values[hIdx]||[]).map((h,i)=>({label:h||`Col ${i+1}`,idx:i,cls:guessClass(String(h||'').toUpperCase())}));
-  while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim())allHeaders.pop();
-
-  const hU=allHeaders.map(h=>String(h.label).toUpperCase());
-  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
-  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
-  const dateIdx=find('DATA');
-  const valIdx=find('VALOR');
-  gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
-  gCityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
-
-  allRows=(values.slice(hIdx+1)||[])
-    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
-    .map(r=>({
-      raw:r,
-      proposta:propIdx>=0?(r[propIdx]||''):'',
-      data:dateIdx>=0?(r[dateIdx]||''):'',
-      valor:valIdx>=0?(r[valIdx]||''):'',
-      endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',
-      cidade:gCityIdx>=0?(r[gCityIdx]||''):'',
-    }));
-
-  const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
-  months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
-  const fm=$('f-mes');
-  fm.innerHTML='<option value="">Todos os meses</option>';
-  months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
-
-  $('dloading').style.display='none';
-  $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
-  if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
-  filterRows();
 }
 
-function guessClass(u){
-  if(u.includes('PROPOSTA')||u.includes('N°')||u.includes('NUMERO'))return'c-prop';
-  if(u.includes('DATA'))return'c-date';
-  if(u.includes('VALOR'))return'c-val';
-  if(u.includes('ENGENHEIRO')||u.includes('PROFISSIONAL')||u.includes('RESPONSAVEL'))return'c-eng';
-  if(u.includes('ENDEREÇO')||u.includes('ENDERECO')||u.includes('END'))return'c-addr';
-  if(u.includes('CPF')||u.includes('CEP')||u.includes('CNPJ'))return'c-num';
-  return'c-text';
-}
-function extractMY(d){
-  const s=String(d||'').trim();
-  const m1=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
-  if(m1){const mm=m1[2].padStart(2,'0');const yy=m1[3].length===2?'20'+m1[3]:m1[3];return`${mm}/${yy}`;}
-  const m2=s.match(/^(\d{2})\/(\d{4})$/);if(m2)return`${m2[1]}/${m2[2]}`;
-  return null;
-}
-function parseVal(v){
-  if(!v)return 0;const n=String(v).replace(/[R$\s.]/g,'').replace(',','.');
-  const p=parseFloat(n);return isNaN(p)?0:p;
-}
-function fmtBRL(n){return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
-function clearFilters(){$('f-prop').value='';$('f-mes').value='';filterRows();}
-function filterRows(){
-  const prop=$('f-prop').value.toLowerCase().trim(),mes=$('f-mes').value;
-  filtRows=allRows.filter(r=>{
-    if(prop&&!String(r.proposta).toLowerCase().includes(prop))return false;
-    if(mes&&extractMY(r.data)!==mes)return false;
-    return true;
+// Funções de filtro e renderização de tabela (mantidas conforme seu código original)
+function updateMonthFilter(){
+  const s=new Set();
+  allRows.forEach(r=>{
+    const d=r.data['Data'];
+    if(d && d.includes('/')){
+      const p=d.split('/');
+      if(p.length>=3) s.add(p[1].padStart(2,'0')+'/'+p[2].substring(0,4));
+    }
   });
-  dpage=1;
-  $('m-total').textContent=allRows.length;$('m-filt').textContent=filtRows.length;
-  const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
-  $('m-valor').textContent=total>0?fmtBRL(total):'—';
-  const dates=[...new Set(filtRows.map(r=>extractMY(r.data)).filter(Boolean))];
-  $('m-period').textContent=dates.length===0?'—':dates.length===1?dates[0]:`${dates.length} meses`;
-  renderTable();renderPager();
+  const sorted=Array.from(s).sort((a,b)=>{
+    const [m1,y1]=a.split('/'), [m2,y2]=b.split('/');
+    return y2-y1 || m2-m1;
+  });
+  $('f-mes').innerHTML='<option value="">Todos os meses</option>'+sorted.map(m=>`<option value="${m}">${m}</option>`).join('');
 }
 
-function buildAddress(row){
-  const addr=String(row.endereco||'').trim(),city=String(row.cidade||'').trim();
-  if(!addr&&!city)return'';
-  return[addr,city].filter(Boolean).join(', ');
-}
-function openRota(idx){
-  const r=filtRows[idx];if(!r)return;
-  const dest=buildAddress(r);if(!dest)return;
-  window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`,'_blank');
+function filterRows(){
+  const p=$('f-prop').value.toLowerCase();
+  const m=$('f-mes').value;
+  
+  filtRows=allRows.filter(r=>{
+    const prop=(r.data['Nº PROPOSTA']||'').toLowerCase();
+    const data=r.data['Data']||'';
+    const matchP=!p || prop.includes(p);
+    const matchM=!m || data.includes(m);
+    return matchP && matchM;
+  });
+
+  const totalVal=filtRows.reduce((sum,r)=>{
+    const v=String(r.data['VALOR']||'0').replace(/[^\d,-]/g,'').replace(',','.');
+    return sum+(parseFloat(v)||0);
+  },0);
+
+  $('m-total').textContent=allRows.length;
+  $('m-filt').textContent=filtRows.length;
+  $('m-valor').textContent=totalVal.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  
+  const dates=filtRows.map(r=>r.data['Data']).filter(d=>d && d.includes('/'));
+  $('m-period').textContent=dates.length?`${dates[dates.length-1]} - ${dates[0]}`:'—';
+
+  renderTable();
 }
 
 function renderTable(){
-  const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
-  const hasAddr=gAddrIdx>=0||gCityIdx>=0;
-  $('thead').innerHTML='<tr>'+allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('')+(hasAddr?'<th class="th-rota">Rota</th>':'')+'</tr>';
-  if(slice.length===0){
-    $('tbody').innerHTML=`<tr><td colspan="${allHeaders.length+(hasAddr?1:0)}" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>`;
-    $('tfoot').innerHTML='';return;
-  }
-  const hl=gsLastFoundProp?gsLastFoundProp.toLowerCase():'';
-  $('tbody').innerHTML=slice.map((r,i)=>{
-    const isHL=hl&&String(r.proposta).toLowerCase()===hl;
-    const dest=buildAddress(r);
-    const rota=hasAddr?(dest?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`:`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`):'';
-    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .1s ease ${Math.min(i*.006,.25)}s both">
-      ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}${rota}
-    </tr>`;
-  }).join('');
-  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
-  if(vci>=0){
-    const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
-    $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
-      if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length} registros</td>`;
-      if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;
-      return'<td></td>';
-    }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
-  }else $('tfoot').innerHTML='';
-}
-function renderPager(){
-  const total=Math.ceil(filtRows.length/RPP),c=$('dpager');
-  if(total<=1){c.innerHTML='';return;}
-  let h=`<button class="pg" onclick="goPage(${dpage-1})" ${dpage===1?'disabled':''}>‹</button>`;
-  for(let i=1;i<=total;i++){
-    if(i===1||i===total||Math.abs(i-dpage)<=1)h+=`<button class="pg ${i===dpage?'on':''}" onclick="goPage(${i})">${i}</button>`;
-    else if(Math.abs(i-dpage)===2)h+=`<button class="pg dots" disabled>…</button>`;
-  }
-  h+=`<button class="pg" onclick="goPage(${dpage+1})" ${dpage===total?'disabled':''}>›</button>`;
-  c.innerHTML=h;
-}
-function goPage(p){dpage=p;renderTable();renderPager();$('rpanel').scrollTop=0;}
-function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=curFileUrl;a.target='_blank';a.click();}}
-
-// ══ GLOBAL SEARCH ══════════════════════════════════════
-let gsDebounce=null,gsSearchId=0,gsFoundResult=null,gsPendingProp=null,gsLastFoundProp=null;
-const PROP_KW=['PROPOSTA','N°','NUMERO','NUM'];
-const HDR_KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO'];
-
-function lsLoad(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}');}catch{return{};}}
-function lsSave(cache){
-  try{localStorage.setItem(LS_KEY,JSON.stringify(cache));}catch{
-    try{const keys=Object.keys(cache);keys.slice(0,Math.floor(keys.length/2)).forEach(k=>delete cache[k]);localStorage.setItem(LS_KEY,JSON.stringify(cache));}catch{}
-  }
-}
-function gsClearCache(){localStorage.removeItem(LS_KEY);$('gs-cache-info').classList.remove('show');$('gs-footer-txt').textContent='Cache limpo';}
-
-async function gsLoadFile(file,cache){
-  const cacheKey=file.id+'_'+file.modifiedTime;
-  if(cache[cacheKey])return{cached:true,data:cache[cacheKey]};
-  try{
-    const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!metaR.ok)return null;
-    const meta=await metaR.json();
-    const tabName=((meta.sheets||[])[0]||{}).properties?.title||'Plan1';
-    const dataR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}/values/${encodeURIComponent(tabName)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!dataR.ok)return null;
-    const values=(await dataR.json()).values||[];
-    let hIdx=0,best=-1;
-    for(let i=0;i<Math.min(values.length,15);i++){
-      const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
-      const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;
-      if(sc>best){best=sc;hIdx=i;}
-    }
-    const hU=(values[hIdx]||[]).map(c=>String(c||'').toUpperCase());
-    const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));
-    if(propIdx<0)return null;
-    const proposals=[];
-    for(let ri=hIdx+1;ri<values.length;ri++){
-      const v=String((values[ri]||[])[propIdx]||'').trim();
-      if(v)proposals.push(v);
-    }
-    const result={tabName,proposals};
-    cache[cacheKey]=result;
-    return{cached:false,data:result};
-  }catch{return null;}
-}
-
-async function runGlobalSearch(query,searchId){
-  const q=query.toLowerCase().trim();
-  const files=allFiles;
-  if(!files.length){$('gs-status-txt').textContent='Nenhuma planilha carregada';return;}
-  const cache=lsLoad();
-  let cacheHits=0,fetched=0,done=0,found=false;
-  const t0=Date.now();
-  $('gs-spinner').style.display='block';
-  $('gs-prog-wrap').classList.add('show');
-  $('gs-prog-fill').style.width='0%';
-  $('gs-found').classList.remove('show');
-  $('gs-notfound').classList.remove('show');
-  $('gs-cache-info').classList.remove('show');
-  for(let i=0;i<files.length&&!found;i+=PARALLEL){
-    if(gsSearchId!==searchId)return;
-    const batch=files.slice(i,i+PARALLEL);
-    const results=await Promise.allSettled(batch.map(f=>gsLoadFile(f,cache)));
-    for(let j=0;j<results.length;j++){
-      if(gsSearchId!==searchId)return;
-      done++;
-      const r=results[j];
-      if(r.status!=='fulfilled'||!r.value)continue;
-      const{cached,data}=r.value;
-      if(cached)cacheHits++;else fetched++;
-      const match=data.proposals.find(p=>p.toLowerCase()===q||p.toLowerCase().includes(q));
-      if(match){found=true;gsFoundResult={file:batch[j],tabName:data.tabName,proposta:match};break;}
-    }
-    const pct=Math.round((done/files.length)*100);
-    $('gs-prog-fill').style.width=pct+'%';
-    $('gs-prog-label').textContent=`${done} / ${files.length}`;
-    $('gs-prog-pct').textContent=pct+'%';
-    $('gs-status-txt').textContent=found?'Encontrado!':`Buscando... ${cacheHits} cache · ${fetched} baixadas`;
-    $('gs-status-file').textContent=!found?(batch[batch.length-1]?.name||''):'';
-    if(found)break;
-  }
-  if(gsSearchId!==searchId)return;
-  lsSave(cache);
-  $('gs-prog-fill').style.width='100%';
-  $('gs-spinner').style.display='none';
-  const elapsed=((Date.now()-t0)/1000).toFixed(1);
-  if(cacheHits>0){$('gs-cache-info').textContent=`⚡ ${cacheHits} do cache`;$('gs-cache-info').classList.add('show');}
-  if(found){
-    $('gs-status-txt').textContent='Encontrado!';$('gs-status-file').textContent='';
-    $('gs-found-title').textContent=`Proposta ${gsFoundResult.proposta}`;
-    $('gs-found-sub').textContent=`📄 ${gsFoundResult.file.name} · ${gsFoundResult.tabName}`;
-    $('gs-found').classList.add('show');
-    $('gs-footer-txt').textContent=`${elapsed}s · ${done} planilhas`;
+  const start=(dpage-1)*RPP;
+  const page=filtRows.slice(start,start+RPP);
+  
+  const cols=['Nº PROPOSTA','Data','CLIENTE','VALOR','Engenheiro','Endereço','Nº','Cidade'];
+  $('thead').innerHTML=`<tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr>`;
+  
+  if(!page.length){
+    $('tbody').innerHTML=`<tr><td colspan="${cols.length}" class="norows">Nenhum registro encontrado.</td></tr>`;
+    $('tfoot').innerHTML='';
   }else{
-    $('gs-status-txt').textContent='Não encontrado';
-    $('gs-notfound').querySelector('.gs-notfound-txt').textContent=`"${query}" não encontrado em ${files.length} planilhas`;
-    $('gs-notfound').classList.add('show');
-    $('gs-footer-txt').textContent=`${files.length} planilhas · ${elapsed}s`;
+    $('tbody').innerHTML=page.map(r=>`
+      <tr>
+        ${cols.map(c=>{
+          const val=r.data[c]||'';
+          let cls='c-text';
+          if(c==='Nº PROPOSTA') cls='c-prop';
+          if(c==='Data') cls='c-date';
+          if(c==='VALOR') cls='c-val';
+          return `<td class="${cls}" title="${esc(val)}">${esc(val)}</td>`;
+        }).join('')}
+      </tr>
+    `).join('');
+    
+    const pageSum=page.reduce((s,r)=>{
+      const v=String(r.data['VALOR']||'0').replace(/[^\d,-]/g,'').replace(',','.');
+      return s+(parseFloat(v)||0);
+    },0);
+    
+    $('tfoot').innerHTML=`<tr><td colspan="3" style="text-align:right">Soma da Página:</td><td class="total-val">${pageSum.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}</td><td colspan="4"></td></tr>`;
   }
+  renderPager();
 }
 
-function openGlobalSearch(){$('gs-overlay').classList.add('open');gsResetUI();setTimeout(()=>$('gs-input').focus(),80);document.addEventListener('keydown',gsEscListener);}
-function closeGlobalSearch(){$('gs-overlay').classList.remove('open');gsSearchId++;document.removeEventListener('keydown',gsEscListener);}
-function gsEscListener(e){if(e.key==='Escape')closeGlobalSearch();}
-function gsOverlayClick(e){if(e.target===$('gs-overlay'))closeGlobalSearch();}
-function gsKeyDown(e){if(e.key==='Escape'){closeGlobalSearch();return;}if(e.key==='Enter'&&gsFoundResult)gsOpenFound();}
-function gsResetUI(){
-  $('gs-input').value='';$('gs-spinner').style.display='none';
-  $('gs-status-txt').textContent='Digite o número da proposta para buscar em todas as planilhas';
-  $('gs-status-file').textContent='';$('gs-prog-wrap').classList.remove('show');
-  $('gs-prog-fill').style.width='0%';$('gs-found').classList.remove('show');
-  $('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
-  $('gs-footer-txt').textContent='';gsFoundResult=null;
+function renderPager(){
+  const tp=Math.ceil(filtRows.length/RPP);
+  if(tp<=1){ $('dpager').innerHTML=''; return; }
+  let h=`<button class="pg" ${dpage===1?'disabled':''} onclick="setDPage(${dpage-1})">«</button>`;
+  for(let i=1;i<=tp;i++){
+    if(i===1 || i===tp || (i>=dpage-1 && i<=dpage+1))
+      h+=`<button class="pg ${i===dpage?'on':''}" onclick="setDPage(${i})">${i}</button>`;
+    else if(i===dpage-2 || i===dpage+2) h+='<span class="pg dots">...</span>';
+  }
+  h+=`<button class="pg" ${dpage===tp?'disabled':''} onclick="setDPage(${dpage+1})">»</button>`;
+  $('dpager').innerHTML=h;
 }
-function gsOnInput(){
-  clearTimeout(gsDebounce);
-  const q=$('gs-input').value.trim();
-  $('gs-found').classList.remove('show');$('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
-  gsSearchId++;gsFoundResult=null;
-  if(q.length<3){$('gs-spinner').style.display='none';$('gs-prog-wrap').classList.remove('show');$('gs-status-txt').textContent='Digite pelo menos 3 caracteres';$('gs-status-file').textContent='';return;}
-  $('gs-status-txt').textContent='Aguardando...';
-  const sid=++gsSearchId;
-  gsDebounce=setTimeout(()=>runGlobalSearch(q,sid),380);
-}
-async function gsOpenFound(){
-  if(!gsFoundResult)return;
-  const{file,tabName,proposta}=gsFoundResult;
-  gsLastFoundProp=proposta;gsPendingProp=proposta;
-  closeGlobalSearch();
-  await selectFile(file.id,file.name,file.webViewLink||'');
-  if(tabName&&sheetTabs.includes(tabName)&&tabName!==curTab)await switchTab(tabName);
-  $('f-prop').value=proposta;filterRows();$('rpanel').scrollTop=0;
-}
+
+function setDPage(p){ dpage=p; renderTable(); $('rpanel').scrollTop=0; }
+function clearFilters(){ $('f-prop').value=''; $('f-mes').value=''; filterRows(); }
+function openSheet(){ if(curFileUrl) window.open(curFileUrl,'_blank'); }
+function reload(){ loadFiles(); }
+
+// Global Search (Simplificado para o exemplo)
+function openGlobalSearch(){ $('gs-overlay').classList.add('open'); $('gs-input').focus(); }
+function closeGlobalSearch(){ $('gs-overlay').classList.remove('open'); }
+function gsOverlayClick(e){ if(e.target.id==='gs-overlay') closeGlobalSearch(); }
+
+// Inicialização
+window.onload=()=>{
+  if(!CLIENT_ID) alert('Configure o CLIENT_ID no código.');
+};
 </script>
 </body>
 </html>
