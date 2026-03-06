@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -376,10 +375,11 @@ const FOLDER_ID='1xgSiwX9tT7Cg8pZJkqAr2_3e-gH7Jcau';
 const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 const PARALLEL=10;
 const LS_KEY='cf_gs_cache_v4';
-// NOVOS LIMITES PARA OTIMIZAÇÃO
+
 const FOLDER_SCAN_CONCURRENCY = 8;
 const FOLDER_FILE_BATCH = 20;
 const DRIVE_FILES_PAGE_SIZE = 1000;
+
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null;
@@ -388,8 +388,10 @@ let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
 let dpage=1;
 const RPP=50;
+
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
 function initGoogle(){
   tokenClient=google.accounts.oauth2.initTokenClient({
     client_id:CLIENT_ID,scope:SCOPES,
@@ -401,7 +403,7 @@ function initGoogle(){
   });
 }
 function doLogin(){
-  if(typeof google==='undefined')return alert('Aguarde...');
+  if(typeof google==='undefined')return alert('Aguarde o carregamento do Google...');
   if(!tokenClient)initGoogle();
   tokenClient.requestAccessToken({prompt:'consent'});
 }
@@ -431,19 +433,20 @@ function showApp(){
   $('app').style.display='flex';$('app').classList.add('on');
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
-// ======================
-// CARREGAMENTO DE ARQUIVOS OTIMIZADO
-// ======================
+
 async function loadFiles(){
   setSyncState('loading',0,'Buscando planilhas...');
   $('floading').style.display='flex';$('fitems').innerHTML='';
   const seen=new Map();
-  const dedup=arr=>{for(const f of (arr||[])){if(f && f.id && !seen.has(f.id))seen.set(f.id,f);}};
+  const dedup=arr=>{for(const f of(arr||[]))if(f?.id&&!seen.has(f.id))seen.set(f.id,f);};
   const update=txt=>{allFiles=[...seen.values()];filterFiles();setSyncState('loading',null,txt);};
+
   try{
-    // 1) Meu Drive (pasta raiz + TODAS subpastas) – busca paralela + arquivos em lotes
     setSyncState('loading',null,'Mapeando pastas...');
-    const folderIds=await getAllSubfoldersFast(FOLDER_ID,(done,total)=>{update(`Mapeando pastas... ${done}/${total}`);});
+    const folderIds=await getAllSubfoldersFast(FOLDER_ID,(done,total)=>{
+      update(`Mapeando pastas... ${done}/${total}`);
+    });
+
     update(`${seen.size} planilhas · listando arquivos nas pastas...`);
     const totalBatches=Math.ceil(folderIds.length/FOLDER_FILE_BATCH);
     for(let bi=0;bi<folderIds.length;bi+=FOLDER_FILE_BATCH){
@@ -452,17 +455,16 @@ async function loadFiles(){
       const q=
         `(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') `+
         `and trashed=false and (${parents})`;
-      const files=await fetchAllPagesQuery(q);
-      dedup(files);
+      dedup(await fetchAllPagesQuery(q));
       const batchN=Math.floor(bi/FOLDER_FILE_BATCH)+1;
       update(`${seen.size} planilhas · pastas (lotes) ${batchN}/${totalBatches}...`);
     }
-    // 2) Compartilhados comigo
+
     update(`${seen.size} planilhas · buscando compartilhados...`);
     dedup(await fetchAllPagesQuery(
       `(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false and sharedWithMe`
     ));
-    // 3) Shared Drives – com limite de concorrência
+
     update(`${seen.size} planilhas · buscando Shared Drives...`);
     const sharedDrives=await listSharedDrives();
     const driveQuery=
@@ -472,6 +474,7 @@ async function loadFiles(){
       return await fetchAllPagesQuery(driveQuery,drv.id);
     });
     dedup(driveFilesArrays.flat());
+
     allFiles=[...seen.values()];
     filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -482,11 +485,12 @@ async function loadFiles(){
   }
   $('floading').style.display='none';
 }
-// Varredura de subpastas com concorrência
+
 async function getAllSubfoldersFast(rootId,onProgress){
   const seen=new Set([rootId]);
   const queue=[rootId];
   let doneParents=0;
+
   while(queue.length){
     const batch=queue.splice(0,FOLDER_SCAN_CONCURRENCY);
     const results=await Promise.allSettled(batch.map(pid=>listChildFolders(pid)));
@@ -495,12 +499,13 @@ async function getAllSubfoldersFast(rootId,onProgress){
     for(const r of results){
       if(r.status!=='fulfilled'||!Array.isArray(r.value))continue;
       for(const id of r.value){
-        if(id && !seen.has(id)){seen.add(id);queue.push(id);}
+        if(id&&!seen.has(id)){seen.add(id);queue.push(id);}
       }
     }
   }
   return [...seen];
 }
+
 async function listChildFolders(parentId){
   const out=[];let pageToken=null;
   do{
@@ -513,12 +518,12 @@ async function listChildFolders(parentId){
     const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
     if(!r.ok)break;
     const d=await r.json();
-    (d.files||[]).forEach(f=>{if(f && f.id)out.push(f.id);});
+    (d.files||[]).forEach(f=>{if(f?.id)out.push(f.id);});
     pageToken=d.nextPageToken||null;
   }while(pageToken);
   return out;
 }
-// Utilitário para limitar concorrência
+
 async function mapLimit(items,limit,fn){
   const arr=items||[];if(!arr.length)return[];
   const out=new Array(arr.length);let i=0;
@@ -531,6 +536,43 @@ async function mapLimit(items,limit,fn){
   await Promise.all(workers);
   return out;
 }
+
+async function fetchAllPagesQuery(query,driveId=null){
+  const files=[];let pageToken=null;
+  do{
+    const q=encodeURIComponent(query);
+    let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
+      +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
+      +`&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+    if(driveId)url+=`&corpora=drive&driveId=${driveId}`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return files;
+}
+
+async function listSharedDrives(){
+  const drives=[];let pageToken=null;
+  do{
+    let url=`https://www.googleapis.com/drive/v3/drives?pageSize=100`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      drives.push(...(d.drives||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return drives;
+}
+
 function setSyncState(state,pct,txt){
   $('sync-txt').textContent=txt;
   const prog=$('sync-prog'),fill=$('sync-prog-fill'),btn=$('sync-btn');
@@ -543,6 +585,7 @@ function setSyncState(state,pct,txt){
   }
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
+
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
   filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q));
@@ -561,6 +604,7 @@ function filterFiles(){
       <div class="farrow">›</div>
     </div>`).join('');
 }
+
 async function selectFile(id,name,url){
   curFileId=id;curFileUrl=url;filterFiles();
   $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
@@ -602,6 +646,7 @@ async function loadTabData(id,tab){
     $('tbody').innerHTML=`<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
   }
 }
+
 function processData(values){
   let engineer='';
   for(let i=0;i<Math.min(values.length,6);i++){
@@ -630,7 +675,7 @@ function processData(values){
   gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
   gCityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
   allRows=(values.slice(hIdx+1)||[])
-    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
+    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))    
     .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):'',endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',cidade:gCityIdx>=0?(r[gCityIdx]||''):''}));
   const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
   months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
@@ -642,6 +687,7 @@ function processData(values){
   if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
   filterRows();
 }
+
 function guessClass(u){
   if(u.includes('PROPOSTA')||u.includes('N°')||u.includes('NUMERO'))return'c-prop';
   if(u.includes('DATA'))return'c-date';
@@ -708,7 +754,9 @@ function renderTable(){
   if(vci>=0){
     const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
     $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
-      if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length]||filtRows.length} registros</td>`;
+      if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length} registros</td>`;
+      if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;
+      return'<td></td>';
     }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
   }else $('tfoot').innerHTML='';
 }
@@ -725,7 +773,7 @@ function renderPager(){
 }
 function goPage(p){dpage=p;renderTable();renderPager();$('rpanel').scrollTop=0;}
 function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=curFileUrl;a.target='_blank';a.click();}}
-// ══ GLOBAL SEARCH ══
+
 let gsDebounce=null,gsSearchId=0,gsFoundResult=null,gsPendingProp=null,gsLastFoundProp=null;
 const PROP_KW=['PROPOSTA','N°','NUMERO','NUM'];
 const HDR_KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO'];
