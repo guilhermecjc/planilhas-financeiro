@@ -381,7 +381,7 @@ const DRIVE_FILES_PAGE_SIZE=1000;
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
-let curFileId=null,curFileUrl=null,curFileMime=null;
+let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
@@ -595,15 +595,18 @@ function filterFiles(){
 }
 
 async function selectFile(id,name,url,mime){
-  curFileId=id;curFileUrl=url;curFileMime=mime||'';filterFiles();
+  curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;filterFiles();
   $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
   $('dloading-txt').textContent='Lendo estrutura...';
   try{
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     if(isXlsx){
-      // .xlsx: usar Drive export para listar abas via conversão
+      // .xlsx: baixar workbook uma vez, listar abas reais
       $('dfilename').textContent=name;
-      sheetTabs=['Plan1'];curTab='Plan1';
+      curXlsxWb=await loadXlsxWorkbook(id);
+      if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
+      sheetTabs=curXlsxWb.SheetNames;
+      curTab=sheetTabs[0]||'Plan1';
       renderTabs();await loadTabData(id,curTab);
     }else{
       const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
@@ -638,8 +641,12 @@ async function loadTabData(id,tab){
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values;
     if(isXlsx){
-      // Baixar binário do .xlsx e parsear com SheetJS
-      values=await readXlsxFile(id);
+      // Usar workbook cacheado, ler a aba solicitada
+      if(!curXlsxWb)curXlsxWb=await loadXlsxWorkbook(id);
+      if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
+      const ws=curXlsxWb.Sheets[tab]||curXlsxWb.Sheets[curXlsxWb.SheetNames[0]];
+      const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      values=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
     }else{
       const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
       if(!r.ok)throw new Error('Erro ao ler aba');
@@ -651,13 +658,8 @@ async function loadTabData(id,tab){
     $('tbody').innerHTML='<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ '+e.message+'</td></tr>';
   }
 }
-async function readXlsxFile(fileId){
+async function loadXlsxWorkbook(fileId){
   try{
-    // Baixar arquivo binário
-    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok)return null;
-    const buf=await r.arrayBuffer();
-    // Carregar SheetJS se ainda não carregado
     if(typeof XLSX==='undefined'){
       await new Promise((res,rej)=>{
         const s=document.createElement('script');
@@ -666,10 +668,10 @@ async function readXlsxFile(fileId){
         document.head.appendChild(s);
       });
     }
-    const wb=XLSX.read(buf,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    return data.map(row=>row.map(c=>c===null||c===undefined?'':String(c)));
+    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok)return null;
+    const buf=await r.arrayBuffer();
+    return XLSX.read(buf,{type:'array'});
   }catch(e){return null;}
 }
 function processData(values){
@@ -819,8 +821,31 @@ async function gsLoadFile(file,cache){
     const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values,tabName='Plan1';
     if(isXlsx){
-      values=await readXlsxFile(file.id);
-      if(!values)return null;
+      const wb=await loadXlsxWorkbook(file.id);
+      if(!wb)return null;
+      // Buscar proposta em todas as abas do xlsx
+      const allProposals=[];
+      for(const shName of wb.SheetNames){
+        const ws=wb.Sheets[shName];
+        const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+        const rows=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
+        let hIdx=0,best=-1;
+        for(let i=0;i<Math.min(rows.length,15);i++){
+          const row=(rows[i]||[]).map(c=>c.toUpperCase());
+          const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;
+          if(sc>best){best=sc;hIdx=i;}
+        }
+        const hU=(rows[hIdx]||[]).map(c=>String(c||'').toUpperCase());
+        const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));
+        if(propIdx<0)continue;
+        for(let ri=hIdx+1;ri<rows.length;ri++){
+          const v=String((rows[ri]||[])[propIdx]||'').trim();
+          if(v)allProposals.push(v);
+        }
+      }
+      const result={tabName:wb.SheetNames[0],proposals:allProposals};
+      cache[cacheKey]=result;
+      return{cached:false,data:result};
     }else{
       const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
       if(!metaR.ok)return null;
