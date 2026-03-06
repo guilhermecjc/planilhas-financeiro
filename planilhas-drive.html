@@ -537,6 +537,8 @@ const FOLDER_SCAN_CONCURRENCY=8;
 const DRIVE_FILES_PAGE_SIZE=1000;
 
 let tokenClient,accessToken=null;
+let viewMode='all';
+let engMap={};
 let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
 let sheetTabs=[],curTab=null;
@@ -588,6 +590,7 @@ function showApp(){
   $('login-wrap').style.display='none';
   $('app').style.display='flex';$('app').classList.add('on');
   $('upill').style.display='flex';$('blogout').style.display='block';
+  loadEngMap();
 }
 
 async function loadFiles(){
@@ -1284,13 +1287,13 @@ function setFontSize(delta){
   if(lbl)lbl.textContent=curFontSize;
 }
 // Inicializar ao carregar
-initDark();
-initFontSize();
+document.addEventListener('DOMContentLoaded',function(){
+  initDark();
+  initFontSize();
+});
 
 // AGRUPAMENTO POR ENGENHEIRO
 const LS_ENG='cf_eng_map_v1';
-let engMap={};   // fileId -> nomeEngenheiro
-let viewMode='all'; // 'all' | 'eng'
 
 function loadEngMap(){
   try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}
@@ -1305,8 +1308,8 @@ function setViewMode(mode){
   filterFiles();
 }
 
-// Inicializar mapa ao carregar
-loadEngMap();
+// Inicializar mapa ao carregar (chamado no DOMContentLoaded junto com os outros)
+// loadEngMap() é chamado em initGoogle via showApp
 
 
 function fitemHtml(f){
