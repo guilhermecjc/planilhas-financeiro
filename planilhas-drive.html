@@ -8,13 +8,13 @@
 <script src="https://accounts.google.com/gsi/client" onload="initGoogle()"></script>
 <style>
 :root{
-  --bg:#f1f3f4;--bg2:#e8eaed;--bg3:#fff;
-  --b:#dadce0;--b2:#bdc1c6;
-  --t:#202124;--m:#5f6368;--m2:#3c4043;
-  --a:#1a73e8;--a2:#1557b0;--a3:#188038;
-  --gold:#e37400;--red:#d93025;
-  --sh:0 1px 3px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.1);
-  --sh2:0 2px 6px rgba(60,64,67,.2),0 1px 3px rgba(60,64,67,.15);
+  --bg:#f1f3f4;--bg2:#e8eaed;--bg3:#fff;
+  --b:#dadce0;--b2:#bdc1c6;
+  --t:#202124;--m:#5f6368;--m2:#3c4043;
+  --a:#1a73e8;--a2:#1557b0;--a3:#188038;
+  --gold:#e37400;--red:#d93025;
+  --sh:0 1px 3px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.1);
+  --sh2:0 2px 6px rgba(60,64,67,.2),0 1px 3px rgba(60,64,67,.15);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--t);font-family:'Outfit',sans-serif;font-size:13px;min-height:100vh;overflow-x:hidden}
@@ -37,7 +37,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .login-card h1{font-size:22px;font-weight:700;color:var(--t);margin-bottom:7px}
 .login-card .lsub{font-size:13px;color:var(--m);line-height:1.5;margin-bottom:28px}
 .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;border:1px solid var(--b2);border-radius:8px;padding:11px 20px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;color:var(--t);cursor:pointer;transition:all .15s;box-shadow:var(--sh)}
-.gbtn:hover{box-shadow:var(--sh2)}
+.gbtn:hover{box-shadow:var(--sh2);border-color:var(--b2)}
 .gbtn:active{transform:scale(.98)}
 .glogo{width:18px;height:18px;flex-shrink:0}
 .lnote{margin-top:14px;font-size:11px;color:var(--m)}
@@ -45,15 +45,15 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .app.on{display:flex}
 .lpanel{width:300px;flex-shrink:0;border-right:1px solid var(--b);display:flex;flex-direction:column;overflow:hidden;background:#fff}
 .lpanel-head{padding:12px 10px 10px;border-bottom:1px solid var(--b);flex-shrink:0}
-.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px;flex-wrap:wrap}
+.sync-bar{display:flex;align-items:center;gap:6px;padding:5px 8px;background:rgba(26,115,232,.05);border:1px solid rgba(26,115,232,.15);border-radius:7px;margin-bottom:8px}
 .sync-ico{font-size:12px;flex-shrink:0}
-.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.sync-txt{flex:1;font-size:11px;color:var(--m);font-family:'JetBrains Mono',monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sync-btn{background:none;border:none;cursor:pointer;color:var(--a);font-size:13px;line-height:1;padding:2px 4px;border-radius:4px;transition:all .15s;flex-shrink:0}
 .sync-btn:hover{background:rgba(26,115,232,.1)}
-.sync-prog{height:2px;background:rgba(26,115,232,.12);border-radius:2px;margin-top:5px;width:100%;overflow:hidden;display:none}
+.sync-btn.spin{animation:rot .7s linear infinite}
+.sync-prog{height:2px;background:rgba(26,115,232,.15);border-radius:2px;margin-top:4px;overflow:hidden;display:none}
 .sync-prog.show{display:block}
 .sync-prog-fill{height:100%;background:var(--a);border-radius:2px;transition:width .3s ease}
-.sync-prog-fill.indeterminate{width:40%!important;animation:indeterminate 1.4s ease-in-out infinite}
 .panel-label{font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
 .sinput-wrap{position:relative;margin-bottom:7px}
 .sinput-wrap svg{position:absolute;left:8px;top:50%;transform:translateY(-50%);color:var(--m);pointer-events:none;width:13px;height:13px}
@@ -62,8 +62,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .sinput::placeholder{color:var(--m)}
 .sort-row{display:flex;gap:6px}
 .sselect{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--t);font-family:'Outfit',sans-serif;font-weight:600;font-size:11px;padding:6px 8px;border-radius:7px;outline:none;cursor:pointer}
-.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
-.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
 .fcount{font-size:10px;color:var(--m);padding:6px 10px 0;font-family:'JetBrains Mono',monospace}
 .fcount strong{color:var(--a)}
 .flist{flex:1;overflow-y:auto;padding:3px 4px}
@@ -82,6 +80,8 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
+.gsearch-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:7px 12px;border-radius:7px;cursor:pointer;transition:all .15s;margin-top:8px}
+.gsearch-btn:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
 .rpanel{flex:1;overflow-y:auto;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
 .rpanel::-webkit-scrollbar{width:6px}
 .rpanel::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
@@ -137,7 +137,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .ttable thead th{padding:7px 10px;font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-right:1px solid var(--b);user-select:none}
 .ttable thead th:last-child{border-right:none}
 .ttable thead th.th-rota{text-align:center;width:52px}
-.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s}
+.ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s;cursor:default}
 .ttable tbody tr:last-child{border-bottom:none}
 .ttable tbody tr:hover{background:#f8f9fa}
 .ttable tbody tr:nth-child(even){background:#fafafa}
@@ -154,9 +154,9 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .c-addr{color:var(--m);font-size:11px}
 .c-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m)}
 .btn-rota{display:inline-flex;align-items:center;justify-content:center;gap:3px;background:rgba(24,128,56,.08);border:1px solid rgba(24,128,56,.25);color:var(--a3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
-.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4)}
+.btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4);box-shadow:0 1px 4px rgba(24,128,56,.15)}
 .btn-rota.no-addr{opacity:.35;cursor:not-allowed}
-.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25)}
+.btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25);box-shadow:none}
 .ttable tfoot tr{background:var(--bg2);border-top:1px solid var(--b)}
 .ttable tfoot td{padding:6px 10px;font-weight:700;font-size:11px;color:var(--m2)}
 .total-val{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800}
@@ -212,178 +212,169 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 @keyframes pd{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes indeterminate{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
 @media(max-width:768px){
-  .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
-  .app{flex-direction:column}
-  .metrics{grid-template-columns:1fr 1fr}
-  .mc:nth-child(3),.mc:nth-child(4){display:none}
-  .gs-overlay{padding-top:0;align-items:flex-end}
-  .gs-modal{border-radius:12px 12px 0 0;max-width:100%}
+  .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
+  .app{flex-direction:column}
+  .metrics{grid-template-columns:1fr 1fr}
+  .mc:nth-child(3),.mc:nth-child(4){display:none}
+  .gs-overlay{padding-top:0;align-items:flex-end}
+  .gs-modal{border-radius:12px 12px 0 0;max-width:100%}
 }
 </style>
 </head>
 <body>
 <header>
-  <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
-  <div class="hright">
-    <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
-    <div class="upill" id="upill"><img class="uavatar" id="uavatar" src="" alt=""/><span class="uname" id="uname"></span></div>
-    <button class="blogout" id="blogout" onclick="logout()">↩ Sair</button>
-  </div>
+  <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
+  <div class="hright">
+    <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
+    <div class="upill" id="upill"><img class="uavatar" id="uavatar" src="" alt=""/><span class="uname" id="uname"></span></div>
+    <button class="blogout" id="blogout" onclick="logout()">↩ Sair</button>
+  </div>
 </header>
-
 <div class="login-wrap" id="login-wrap">
-  <div class="login-card">
-    <div class="lglyph">📊</div>
-    <h1>Central Financeira</h1>
-    <p class="lsub">Acesse e filtre todas as planilhas de vistorias com dados completos.</p>
-    <button class="gbtn" onclick="doLogin()">
-      <svg class="glogo" viewBox="0 0 48 48">
-        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-      </svg>
-      Entrar com Google
-    </button>
-    <p class="lnote">🔒 Acesso restrito · Conta corporativa · Dados seguros</p>
-  </div>
+  <div class="login-card">
+    <div class="lglyph">📊</div>
+    <h1>Central Financeira</h1>
+    <p class="lsub">Acesse e filtre todas as planilhas de vistorias com dados completos.</p>
+    <button class="gbtn" onclick="doLogin()">
+      <svg class="glogo" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Entrar com Google
+    </button>
+    <p class="lnote">🔒 Acesso restrito · Conta corporativa · Dados seguros</p>
+  </div>
 </div>
-
 <div class="app" id="app">
-  <div class="lpanel">
-    <div class="lpanel-head">
-      <div class="panel-label">Planilhas</div>
-      <div class="sync-bar">
-        <span class="sync-ico">🔄</span>
-        <span class="sync-txt" id="sync-txt">Aguardando...</span>
-        <button class="sync-btn" id="sync-btn" onclick="reload()" title="Sincronizar agora">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        </button>
-        <div class="sync-prog" id="sync-prog"><div class="sync-prog-fill" id="sync-prog-fill" style="width:0%"></div></div>
-      </div>
-      <div class="sinput-wrap">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input class="sinput" id="fq" type="text" placeholder="Buscar planilha..." oninput="filterFiles()"/>
-      </div>
-      <div class="sort-row">
-        <select class="sselect" id="fsort" onchange="filterFiles()">
-          <option value="name_az">Nome A → Z</option>
-          <option value="name_za">Nome Z → A</option>
-          <option value="date_new" selected>Mais recente</option>
-          <option value="date_old">Mais antigo</option>
-        </select>
-      </div>
-      <button class="gsearch-btn" onclick="openGlobalSearch()">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Buscar Nº Proposta em Tudo
-      </button>
-    </div>
-    <div class="fcount" id="fcount"></div>
-    <div class="flist">
-      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt" id="floading-txt">Carregando...</div></div>
-      <div id="fitems"></div>
-    </div>
-  </div>
-
-  <div class="rpanel" id="rpanel">
-    <div class="dempty" id="dempty">
-      <div class="dempty-ico">👈</div>
-      <div class="dempty-title">Selecione uma planilha</div>
-      <div class="dempty-sub">Clique em qualquer planilha para visualizar as vistorias com filtros avançados.</div>
-    </div>
-    <div class="dloading" id="dloading"><div class="dspinner"></div><div class="dloading-txt" id="dloading-txt">Lendo planilha...</div></div>
-    <div id="dcontent" style="display:none;flex:1;flex-direction:column">
-      <div class="dhead">
-        <div class="dhead-top">
-          <div class="dtitle-wrap">
-            <div class="dbadge">📋 Ativa</div>
-            <div class="dfilename" id="dfilename">—</div>
-            <div id="eng-badge" style="display:none" class="engineer-badge">
-              <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span id="eng-name">—</span>
-            </div>
-          </div>
-          <button class="btn-open" onclick="openSheet()">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-            Abrir no Sheets
-          </button>
-        </div>
-        <div class="tabs-row" id="tabs-row"></div>
-        <div class="filters">
-          <div class="fg"><div class="flabel">Nº Proposta</div><input class="finput" id="f-prop" type="text" placeholder="Ex: 20241016-0440" oninput="filterRows()"/></div>
-          <div class="fg"><div class="flabel">Mês / Ano</div><select class="finput" id="f-mes" onchange="filterRows()"><option value="">Todos os meses</option></select></div>
-          <button class="clearbtn" onclick="clearFilters()">✕ Limpar</button>
-        </div>
-      </div>
-      <div class="dcontent">
-        <div class="metrics">
-          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="m-total">—</div></div>
-          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Filtradas</div><div class="mc-val" id="m-filt">—</div></div>
-          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Valor Total</div><div class="mc-val" id="m-valor">—</div></div>
-          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Período</div><div class="mc-val" id="m-period">—</div></div>
-        </div>
-        <div class="twrap"><div class="tscroll"><table class="ttable"><thead id="thead"><tr></tr></thead><tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table></div></div>
-        <div class="pager" id="dpager"></div>
-      </div>
-    </div>
-  </div>
+  <div class="lpanel">
+    <div class="lpanel-head">
+      <div class="panel-label">Planilhas</div>
+      <div class="sync-bar" id="sync-bar">
+        <span class="sync-ico">🔄</span>
+        <span class="sync-txt" id="sync-txt">Aguardando...</span>
+        <button class="sync-btn" id="sync-btn" onclick="reload()" title="Sincronizar agora">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </button>
+        <div class="sync-prog" id="sync-prog"><div class="sync-prog-fill" id="sync-prog-fill" style="width:0%"></div></div>
+      </div>
+      <div class="sinput-wrap">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input class="sinput" id="fq" type="text" placeholder="Buscar planilha..." oninput="filterFiles()"/>
+      </div>
+      <div class="sort-row">
+        <select class="sselect" id="fsort" onchange="filterFiles()">
+          <option value="name_az">Nome A → Z</option>
+          <option value="name_za">Nome Z → A</option>
+          <option value="date_new" selected>Mais recente</option>
+          <option value="date_old">Mais antigo</option>
+        </select>
+      </div>
+      <button class="gsearch-btn" onclick="openGlobalSearch()">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Buscar Nº Proposta em Tudo
+      </button>
+    </div>
+    <div class="fcount" id="fcount"></div>
+    <div class="flist">
+      <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
+      <div id="fitems"></div>
+    </div>
+  </div>
+  <div class="rpanel" id="rpanel">
+    <div class="dempty" id="dempty">
+      <div class="dempty-ico">👈</div>
+      <div class="dempty-title">Selecione uma planilha</div>
+      <div class="dempty-sub">Clique em qualquer planilha para visualizar as vistorias com filtros avançados.</div>
+    </div>
+    <div class="dloading" id="dloading"><div class="dspinner"></div><div class="dloading-txt" id="dloading-txt">Lendo planilha...</div></div>
+    <div id="dcontent" style="display:none;flex:1;flex-direction:column">
+      <div class="dhead">
+        <div class="dhead-top">
+          <div class="dtitle-wrap">
+            <div class="dbadge">📋 Ativa</div>
+            <div class="dfilename" id="dfilename">—</div>
+            <div id="eng-badge" style="display:none" class="engineer-badge">
+              <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="eng-name">—</span>
+            </div>
+          </div>
+          <button class="btn-open" onclick="openSheet()">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+            Abrir no Sheets
+          </button>
+        </div>
+        <div class="tabs-row" id="tabs-row"></div>
+        <div class="filters">
+          <div class="fg"><div class="flabel">Nº Proposta</div><input class="finput" id="f-prop" type="text" placeholder="Ex: 20241016-0440" oninput="filterRows()"/></div>
+          <div class="fg"><div class="flabel">Mês / Ano</div><select class="finput" id="f-mes" onchange="filterRows()"><option value="">Todos os meses</option></select></div>
+          <button class="clearbtn" onclick="clearFilters()">✕ Limpar</button>
+        </div>
+      </div>
+      <div class="dcontent">
+        <div class="metrics">
+          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="m-total">—</div></div>
+          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Filtradas</div><div class="mc-val" id="m-filt">—</div></div>
+          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Valor Total</div><div class="mc-val" id="m-valor">—</div></div>
+          <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Período</div><div class="mc-val" id="m-period">—</div></div>
+        </div>
+        <div class="twrap"><div class="tscroll"><table class="ttable"><thead id="thead"><tr></tr></thead><tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table></div></div>
+        <div class="pager" id="dpager"></div>
+      </div>
+    </div>
+  </div>
 </div>
-
 <div class="gs-overlay" id="gs-overlay" onclick="gsOverlayClick(event)">
-  <div class="gs-modal">
-    <div class="gs-bar">
-      <svg class="gs-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="gs-input" id="gs-input" type="text" placeholder="Digite o Nº da Proposta..." oninput="gsOnInput()" onkeydown="gsKeyDown(event)" autocomplete="off" spellcheck="false"/>
-      <button class="gs-close" onclick="closeGlobalSearch()">ESC</button>
-    </div>
-    <div class="gs-divider"></div>
-    <div class="gs-status">
-      <div class="gs-spinner" id="gs-spinner"></div>
-      <div class="gs-status-body">
-        <div class="gs-status-txt" id="gs-status-txt">Digite o número da proposta para buscar em todas as planilhas</div>
-        <div class="gs-status-file" id="gs-status-file"></div>
-      </div>
-    </div>
-    <div class="gs-prog-wrap" id="gs-prog-wrap">
-      <div class="gs-prog-row"><span id="gs-prog-label">Iniciando...</span><span id="gs-prog-pct">0%</span></div>
-      <div class="gs-prog-track"><div class="gs-prog-fill" id="gs-prog-fill" style="width:0%"></div></div>
-    </div>
-    <div class="gs-cache-info" id="gs-cache-info"></div>
-    <div class="gs-found" id="gs-found">
-      <div class="gs-found-ico">✅</div>
-      <div class="gs-found-body"><div class="gs-found-title" id="gs-found-title">—</div><div class="gs-found-sub" id="gs-found-sub">—</div></div>
-      <button class="gs-found-btn" onclick="gsOpenFound()">Abrir →</button>
-    </div>
-    <div class="gs-notfound" id="gs-notfound">
-      <span style="font-size:16px">😶</span>
-      <div class="gs-notfound-txt" id="gs-notfound-txt">Nenhuma proposta encontrada</div>
-    </div>
-    <div class="gs-footer">
-      <span id="gs-footer-txt"></span>
-      <button class="gs-clear-cache" onclick="gsClearCache()">limpar cache</button>
-    </div>
-  </div>
+  <div class="gs-modal">
+    <div class="gs-bar">
+      <svg class="gs-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="gs-input" id="gs-input" type="text" placeholder="Digite o Nº da Proposta..." oninput="gsOnInput()" onkeydown="gsKeyDown(event)" autocomplete="off" spellcheck="false"/>
+      <button class="gs-close" onclick="closeGlobalSearch()">ESC</button>
+    </div>
+    <div class="gs-divider"></div>
+    <div class="gs-status">
+      <div class="gs-spinner" id="gs-spinner"></div>
+      <div class="gs-status-body">
+        <div class="gs-status-txt" id="gs-status-txt">Digite o número da proposta para buscar em todas as planilhas</div>
+        <div class="gs-status-file" id="gs-status-file"></div>
+      </div>
+    </div>
+    <div class="gs-prog-wrap" id="gs-prog-wrap">
+      <div class="gs-prog-row"><span id="gs-prog-label">Iniciando...</span><span id="gs-prog-pct">0%</span></div>
+      <div class="gs-prog-track"><div class="gs-prog-fill" id="gs-prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="gs-cache-info" id="gs-cache-info"></div>
+    <div class="gs-found" id="gs-found">
+      <div class="gs-found-ico">✅</div>
+      <div class="gs-found-body"><div class="gs-found-title" id="gs-found-title">—</div><div class="gs-found-sub" id="gs-found-sub">—</div></div>
+      <button class="gs-found-btn" onclick="gsOpenFound()">Abrir →</button>
+    </div>
+    <div class="gs-notfound" id="gs-notfound">
+      <span style="font-size:16px">😶</span>
+      <div class="gs-notfound-txt" id="gs-notfound-txt">Nenhuma proposta encontrada</div>
+    </div>
+    <div class="gs-footer">
+      <span id="gs-footer-txt"></span>
+      <button class="gs-clear-cache" onclick="gsClearCache()">limpar cache</button>
+    </div>
+  </div>
 </div>
-
 <svg style="display:none">
-  <symbol id="si" viewBox="0 0 24 24">
-    <rect width="24" height="24" rx="3" fill="#0f7b4d"/>
-    <rect x="6" y="7" width="12" height="1.5" rx=".5" fill="white" opacity=".9"/>
-    <rect x="6" y="10.5" width="12" height="1.5" rx=".5" fill="white" opacity=".9"/>
-    <rect x="6" y="14" width="8" height="1.5" rx=".5" fill="white" opacity=".9"/>
-  </symbol>
+  <symbol id="si" viewBox="0 0 24 24">
+    <rect width="24" height="24" rx="3" fill="#0f7b4d"/>
+    <rect x="6" y="7" width="12" height="1.5" rx=".5" fill="white" opacity=".9"/>
+    <rect x="6" y="10.5" width="12" height="1.5" rx=".5" fill="white" opacity=".9"/>
+    <rect x="6" y="14" width="8" height="1.5" rx=".5" fill="white" opacity=".9"/>
+  </symbol>
 </svg>
-
 <script>
 const CLIENT_ID='646674260237-2ebjctgnrj4qsto0lbkse1io760ltj6f.apps.googleusercontent.com';
-
-// ✅ CORREÇÃO 1: escopo drive completo para acessar todos os drives compartilhados
-const SCOPES='https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/spreadsheets.readonly';
-
+const FOLDER_ID='1xgSiwX9tT7Cg8pZJkqAr2_3e-gH7Jcau';
+const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 const PARALLEL=10;
-const LS_KEY='cf_gs_cache_v6';
+const LS_KEY='cf_gs_cache_v4';
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
@@ -398,96 +389,489 @@ const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 function initGoogle(){
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID,scope:SCOPES,
-    callback:async r=>{
-      if(r.error)return;
-      accessToken=r.access_token;
-      await fetchUser();showApp();await loadFiles();
-    }
-  });
+  tokenClient=google.accounts.oauth2.initTokenClient({
+    client_id:CLIENT_ID,scope:SCOPES,
+    callback:async r=>{
+      if(r.error)return;
+      accessToken=r.access_token;
+      await fetchUser();showApp();await loadFiles();
+    }
+  });
 }
 function doLogin(){
-  if(typeof google==='undefined')return alert('Aguarde...');
-  if(!tokenClient)initGoogle();
-  tokenClient.requestAccessToken({prompt:'consent'});
+  if(typeof google==='undefined')return alert('Aguarde...');
+  if(!tokenClient)initGoogle();
+  tokenClient.requestAccessToken({prompt:'consent'});
 }
 function logout(){
-  if(accessToken)google.accounts.oauth2.revoke(accessToken);
-  accessToken=null;allFiles=[];filtFiles=[];
-  $('login-wrap').style.display='flex';
-  $('app').classList.remove('on');$('app').style.display='none';
-  $('upill').style.display='none';$('blogout').style.display='none';
-  setOnline(false);
+  if(accessToken)google.accounts.oauth2.revoke(accessToken);
+  accessToken=null;allFiles=[];filtFiles=[];
+  $('login-wrap').style.display='flex';
+  $('app').classList.remove('on');$('app').style.display='none';
+  $('upill').style.display='none';$('blogout').style.display='none';
+  setOnline(false);
 }
 async function fetchUser(){
-  try{
-    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+accessToken}});
-    const u=await r.json();
-    $('uname').textContent=u.name||u.email||'';
-    if(u.picture)$('uavatar').src=u.picture;
-    setOnline(true);
-  }catch(e){}
+  try{
+    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+accessToken}});
+    const u=await r.json();
+    $('uname').textContent=u.name||u.email||'';
+    if(u.picture)$('uavatar').src=u.picture;
+    setOnline(true);
+  }catch(e){}
 }
 function setOnline(on){
-  $('cbadge').className='cbadge'+(on?' live':'');
-  $('clabel').textContent=on?'online':'offline';
+  $('cbadge').className='cbadge'+(on?' live':'');
+  $('clabel').textContent=on?'online':'offline';
 }
 function showApp(){
-  $('login-wrap').style.display='none';
-  $('app').style.display='flex';$('app').classList.add('on');
-  $('upill').style.display='flex';$('blogout').style.display='block';
+  $('login-wrap').style.display='none';
+  $('app').style.display='flex';$('app').classList.add('on');
+  $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
-// ── FILES — varre TODO o Drive, todas as páginas ─────────
-let _loadId=0; // cancela cargas concorrentes
-
+// ── FILES: busca nos 3 lugares + dedup por ID ──
 async function loadFiles(){
-  const myId=++_loadId; // id desta execução
-  allFiles=[];
-  filtFiles=[];
-  setSyncState('loading',null,'Conectando ao Drive...');
-  $('floading').style.display='flex';
-  $('floading-txt').textContent='Buscando planilhas...';
-  $('fitems').innerHTML='';
-  try{
-    const seen=new Map(); // id → arquivo, garante unicidade global
-    let pageToken=null;
-    do{
-      if(_loadId!==myId)return; // outra carga iniciou, abandona esta
-      
-      // ✅ ALTERAÇÃO AQUI: Query atualizada para incluir .xlsx
-      const q = "(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false";
+  setSyncState('loading',0,'Buscando planilhas...');
+  $('floading').style.display='flex';$('fitems').innerHTML='';
+  const seen=new Map();
 
-      const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&includeItemsFromAllDrives=true&supportsAllDrives=true${pageToken ? `&pageToken=${pageToken}` : ''}`;
-      
-      const r = await fetch(url, { headers: { Authorization: 'Bearer ' + accessToken } });
-      if(!r.ok) throw new Error('Erro Drive');
-      
-      const data = await r.json();
-      (data.files||[]).forEach(f=>{ 
-        if(!seen.has(f.id)){ 
-          seen.set(f.id, f); 
-          allFiles.push(f); 
-        } 
-      });
-      pageToken = data.nextPageToken;
-    } while(pageToken);
+  const dedup=arr=>{for(const f of arr)if(!seen.has(f.id))seen.set(f.id,f);};
+  const update=txt=>{allFiles=[...seen.values()];filterFiles();setSyncState('loading',null,txt);};
 
-    if(_loadId===myId) filterFiles();
-  }catch(e){
-    console.error(e);
-    if(_loadId===myId) $('fitems').innerHTML='<div class="norows">Erro ao carregar arquivos.</div>';
-  }finally{
-    if(_loadId===myId) {
-       $('floading').style.display='none';
-       setSyncState('idle', new Date());
+  try{
+    // 1) Pasta raiz + subpastas (Meu Drive)
+    setSyncState('loading',null,'Mapeando pastas...');
+    const folderIds=await getAllSubfolders(FOLDER_ID);
+    for(let i=0;i<folderIds.length;i++){
+      dedup(await getAllFilesInFolder(folderIds[i]));
+      update(`${seen.size} planilhas · pastas ${i+1}/${folderIds.length}...`);
     }
-  }
+
+    // 2) Compartilhados comigo (sharedWithMe) — Sheets + xlsx
+    update(`${seen.size} planilhas · buscando compartilhados...`);
+    dedup(await fetchAllPagesQuery(`(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false and sharedWithMe`));
+    update(`${seen.size} planilhas · buscando Shared Drives...`);
+
+    // 3) Shared Drives (Drives compartilhados corporativos) — Sheets + xlsx
+    const sharedDrives=await listSharedDrives();
+    for(let i=0;i<sharedDrives.length;i++){
+      dedup(await fetchAllPagesQuery(
+        `(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false`,
+        sharedDrives[i].id
+      ));
+      update(`${seen.size} planilhas · drive ${i+1}/${sharedDrives.length}...`);
+    }
+
+    allFiles=[...seen.values()];
+    filterFiles();
+    const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+    setSyncState('done',100,`${allFiles.length} planilhas · ${now}`);
+  }catch(e){
+    $('fitems').innerHTML=`<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">${e.message}</div></div>`;
+    setSyncState('error',0,'Erro ao carregar');
+  }
+  $('floading').style.display='none';
 }
 
-// Restante das funções do seu código... (filterFiles, renderFileList, loadFile, etc...)
-// (O código continua exatamente como você enviou a partir daqui)
+// BFS para subpastas do Meu Drive
+async function getAllSubfolders(rootId){
+  const all=[rootId];const queue=[rootId];
+  while(queue.length>0){
+    const parentId=queue.shift();
+    const q=encodeURIComponent(`'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
+    try{
+      const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1000`,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)continue;
+      const d=await r.json();
+      for(const f of(d.files||[])){if(!all.includes(f.id)){all.push(f.id);queue.push(f.id);}}
+    }catch(e){}
+  }
+  return all;
+}
+
+// Busca arquivos em pasta específica do Meu Drive, com todas as páginas (Sheets + xlsx)
+async function getAllFilesInFolder(folderId){
+  const files=[];let pageToken=null;
+  do{
+    const q=encodeURIComponent(`'${folderId}' in parents and (mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false`);
+    let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
+    if(pageToken)url+=`&pageToken=${pageToken}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return files;
+}
+
+// Busca por query genérica com suporte a Shared Drive
+async function fetchAllPagesQuery(query,driveId=null){
+  const files=[];let pageToken=null;
+  do{
+    const q=encodeURIComponent(query);
+    let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
+      +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
+      +`&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+    if(driveId)url+=`&corpora=drive&driveId=${driveId}`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return files;
+}
+
+// Lista todos os Shared Drives acessíveis
+async function listSharedDrives(){
+  const drives=[];let pageToken=null;
+  do{
+    let url=`https://www.googleapis.com/drive/v3/drives?pageSize=100`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      drives.push(...(d.drives||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return drives;
+}
+
+function setSyncState(state,pct,txt){
+  $('sync-txt').textContent=txt;
+  const prog=$('sync-prog'),fill=$('sync-prog-fill'),btn=$('sync-btn');
+  if(state==='loading'||state===null){
+    prog.classList.add('show');btn.classList.add('spin');
+    if(pct===null||pct===undefined){fill.style.width='60%';fill.style.opacity='.5';}
+    else{fill.style.width=pct+'%';fill.style.opacity='1';}
+  }else{
+    prog.classList.remove('show');btn.classList.remove('spin');fill.style.opacity='1';
+  }
+}
+async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
+
+function filterFiles(){
+  const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
+  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q));
+  filtFiles.sort((a,b)=>{
+    if(s==='name_az')return a.name.localeCompare(b.name,'pt-BR');
+    if(s==='name_za')return b.name.localeCompare(a.name,'pt-BR');
+    if(s==='date_new')return new Date(b.modifiedTime)-new Date(a.modifiedTime);
+    if(s==='date_old')return new Date(a.modifiedTime)-new Date(b.modifiedTime);
+    return 0;
+  });
+  $('fcount').innerHTML=`<strong>${filtFiles.length}</strong> de ${allFiles.length} planilhas`;
+  $('fitems').innerHTML=filtFiles.map((f,i)=>`
+    <div class="fitem ${curFileId===f.id?'active':''}" onclick="selectFile('${f.id}','${esc(f.name)}','${esc(f.webViewLink)}')" style="animation:fi .15s ease ${Math.min(i*.01,.3)}s both">
+      <div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>
+      <div class="finfo"><div class="fname">${esc(f.name)}</div><div class="fmeta">${new Date(f.modifiedTime).toLocaleDateString('pt-BR')}</div></div>
+      <div class="farrow">›</div>
+    </div>`).join('');
+}
+
+async function selectFile(id,name,url){
+  curFileId=id;curFileUrl=url;filterFiles();
+  $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
+  $('dloading-txt').textContent='Lendo estrutura...';
+  try{
+    const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!metaR.ok)throw new Error('Não foi possível acessar esta planilha');
+    const meta=await metaR.json();
+    sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
+    curTab=sheetTabs[0]||'Plan1';
+    $('dfilename').textContent=name;
+    renderTabs();await loadTabData(id,curTab);
+  }catch(e){
+    $('dloading').style.display='none';$('dempty').style.display='flex';
+    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
+    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
+    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+  }
+}
+function renderTabs(){
+  $('tabs-row').innerHTML=sheetTabs.map(t=>`
+    <div class="tab ${t===curTab?'active':''}" onclick="switchTab('${esc(t)}')">
+      <div class="tab-ico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>${esc(t)}
+    </div>`).join('');
+}
+async function switchTab(tabName){
+  curTab=tabName;renderTabs();
+  $('dloading-txt').textContent=`Lendo "${tabName}"...`;
+  $('dloading').style.display='flex';$('dcontent').style.display='none';
+  await loadTabData(curFileId,tabName);
+}
+async function loadTabData(id,tab){
+  try{
+    const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent(tab)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok)throw new Error('Erro ao ler aba');
+    processData((await r.json()).values||[]);
+  }catch(e){
+    $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
+    $('tbody').innerHTML=`<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ ${e.message}</td></tr>`;
+  }
+}
+function processData(values){
+  let engineer='';
+  for(let i=0;i<Math.min(values.length,6);i++){
+    for(const cell of(values[i]||[])){
+      const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);
+      if(cm){engineer=cm[1].trim();break;}
+    }
+    if(engineer)break;
+  }
+  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;}
+  else $('eng-badge').style.display='none';
+  const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
+  let hIdx=0,best=-1;
+  for(let i=0;i<Math.min(values.length,15);i++){
+    const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
+    const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;
+    if(sc>best){best=sc;hIdx=i;}
+  }
+  allHeaders=(values[hIdx]||[]).map((h,i)=>({label:h||`Col ${i+1}`,idx:i,cls:guessClass(String(h||'').toUpperCase())}));
+  while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim())allHeaders.pop();
+  const hU=allHeaders.map(h=>String(h.label).toUpperCase());
+  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
+  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
+  const dateIdx=find('DATA');
+  const valIdx=find('VALOR');
+  gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
+  gCityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
+  allRows=(values.slice(hIdx+1)||[])
+    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
+    .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):'',endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',cidade:gCityIdx>=0?(r[gCityIdx]||''):''}));
+  const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
+  months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
+  const fm=$('f-mes');
+  fm.innerHTML='<option value="">Todos os meses</option>';
+  months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
+  $('dloading').style.display='none';
+  $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
+  if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
+  filterRows();
+}
+function guessClass(u){
+  if(u.includes('PROPOSTA')||u.includes('N°')||u.includes('NUMERO'))return'c-prop';
+  if(u.includes('DATA'))return'c-date';
+  if(u.includes('VALOR'))return'c-val';
+  if(u.includes('ENGENHEIRO')||u.includes('PROFISSIONAL')||u.includes('RESPONSAVEL'))return'c-eng';
+  if(u.includes('ENDEREÇO')||u.includes('ENDERECO')||u.includes('END'))return'c-addr';
+  if(u.includes('CPF')||u.includes('CEP')||u.includes('CNPJ'))return'c-num';
+  return'c-text';
+}
+function extractMY(d){
+  const s=String(d||'').trim();
+  const m1=s.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if(m1){const mm=m1[2].padStart(2,'0');const yy=m1[3].length===2?'20'+m1[3]:m1[3];return`${mm}/${yy}`;}
+  const m2=s.match(/^(\d{2})\/(\d{4})$/);if(m2)return`${m2[1]}/${m2[2]}`;
+  return null;
+}
+function parseVal(v){
+  if(!v)return 0;const n=String(v).replace(/[R$\s.]/g,'').replace(',','.');const p=parseFloat(n);return isNaN(p)?0:p;}
+function fmtBRL(n){return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function clearFilters(){$('f-prop').value='';$('f-mes').value='';filterRows();}
+function filterRows(){
+  const prop=$('f-prop').value.toLowerCase().trim(),mes=$('f-mes').value;
+  filtRows=allRows.filter(r=>{
+    if(prop&&!String(r.proposta).toLowerCase().includes(prop))return false;
+    if(mes&&extractMY(r.data)!==mes)return false;
+    return true;
+  });
+  dpage=1;
+  $('m-total').textContent=allRows.length;$('m-filt').textContent=filtRows.length;
+  const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
+  $('m-valor').textContent=total>0?fmtBRL(total):'—';
+  const dates=[...new Set(filtRows.map(r=>extractMY(r.data)).filter(Boolean))];
+  $('m-period').textContent=dates.length===0?'—':dates.length===1?dates[0]:`${dates.length} meses`;
+  renderTable();renderPager();
+}
+function buildAddress(row){
+  const addr=String(row.endereco||'').trim(),city=String(row.cidade||'').trim();
+  if(!addr&&!city)return'';
+  return[addr,city].filter(Boolean).join(', ');
+}
+function openRota(idx){
+  const r=filtRows[idx];if(!r)return;
+  const dest=buildAddress(r);if(!dest)return;
+  window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`,'_blank');
+}
+function renderTable(){
+  const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
+  const hasAddr=gAddrIdx>=0||gCityIdx>=0;
+  $('thead').innerHTML='<tr>'+allHeaders.map(h=>`<th>${esc(h.label)}</th>`).join('')+(hasAddr?'<th class="th-rota">Rota</th>':'')+'</tr>';
+  if(slice.length===0){
+    $('tbody').innerHTML=`<tr><td colspan="${allHeaders.length+(hasAddr?1:0)}" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>`;
+    $('tfoot').innerHTML='';return;
+  }
+  const hl=gsLastFoundProp?gsLastFoundProp.toLowerCase():'';
+  $('tbody').innerHTML=slice.map((r,i)=>{
+    const isHL=hl&&String(r.proposta).toLowerCase()===hl;
+    const dest=buildAddress(r);
+    const rota=hasAddr?(dest?`<td class="td-rota"><button class="btn-rota" onclick="openRota(${start+i})" title="${esc(dest)}">🗺 Rota</button></td>`:`<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>`):'';
+    return`<tr class="${isHL?'gs-hl':''}" style="animation:fi .12s ease ${Math.min(i*.008,.3)}s both">
+      ${allHeaders.map(h=>`<td class="${h.cls}" title="${esc(r.raw[h.idx]||'')}">${esc(r.raw[h.idx]||'')}</td>`).join('')}${rota}
+    </tr>`;
+  }).join('');
+  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
+  if(vci>=0){
+    const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
+    $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
+      if(i===0)return`<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — ${filtRows.length} registros</td>`;
+      if(i===vci)return`<td class="total-val">${fmtBRL(total)}</td>`;
+      return'<td></td>';
+    }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
+  }else $('tfoot').innerHTML='';
+}
+function renderPager(){
+  const total=Math.ceil(filtRows.length/RPP),c=$('dpager');
+  if(total<=1){c.innerHTML='';return;}
+  let h=`<button class="pg" onclick="goPage(${dpage-1})" ${dpage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=total;i++){
+    if(i===1||i===total||Math.abs(i-dpage)<=1)h+=`<button class="pg ${i===dpage?'on':''}" onclick="goPage(${i})">${i}</button>`;
+    else if(Math.abs(i-dpage)===2)h+=`<button class="pg dots" disabled>…</button>`;
+  }
+  h+=`<button class="pg" onclick="goPage(${dpage+1})" ${dpage===total?'disabled':''}>›</button>`;
+  c.innerHTML=h;
+}
+function goPage(p){dpage=p;renderTable();renderPager();$('rpanel').scrollTop=0;}
+function openSheet(){if(curFileUrl){const a=document.createElement('a');a.href=curFileUrl;a.target='_blank';a.click();}}
+
+// ══ GLOBAL SEARCH ══
+let gsDebounce=null,gsSearchId=0,gsFoundResult=null,gsPendingProp=null,gsLastFoundProp=null;
+const PROP_KW=['PROPOSTA','N°','NUMERO','NUM'];
+const HDR_KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO'];
+function lsLoad(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}');}catch{return{};}}
+function lsSave(cache){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(cache));}catch{
+    try{const keys=Object.keys(cache);keys.slice(0,Math.floor(keys.length/2)).forEach(k=>delete cache[k]);localStorage.setItem(LS_KEY,JSON.stringify(cache));}catch{}
+  }
+}
+function gsClearCache(){localStorage.removeItem(LS_KEY);$('gs-cache-info').classList.remove('show');$('gs-footer-txt').textContent='Cache limpo';}
+async function gsLoadFile(file,cache){
+  const cacheKey=file.id+'_'+file.modifiedTime;
+  if(cache[cacheKey])return{cached:true,data:cache[cacheKey]};
+  try{
+    const metaR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}?fields=sheets.properties`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!metaR.ok)return null;
+    const meta=await metaR.json();
+    const tabName=((meta.sheets||[])[0]||{}).properties?.title||'Plan1';
+    const dataR=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${file.id}/values/${encodeURIComponent(tabName)}?majorDimension=ROWS`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!dataR.ok)return null;
+    const values=(await dataR.json()).values||[];
+    let hIdx=0,best=-1;
+    for(let i=0;i<Math.min(values.length,15);i++){
+      const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
+      const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;
+      if(sc>best){best=sc;hIdx=i;}
+    }
+    const hU=(values[hIdx]||[]).map(c=>String(c||'').toUpperCase());
+    const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));
+    if(propIdx<0)return null;
+    const proposals=[];
+    for(let ri=hIdx+1;ri<values.length;ri++){
+      const v=String((values[ri]||[])[propIdx]||'').trim();
+      if(v)proposals.push(v);
+    }
+    const result={tabName,proposals};
+    cache[cacheKey]=result;
+    return{cached:false,data:result};
+  }catch{return null;}
+}
+async function runGlobalSearch(query,searchId){
+  const q=query.toLowerCase().trim();
+  const files=allFiles;
+  if(!files.length){$('gs-status-txt').textContent='Nenhuma planilha carregada';return;}
+  const cache=lsLoad();
+  let cacheHits=0,fetched=0,done=0,found=false;
+  const t0=Date.now();
+  $('gs-spinner').style.display='block';
+  $('gs-prog-wrap').classList.add('show');
+  $('gs-prog-fill').style.width='0%';
+  $('gs-found').classList.remove('show');
+  $('gs-notfound').classList.remove('show');
+  $('gs-cache-info').classList.remove('show');
+  for(let i=0;i<files.length&&!found;i+=PARALLEL){
+    if(gsSearchId!==searchId)return;
+    const batch=files.slice(i,i+PARALLEL);
+    const results=await Promise.allSettled(batch.map(f=>gsLoadFile(f,cache)));
+    for(let j=0;j<results.length;j++){
+      if(gsSearchId!==searchId)return;
+      done++;
+      const r=results[j];
+      if(r.status!=='fulfilled'||!r.value)continue;
+      const{cached,data}=r.value;
+      if(cached)cacheHits++;else fetched++;
+      const match=data.proposals.find(p=>p.toLowerCase()===q||p.toLowerCase().includes(q));
+      if(match){found=true;gsFoundResult={file:batch[j],tabName:data.tabName,proposta:match};break;}
+    }
+    const pct=Math.round((done/files.length)*100);
+    $('gs-prog-fill').style.width=pct+'%';
+    $('gs-prog-label').textContent=`${done} / ${files.length}`;
+    $('gs-prog-pct').textContent=pct+'%';
+    $('gs-status-txt').textContent=found?'Encontrado!':`Buscando... ${cacheHits} cache · ${fetched} baixadas`;
+    $('gs-status-file').textContent=!found?(batch[batch.length-1]?.name||''):'';
+    if(found)break;
+  }
+  if(gsSearchId!==searchId)return;
+  lsSave(cache);
+  $('gs-prog-fill').style.width='100%';
+  $('gs-spinner').style.display='none';
+  const elapsed=((Date.now()-t0)/1000).toFixed(1);
+  if(cacheHits>0){$('gs-cache-info').textContent=`⚡ ${cacheHits} do cache`;$('gs-cache-info').classList.add('show');}
+  if(found){
+    $('gs-status-txt').textContent='Encontrado!';$('gs-status-file').textContent='';
+    $('gs-found-title').textContent=`Proposta ${gsFoundResult.proposta}`;
+    $('gs-found-sub').textContent=`📄 ${gsFoundResult.file.name} · ${gsFoundResult.tabName}`;
+    $('gs-found').classList.add('show');
+    $('gs-footer-txt').textContent=`${elapsed}s · ${done} planilhas`;
+  }else{
+    $('gs-status-txt').textContent='Não encontrado';
+    $('gs-notfound').querySelector('.gs-notfound-txt').textContent=`"${query}" não encontrado em ${files.length} planilhas`;
+    $('gs-notfound').classList.add('show');
+    $('gs-footer-txt').textContent=`${files.length} planilhas · ${elapsed}s`;
+  }
+}
+function openGlobalSearch(){$('gs-overlay').classList.add('open');gsResetUI();setTimeout(()=>$('gs-input').focus(),80);document.addEventListener('keydown',gsEscListener);}
+function closeGlobalSearch(){$('gs-overlay').classList.remove('open');gsSearchId++;document.removeEventListener('keydown',gsEscListener);}
+function gsEscListener(e){if(e.key==='Escape')closeGlobalSearch();}
+function gsOverlayClick(e){if(e.target===$('gs-overlay'))closeGlobalSearch();}
+function gsKeyDown(e){if(e.key==='Escape'){closeGlobalSearch();return;}if(e.key==='Enter'&&gsFoundResult)gsOpenFound();}
+function gsResetUI(){
+  $('gs-input').value='';$('gs-spinner').style.display='none';
+  $('gs-status-txt').textContent='Digite o número da proposta para buscar em todas as planilhas';
+  $('gs-status-file').textContent='';$('gs-prog-wrap').classList.remove('show');
+  $('gs-prog-fill').style.width='0%';$('gs-found').classList.remove('show');
+  $('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
+  $('gs-footer-txt').textContent='';gsFoundResult=null;
+}
+function gsOnInput(){
+  clearTimeout(gsDebounce);
+  const q=$('gs-input').value.trim();
+  $('gs-found').classList.remove('show');$('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
+  gsSearchId++;gsFoundResult=null;
+  if(q.length<3){$('gs-spinner').style.display='none';$('gs-prog-wrap').classList.remove('show');$('gs-status-txt').textContent='Digite pelo menos 3 caracteres';$('gs-status-file').textContent='';return;}
+  $('gs-status-txt').textContent='Aguardando...';
+  const sid=++gsSearchId;
+  gsDebounce=setTimeout(()=>runGlobalSearch(q,sid),380);
+}
+async function gsOpenFound(){
+  if(!gsFoundResult)return;
+  const{file,tabName,proposta}=gsFoundResult;
+  gsLastFoundProp=proposta;gsPendingProp=proposta;
+  closeGlobalSearch();
+  await selectFile(file.id,file.name,file.webViewLink||'');
+  if(tabName&&sheetTabs.includes(tabName)&&tabName!==curTab)await switchTab(tabName);
+  $('f-prop').value=proposta;filterRows();$('rpanel').scrollTop=0;
+}
 </script>
 </body>
 </html>
