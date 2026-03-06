@@ -638,11 +638,8 @@ async function loadTabData(id,tab){
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values;
     if(isXlsx){
-      // Exportar .xlsx como CSV via Drive API (sem criar arquivo, só leitura)
-      const r=await fetch('https://www.googleapis.com/drive/v3/files/'+id+'/export?mimeType=text/csv',{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)throw new Error('Erro ao ler arquivo .xlsx');
-      const csv=await r.text();
-      values=parseCSV(csv);
+      // Baixar binário do .xlsx e parsear com SheetJS
+      values=await readXlsxFile(id);
     }else{
       const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
       if(!r.ok)throw new Error('Erro ao ler aba');
@@ -654,22 +651,26 @@ async function loadTabData(id,tab){
     $('tbody').innerHTML='<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ '+e.message+'</td></tr>';
   }
 }
-function parseCSV(text){
-  const rows=[];
-  const lines=text.split(/\r?\n/);
-  for(const line of lines){
-    if(!line.trim())continue;
-    const row=[];let cur='',inQ=false;
-    for(let i=0;i<line.length;i++){
-      const ch=line[i];
-      if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
-      else if(ch===','&&!inQ){row.push(cur);cur='';}
-      else cur+=ch;
+async function readXlsxFile(fileId){
+  try{
+    // Baixar arquivo binário
+    const r=await fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok)return null;
+    const buf=await r.arrayBuffer();
+    // Carregar SheetJS se ainda não carregado
+    if(typeof XLSX==='undefined'){
+      await new Promise((res,rej)=>{
+        const s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+        s.onload=res;s.onerror=rej;
+        document.head.appendChild(s);
+      });
     }
-    row.push(cur);
-    rows.push(row);
-  }
-  return rows;
+    const wb=XLSX.read(buf,{type:'array'});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    return data.map(row=>row.map(c=>c===null||c===undefined?'':String(c)));
+  }catch(e){return null;}
 }
 function processData(values){
   let engineer='';
@@ -818,9 +819,8 @@ async function gsLoadFile(file,cache){
     const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values,tabName='Plan1';
     if(isXlsx){
-      const r=await fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'/export?mimeType=text/csv',{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)return null;
-      values=parseCSV(await r.text());
+      values=await readXlsxFile(file.id);
+      if(!values)return null;
     }else{
       const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
       if(!metaR.ok)return null;
