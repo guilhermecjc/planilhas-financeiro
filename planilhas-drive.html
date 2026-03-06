@@ -430,33 +430,39 @@ function showApp(){
   $('upill').style.display='flex';$('blogout').style.display='block';
 }
 
-// ── FILES: idêntico ao original que funcionava + dedup por ID no final ──
+// ── FILES: busca nos 3 lugares + dedup por ID ──
 async function loadFiles(){
   setSyncState('loading',0,'Buscando planilhas...');
   $('floading').style.display='flex';$('fitems').innerHTML='';
+  const seen=new Map();
+
+  const dedup=arr=>{for(const f of arr)if(!seen.has(f.id))seen.set(f.id,f);};
+  const update=txt=>{allFiles=[...seen.values()];filterFiles();setSyncState('loading',null,txt);};
 
   try{
-    const files=[];
+    // 1) Pasta raiz + subpastas (Meu Drive)
+    setSyncState('loading',null,'Mapeando pastas...');
     const folderIds=await getAllSubfolders(FOLDER_ID);
-    const totalFolders=folderIds.length;
-    let foldersDone=0;
-
-    for(const folderId of folderIds){
-      const folderFiles=await getAllFilesInFolder(folderId);
-      files.push(...folderFiles);
-      foldersDone++;
-      const pct=Math.round((foldersDone/totalFolders)*100);
-      setSyncState('loading',pct,`${files.length} planilhas encontradas...`);
-      // ✅ dedup em tempo real enquanto carrega
-      const seen=new Map();
-      for(const f of files)if(!seen.has(f.id))seen.set(f.id,f);
-      allFiles=[...seen.values()];
-      filterFiles();
+    for(let i=0;i<folderIds.length;i++){
+      dedup(await getAllFilesInFolder(folderIds[i]));
+      update(`${seen.size} planilhas · pastas ${i+1}/${folderIds.length}...`);
     }
 
-    // ✅ dedup final garante zero duplicatas
-    const seen=new Map();
-    for(const f of files)if(!seen.has(f.id))seen.set(f.id,f);
+    // 2) Compartilhados comigo (sharedWithMe)
+    update(`${seen.size} planilhas · buscando compartilhados...`);
+    dedup(await fetchAllPagesQuery(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`));
+    update(`${seen.size} planilhas · buscando Shared Drives...`);
+
+    // 3) Shared Drives (Drives compartilhados corporativos)
+    const sharedDrives=await listSharedDrives();
+    for(let i=0;i<sharedDrives.length;i++){
+      dedup(await fetchAllPagesQuery(
+        `mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`,
+        sharedDrives[i].id
+      ));
+      update(`${seen.size} planilhas · drive ${i+1}/${sharedDrives.length}...`);
+    }
+
     allFiles=[...seen.values()];
     filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
@@ -468,28 +474,25 @@ async function loadFiles(){
   $('floading').style.display='none';
 }
 
-// ✅ IDÊNTICO ao original — BFS sequencial, sem alterações
+// BFS para subpastas do Meu Drive
 async function getAllSubfolders(rootId){
-  const all=[rootId];
-  const queue=[rootId];
+  const all=[rootId];const queue=[rootId];
   while(queue.length>0){
     const parentId=queue.shift();
     const q=encodeURIComponent(`'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`);
-    const url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1000`;
     try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1000`,{headers:{Authorization:'Bearer '+accessToken}});
       if(!r.ok)continue;
       const d=await r.json();
-      for(const f of(d.files||[])){all.push(f.id);queue.push(f.id);}
+      for(const f of(d.files||[])){if(!all.includes(f.id)){all.push(f.id);queue.push(f.id);}}
     }catch(e){}
   }
   return all;
 }
 
-// ✅ IDÊNTICO ao original — paginação completa com orderBy
+// Busca arquivos em pasta específica do Meu Drive, com todas as páginas
 async function getAllFilesInFolder(folderId){
-  const files=[];
-  let pageToken=null;
+  const files=[];let pageToken=null;
   do{
     const q=encodeURIComponent(`'${folderId}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
     let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
@@ -505,13 +508,53 @@ async function getAllFilesInFolder(folderId){
   return files;
 }
 
+// Busca por query genérica com suporte a Shared Drive
+async function fetchAllPagesQuery(query,driveId=null){
+  const files=[];let pageToken=null;
+  do{
+    const q=encodeURIComponent(query);
+    let url=`https://www.googleapis.com/drive/v3/files?q=${q}`
+      +`&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)`
+      +`&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true`;
+    if(driveId)url+=`&corpora=drive&driveId=${driveId}`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      files.push(...(d.files||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return files;
+}
+
+// Lista todos os Shared Drives acessíveis
+async function listSharedDrives(){
+  const drives=[];let pageToken=null;
+  do{
+    let url=`https://www.googleapis.com/drive/v3/drives?pageSize=100`;
+    if(pageToken)url+=`&pageToken=${encodeURIComponent(pageToken)}`;
+    try{
+      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)break;
+      const d=await r.json();
+      drives.push(...(d.drives||[]));
+      pageToken=d.nextPageToken||null;
+    }catch(e){break;}
+  }while(pageToken);
+  return drives;
+}
+
 function setSyncState(state,pct,txt){
   $('sync-txt').textContent=txt;
   const prog=$('sync-prog'),fill=$('sync-prog-fill'),btn=$('sync-btn');
-  if(state==='loading'){
-    prog.classList.add('show');fill.style.width=pct+'%';btn.classList.add('spin');
+  if(state==='loading'||state===null){
+    prog.classList.add('show');btn.classList.add('spin');
+    if(pct===null||pct===undefined){fill.style.width='60%';fill.style.opacity='.5';}
+    else{fill.style.width=pct+'%';fill.style.opacity='1';}
   }else{
-    prog.classList.remove('show');btn.classList.remove('spin');
+    prog.classList.remove('show');btn.classList.remove('spin');fill.style.opacity='1';
   }
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
