@@ -310,6 +310,23 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .desl-btn-sec:hover{border-color:var(--b2);color:var(--t)}
 .desl-btn-pri{background:var(--a3);border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:7px;cursor:pointer;transition:all .15s}
 .desl-btn-pri:hover{background:#137333}
+
+/* AGRUPAMENTO POR ENGENHEIRO */
+.view-toggle{display:flex;gap:4px;margin-bottom:7px}
+.vtbtn{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:5px 4px;border-radius:6px;cursor:pointer;transition:all .12s;text-align:center}
+.vtbtn.on{background:var(--a);color:#fff;border-color:var(--a)}
+.eng-group{margin-bottom:4px}
+.eng-group-hd{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .1s;user-select:none}
+.eng-group-hd:hover{background:var(--bg2)}
+.eng-group-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--a),var(--a2));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.eng-group-info{flex:1;min-width:0}
+.eng-group-name{font-size:11px;font-weight:700;color:var(--t);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.eng-group-count{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
+.eng-group-arrow{font-size:11px;color:var(--m);transition:transform .15s;flex-shrink:0}
+.eng-group.open .eng-group-arrow{transform:rotate(90deg)}
+.eng-group-files{display:none;padding-left:8px}
+.eng-group.open .eng-group-files{display:block}
+.eng-unknown .eng-group-avatar{background:linear-gradient(135deg,var(--m),var(--b2))}
 </style>
 </head>
 <body>
@@ -367,6 +384,10 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
           <option value="date_new" selected>Mais recente</option>
           <option value="date_old">Mais antigo</option>
         </select>
+      </div>
+      <div class="view-toggle">
+        <button class="vtbtn on" id="vt-all" onclick="setViewMode('all')">☰ Todas</button>
+        <button class="vtbtn" id="vt-eng" onclick="setViewMode('eng')">👤 Engenheiro</button>
       </div>
       <button class="gsearch-btn" onclick="openGlobalSearch()">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -713,7 +734,8 @@ async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
 
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
-  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q));
+  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||
+    (engMap[f.id]||'').toLowerCase().includes(q));
   filtFiles.sort((a,b)=>{
     if(s==='name_az')return a.name.localeCompare(b.name,'pt-BR');
     if(s==='name_za')return b.name.localeCompare(a.name,'pt-BR');
@@ -722,12 +744,11 @@ function filterFiles(){
     return 0;
   });
   $('fcount').innerHTML='<strong>'+filtFiles.length+'</strong> de '+allFiles.length+' planilhas';
-  $('fitems').innerHTML=filtFiles.map((f,i)=>
-    '<div class="fitem '+(curFileId===f.id?'active':'')+'" onclick="selectFile(\''+f.id+'\',\''+esc(f.name)+'\',\''+esc(f.webViewLink||'')+'\',' + "\'" + (f.mimeType||'') + "\'" + ')">'+
-    '<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'+
-    '<div class="finfo"><div class="fname">'+esc(f.name)+'</div><div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'+
-    '<div class="farrow">›</div></div>'
-  ).join('');
+  if(viewMode==='eng'){
+    renderFilesGrouped();
+  }else{
+    $('fitems').innerHTML=filtFiles.map(f=>fitemHtml(f)).join('');
+  }
 }
 
 async function selectFile(id,name,url,mime){
@@ -826,8 +847,11 @@ function processData(values){
     }
     if(engineer)break;
   }
-  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;}
-  else $('eng-badge').style.display='none';
+  if(engineer){
+    $('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;
+    // Salvar no mapa de engenheiros para agrupamento
+    if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();}
+  }else $('eng-badge').style.display='none';
   const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
   let hIdx=0,best=-1;
   for(let i=0;i<Math.min(values.length,15);i++){
@@ -1262,6 +1286,82 @@ function setFontSize(delta){
 // Inicializar ao carregar
 initDark();
 initFontSize();
+
+// AGRUPAMENTO POR ENGENHEIRO
+const LS_ENG='cf_eng_map_v1';
+let engMap={};   // fileId -> nomeEngenheiro
+let viewMode='all'; // 'all' | 'eng'
+
+function loadEngMap(){
+  try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}
+}
+function saveEngMap(){
+  try{localStorage.setItem(LS_ENG,JSON.stringify(engMap));}catch{}
+}
+function setViewMode(mode){
+  viewMode=mode;
+  $('vt-all').className='vtbtn'+(mode==='all'?' on':'');
+  $('vt-eng').className='vtbtn'+(mode==='eng'?' on':'');
+  filterFiles();
+}
+
+// Inicializar mapa ao carregar
+loadEngMap();
+
+
+function fitemHtml(f){
+  return '<div class="fitem '+(curFileId===f.id?'active':'')+'" onclick="selectFile(''+f.id+'',''+esc(f.name)+'',''+esc(f.webViewLink||'')+'',' + "'" + (f.mimeType||'') + "'" + ')">'+
+    '<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'+
+    '<div class="finfo"><div class="fname">'+esc(f.name)+'</div><div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'+
+    '<div class="farrow">›</div></div>';
+}
+
+function renderFilesGrouped(){
+  // Agrupar por engenheiro
+  const groups={};
+  const UNKNOWN='— Não identificado';
+  for(const f of filtFiles){
+    const eng=engMap[f.id]||UNKNOWN;
+    if(!groups[eng])groups[eng]=[];
+    groups[eng].push(f);
+  }
+  // Ordenar grupos: conhecidos primeiro (alfabético), desconhecidos por último
+  const keys=Object.keys(groups).sort((a,b)=>{
+    if(a===UNKNOWN)return 1;if(b===UNKNOWN)return -1;
+    return a.localeCompare(b,'pt-BR');
+  });
+  const knownCount=keys.filter(k=>k!==UNKNOWN).length;
+  let html='';
+  if(knownCount===0){
+    html='<div style="padding:16px 8px;text-align:center;font-size:11px;color:var(--m)">'+
+      '👤 Abra planilhas para identificar os engenheiros.<br><br>'+
+      '<span style="color:var(--a);font-weight:600">'+filtFiles.length+' planilhas</span> ainda não identificadas.</div>';
+  }
+  for(const eng of keys){
+    const files=groups[eng];
+    const isUnknown=eng===UNKNOWN;
+    const initials=isUnknown?'?':eng.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const groupId='eg-'+btoa(encodeURIComponent(eng)).replace(/=/g,'').slice(0,12);
+    const isOpen=sessionStorage.getItem('eg_'+groupId)!=='0';
+    html+='<div class="eng-group'+(isUnknown?' eng-unknown':'')+' '+(isOpen?'open':'')+'" id="'+groupId+'">';
+    html+='<div class="eng-group-hd" onclick="toggleEngGroup(''+groupId+'')">';
+    html+='<div class="eng-group-avatar">'+initials+'</div>';
+    html+='<div class="eng-group-info"><div class="eng-group-name">'+esc(eng)+'</div>';
+    html+='<div class="eng-group-count">'+files.length+' planilha'+(files.length!==1?'s':'')+'</div></div>';
+    html+='<div class="eng-group-arrow">›</div></div>';
+    html+='<div class="eng-group-files">'+files.map(f=>fitemHtml(f)).join('')+'</div>';
+    html+='</div>';
+  }
+  $('fitems').innerHTML=html;
+}
+
+function toggleEngGroup(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const isOpen=el.classList.toggle('open');
+  sessionStorage.setItem('eg_'+id,isOpen?'1':'0');
+}
+
 </script>
 </body>
 </html>
