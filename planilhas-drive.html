@@ -448,16 +448,16 @@ async function loadFiles(){
       update(`${seen.size} planilhas · pastas ${i+1}/${folderIds.length}...`);
     }
 
-    // 2) Compartilhados comigo (sharedWithMe)
+    // 2) Compartilhados comigo (sharedWithMe) — Sheets + xlsx
     update(`${seen.size} planilhas · buscando compartilhados...`);
-    dedup(await fetchAllPagesQuery(`mimeType='application/vnd.google-apps.spreadsheet' and trashed=false and sharedWithMe`));
+    dedup(await fetchAllPagesQuery(`(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false and sharedWithMe`));
     update(`${seen.size} planilhas · buscando Shared Drives...`);
 
-    // 3) Shared Drives (Drives compartilhados corporativos)
+    // 3) Shared Drives (Drives compartilhados corporativos) — Sheets + xlsx
     const sharedDrives=await listSharedDrives();
     for(let i=0;i<sharedDrives.length;i++){
       dedup(await fetchAllPagesQuery(
-        `mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`,
+        `(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false`,
         sharedDrives[i].id
       ));
       update(`${seen.size} planilhas · drive ${i+1}/${sharedDrives.length}...`);
@@ -490,11 +490,11 @@ async function getAllSubfolders(rootId){
   return all;
 }
 
-// Busca arquivos em pasta específica do Meu Drive, com todas as páginas
+// Busca arquivos em pasta específica do Meu Drive, com todas as páginas (Sheets + xlsx)
 async function getAllFilesInFolder(folderId){
   const files=[];let pageToken=null;
   do{
-    const q=encodeURIComponent(`'${folderId}' in parents and mimeType='application/vnd.google-apps.spreadsheet' and trashed=false`);
+    const q=encodeURIComponent(`'${folderId}' in parents and (mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') and trashed=false`);
     let url=`https://www.googleapis.com/drive/v3/files?q=${q}&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)&pageSize=1000&orderBy=modifiedTime+desc`;
     if(pageToken)url+=`&pageToken=${pageToken}`;
     try{
