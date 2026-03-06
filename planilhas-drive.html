@@ -381,7 +381,7 @@ const DRIVE_FILES_PAGE_SIZE=1000;
 
 let tokenClient,accessToken=null;
 let allFiles=[],filtFiles=[];
-let curFileId=null,curFileUrl=null;
+let curFileId=null,curFileUrl=null,curFileMime=null;
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
@@ -531,7 +531,7 @@ async function fetchAllPagesQuery(query,driveId=null){
   const files=[];let pageToken=null;
   do{
     let url='https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(query)
-      +'&fields=nextPageToken,files(id,name,modifiedTime,webViewLink)'
+      +'&fields=nextPageToken,files(id,name,mimeType,modifiedTime,webViewLink)'
       +'&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true';
     if(driveId)url+='&corpora=drive&driveId='+driveId;
     if(pageToken)url+='&pageToken='+encodeURIComponent(pageToken);
@@ -587,25 +587,33 @@ function filterFiles(){
   });
   $('fcount').innerHTML='<strong>'+filtFiles.length+'</strong> de '+allFiles.length+' planilhas';
   $('fitems').innerHTML=filtFiles.map((f,i)=>
-    '<div class="fitem '+(curFileId===f.id?'active':'')+'" onclick="selectFile(\''+f.id+'\',\''+esc(f.name)+'\',\''+esc(f.webViewLink||'')+'\')">'+
+    '<div class="fitem '+(curFileId===f.id?'active':'')+'" onclick="selectFile(\''+f.id+'\',\''+esc(f.name)+'\',\''+esc(f.webViewLink||'')+'\',' + "\'" + (f.mimeType||'') + "\'" + ')">'+
     '<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'+
     '<div class="finfo"><div class="fname">'+esc(f.name)+'</div><div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'+
     '<div class="farrow">›</div></div>'
   ).join('');
 }
 
-async function selectFile(id,name,url){
-  curFileId=id;curFileUrl=url;filterFiles();
+async function selectFile(id,name,url,mime){
+  curFileId=id;curFileUrl=url;curFileMime=mime||'';filterFiles();
   $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
   $('dloading-txt').textContent='Lendo estrutura...';
   try{
-    const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!metaR.ok)throw new Error('Não foi possível acessar esta planilha');
-    const meta=await metaR.json();
-    sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
-    curTab=sheetTabs[0]||'Plan1';
-    $('dfilename').textContent=name;
-    renderTabs();await loadTabData(id,curTab);
+    const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    if(isXlsx){
+      // .xlsx: usar Drive export para listar abas via conversão
+      $('dfilename').textContent=name;
+      sheetTabs=['Plan1'];curTab='Plan1';
+      renderTabs();await loadTabData(id,curTab);
+    }else{
+      const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!metaR.ok)throw new Error('Não foi possível acessar esta planilha');
+      const meta=await metaR.json();
+      sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
+      curTab=sheetTabs[0]||'Plan1';
+      $('dfilename').textContent=name;
+      renderTabs();await loadTabData(id,curTab);
+    }
   }catch(e){
     $('dloading').style.display='none';$('dempty').style.display='flex';
     $('dempty').querySelector('.dempty-ico').textContent='⚠️';
@@ -627,13 +635,41 @@ async function switchTab(tabName){
 }
 async function loadTabData(id,tab){
   try{
-    const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok)throw new Error('Erro ao ler aba');
-    processData((await r.json()).values||[]);
+    const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    let values;
+    if(isXlsx){
+      // Exportar .xlsx como CSV via Drive API (sem criar arquivo, só leitura)
+      const r=await fetch('https://www.googleapis.com/drive/v3/files/'+id+'/export?mimeType=text/csv',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)throw new Error('Erro ao ler arquivo .xlsx');
+      const csv=await r.text();
+      values=parseCSV(csv);
+    }else{
+      const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)throw new Error('Erro ao ler aba');
+      values=(await r.json()).values||[];
+    }
+    processData(values);
   }catch(e){
     $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
     $('tbody').innerHTML='<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ '+e.message+'</td></tr>';
   }
+}
+function parseCSV(text){
+  const rows=[];
+  const lines=text.split(/\r?\n/);
+  for(const line of lines){
+    if(!line.trim())continue;
+    const row=[];let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+      else if(ch===','&&!inQ){row.push(cur);cur='';}
+      else cur+=ch;
+    }
+    row.push(cur);
+    rows.push(row);
+  }
+  return rows;
 }
 function processData(values){
   let engineer='';
@@ -779,13 +815,21 @@ async function gsLoadFile(file,cache){
   const cacheKey=file.id+'_'+file.modifiedTime;
   if(cache[cacheKey])return{cached:true,data:cache[cacheKey]};
   try{
-    const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!metaR.ok)return null;
-    const meta=await metaR.json();
-    const tabName=((meta.sheets||[])[0]||{}).properties?.title||'Plan1';
-    const dataR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!dataR.ok)return null;
-    const values=(await dataR.json()).values||[];
+    const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    let values,tabName='Plan1';
+    if(isXlsx){
+      const r=await fetch('https://www.googleapis.com/drive/v3/files/'+file.id+'/export?mimeType=text/csv',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!r.ok)return null;
+      values=parseCSV(await r.text());
+    }else{
+      const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!metaR.ok)return null;
+      const meta=await metaR.json();
+      tabName=((meta.sheets||[])[0]||{}).properties?.title||'Plan1';
+      const dataR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
+      if(!dataR.ok)return null;
+      values=(await dataR.json()).values||[];
+    }
     let hIdx=0,best=-1;
     for(let i=0;i<Math.min(values.length,15);i++){
       const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
