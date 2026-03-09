@@ -836,8 +836,12 @@ async function loadTabData(id,tab){
       if(!curXlsxWb)curXlsxWb=await loadXlsxWorkbook(id);
       if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
       const ws=curXlsxWb.Sheets[tab]||curXlsxWb.Sheets[curXlsxWb.SheetNames[0]];
-      const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
-      values=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
+      const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
+      values=data.map(row=>row.map(cell=>{
+        if(cell===null||cell===undefined||cell==='')return'';
+        if(typeof cell==='number'){return String(cell);}
+        return String(cell);
+      }));
     }else{
       const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
       if(!r.ok)throw new Error('Erro ao ler aba');
@@ -930,7 +934,30 @@ function extractMY(d){
   return null;
 }
 function parseVal(v){
-  if(!v)return 0;const n=String(v).replace(/[R$\s.]/g,'').replace(',','.');const p=parseFloat(n);return isNaN(p)?0:p;
+  if(!v&&v!==0)return 0;
+  const s=String(v).trim();
+  if(!s)return 0;
+  // Já é número puro (xlsx raw)
+  const direct=parseFloat(s);
+  if(!isNaN(direct)&&!/[R$,]/.test(s))return direct;
+  // Formato BR: R$ 1.500,00 ou 1.500,00
+  const hasBrComma=s.includes(',');
+  const hasDot=s.includes('.');
+  let n=s.replace(/[R$\s]/g,'');
+  if(hasBrComma){
+    // ponto=milhar, vírgula=decimal
+    n=n.replace(/\./g,'').replace(',','.');
+  }else if(hasDot){
+    // pode ser separador decimal anglo (100.00) ou milhar (1.000)
+    const parts=n.split('.');
+    if(parts.length===2&&parts[1].length<=2){
+      // decimal anglo: 100.00 -> 100
+    }else{
+      // milhar: 1.000 -> 1000
+      n=n.replace(/\./g,'');
+    }
+  }
+  const p=parseFloat(n);return isNaN(p)?0:p;
 }
 function fmtBRL(n){return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
 function clearFilters(){$('f-prop').value='';$('f-mes').value='';filterRows();}
@@ -1025,7 +1052,7 @@ async function gsLoadFile(file,cache){
       const allProposals=[];
       for(const shName of wb.SheetNames){
         const ws=wb.Sheets[shName];
-        const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,blankrows:false});
+        const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
         const rows=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
         let hIdx=0,best=-1;
         for(let i=0;i<Math.min(rows.length,15);i++){
