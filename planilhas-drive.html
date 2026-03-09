@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Financeira</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" onload="initGoogle()"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root{
   --bg:#f1f3f4;--bg2:#e8eaed;--bg3:#fff;
@@ -536,7 +536,7 @@ const LS_KEY='cf_gs_cache_v4';
 const FOLDER_SCAN_CONCURRENCY=8;
 const DRIVE_FILES_PAGE_SIZE=1000;
 
-let tokenClient,accessToken=null;
+let tokenClient=null,accessToken=null;
 let viewMode='all';
 let engMap={};
 let allFiles=[],filtFiles=[];
@@ -550,21 +550,44 @@ const RPP=50;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+// ─── FIX 1: initGoogle robusto, chamado tanto pelo onload quanto pelo doLogin ───
 function initGoogle(){
-  tokenClient=google.accounts.oauth2.initTokenClient({
-    client_id:CLIENT_ID,scope:SCOPES,
-    callback:async r=>{
-      if(r.error)return;
-      accessToken=r.access_token;
-      await fetchUser();showApp();await loadFiles();
-    }
-  });
+  try{
+    tokenClient=google.accounts.oauth2.initTokenClient({
+      client_id:CLIENT_ID,scope:SCOPES,
+      callback:async r=>{
+        if(r.error){console.error('Auth error:',r.error);return;}
+        accessToken=r.access_token;
+        await fetchUser();showApp();await loadFiles();
+      }
+    });
+  }catch(e){
+    console.error('initGoogle failed:',e);
+    tokenClient=null;
+  }
 }
+
+// Chamado pelo script do Google quando ele termina de carregar
+window.onGoogleLibraryLoad=function(){
+  initGoogle();
+};
+
+// ─── FIX 2: doLogin com verificações robustas ───
 function doLogin(){
-  if(typeof google==='undefined')return alert('Aguarde o carregamento do Google...');
-  if(!tokenClient)initGoogle();
+  if(typeof google==='undefined'||!google.accounts||!google.accounts.oauth2){
+    alert('O serviço do Google ainda está carregando. Aguarde um momento e tente novamente.');
+    return;
+  }
+  if(!tokenClient){
+    initGoogle();
+  }
+  if(!tokenClient){
+    alert('Erro ao inicializar a autenticação. Recarregue a página e tente novamente.');
+    return;
+  }
   tokenClient.requestAccessToken({prompt:'consent'});
 }
+
 function logout(){
   if(accessToken)google.accounts.oauth2.revoke(accessToken);
   accessToken=null;allFiles=[];filtFiles=[];
@@ -580,13 +603,14 @@ async function fetchUser(){
     $('uname').textContent=u.name||u.email||'';
     if(u.picture)$('uavatar').src=u.picture;
     setOnline(true);
-  }catch(e){}
+  }catch(e){console.error('fetchUser:',e);}
 }
 function setOnline(on){
   $('cbadge').className='cbadge'+(on?' live':'');
   $('clabel').textContent=on?'online':'offline';
 }
 function showApp(){
+  if(!tokenClient)initGoogle();
   $('login-wrap').style.display='none';
   $('app').style.display='flex';$('app').classList.add('on');
   $('upill').style.display='flex';$('blogout').style.display='block';
@@ -601,14 +625,11 @@ async function loadFiles(){
   const update=txt=>{allFiles=[...seen.values()];filterFiles();setSyncState('loading',null,txt);};
 
   try{
-    // 1) Mapear todas as subpastas em paralelo (BFS, 8 simultâneas por nível)
     const folderIds=await getAllSubfoldersFast(FOLDER_ID,(n)=>{
       setSyncState('loading',null,'Mapeando pastas... '+n+' encontradas');
     });
     update(seen.size+' planilhas · '+folderIds.length+' pastas, buscando arquivos...');
 
-    // 2) OTIMIZAÇÃO PRINCIPAL: agrupar 20 pastas por query, rodar 10 queries em paralelo
-    // 2035 pastas / 20 = ~102 queries; 10 paralelas = ~10 rounds (~3-5s em vez de minutos)
     const MIME="(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')";
     const BATCH=20,CONC=10;
     const batches=[];
@@ -627,11 +648,9 @@ async function loadFiles(){
       update(seen.size+' planilhas · lotes '+batchDone+'/'+batches.length+'...');
     }
 
-    // 3) Compartilhados comigo
     update(seen.size+' planilhas · buscando compartilhados...');
     dedup(await fetchAllPagesQuery(MIME+' and trashed=false and sharedWithMe'));
 
-    // 4) Shared Drives
     update(seen.size+' planilhas · buscando Shared Drives...');
     const sharedDrives=await listSharedDrives();
     const driveResults=await Promise.allSettled(
@@ -754,6 +773,20 @@ function filterFiles(){
   }
 }
 
+// ─── FIX 3: fitemHtml com template literal — sem quebra de string ───
+function fitemHtml(f){
+  const id=f.id||'';
+  const name=(f.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const url=(f.webViewLink||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  const mime=(f.mimeType||'').replace(/'/g,"\\'");
+  const active=curFileId===f.id?'active':'';
+  return '<div class="fitem '+active+'" onclick="selectFile(\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
+    +'<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'
+    +'<div class="finfo"><div class="fname">'+esc(f.name)+'</div>'
+    +'<div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'
+    +'<div class="farrow">›</div></div>';
+}
+
 async function selectFile(id,name,url,mime){
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;filterFiles();
   $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
@@ -761,7 +794,6 @@ async function selectFile(id,name,url,mime){
   try{
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     if(isXlsx){
-      // .xlsx: baixar workbook uma vez, listar abas reais
       $('dfilename').textContent=name;
       curXlsxWb=await loadXlsxWorkbook(id);
       if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
@@ -801,7 +833,6 @@ async function loadTabData(id,tab){
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values;
     if(isXlsx){
-      // Usar workbook cacheado, ler a aba solicitada
       if(!curXlsxWb)curXlsxWb=await loadXlsxWorkbook(id);
       if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
       const ws=curXlsxWb.Sheets[tab]||curXlsxWb.Sheets[curXlsxWb.SheetNames[0]];
@@ -830,7 +861,6 @@ async function ensureXLSX(){
 }
 async function loadXlsxWorkbook(fileId){
   try{
-    // Carregar SheetJS e arquivo em paralelo
     const [_,r]=await Promise.all([
       ensureXLSX(),
       fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}})
@@ -852,7 +882,6 @@ function processData(values){
   }
   if(engineer){
     $('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;
-    // Salvar no mapa de engenheiros para agrupamento
     if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();}
   }else $('eng-badge').style.display='none';
   const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
@@ -993,7 +1022,6 @@ async function gsLoadFile(file,cache){
     if(isXlsx){
       const wb=await loadXlsxWorkbook(file.id);
       if(!wb)return null;
-      // Buscar proposta em todas as abas do xlsx
       const allProposals=[];
       for(const shName of wb.SheetNames){
         const ws=wb.Sheets[shName];
@@ -1126,7 +1154,7 @@ async function gsOpenFound(){
   const{file,tabName,proposta}=gsFoundResult;
   gsLastFoundProp=proposta;gsPendingProp=proposta;
   closeGlobalSearch();
-  await selectFile(file.id,file.name,file.webViewLink||'');
+  await selectFile(file.id,file.name,file.webViewLink||'',file.mimeType||'');
   if(tabName&&sheetTabs.includes(tabName)&&tabName!==curTab)await switchTab(tabName);
   $('f-prop').value=proposta;filterRows();$('rpanel').scrollTop=0;
 }
@@ -1137,10 +1165,8 @@ function openDeslocamento(){
   const overlay=$('desl-overlay');
   overlay.classList.add('open');
   document.addEventListener('keydown',deslEscListener);
-  // Restaurar origem salva
   const saved=localStorage.getItem(DESL_LS)||'';
   $('desl-origem').value=saved;
-  // Popular lista de vistorias da aba atual
   deslPopularVistorias();
 }
 function closeDeslocamento(){
@@ -1210,20 +1236,16 @@ function deslCalcular(){
   if(selecionadas.length===0){
     alert('Selecione ao menos uma vistoria.');return;
   }
-  // Calcular
   const nVistorias=selecionadas.length;
   const valorVistorias=nVistorias*100;
   const kmTotal=selecionadas.reduce((s,v)=>s+v.km,0);
-  // Regra: (km_ida_volta - 15) * 1.00, só se > 15km
   const kmCobrado=Math.max(0,kmTotal-15);
   const valorDesl=kmCobrado*1;
   const total=valorVistorias+valorDesl;
-  // Atualizar totais por vistoria
   selecionadas.forEach(v=>{
     const el=document.getElementById('dvt-'+v.idx);
     if(el)el.textContent=v.km>0?(v.km+' km'):'0 km';
   });
-  // Montar resultado
   const wrap=$('desl-resultado-wrap');
   const rows2=$('desl-res-rows');
   let html='';
@@ -1234,7 +1256,6 @@ function deslCalcular(){
   }
   rows2.innerHTML=html;
   $('desl-total').textContent=fmtBRL(total);
-  // Regra explicativa
   let regraHtml='⚠️ Regra: R$ 100,00 por vistoria';
   if(kmTotal>0&&kmTotal<=15){
     regraHtml+=' · Deslocamento de '+kmTotal.toFixed(1)+'km não ultrapassa 15km — sem cobrança adicional.';
@@ -1286,7 +1307,7 @@ function setFontSize(delta){
   const lbl=document.getElementById('fs-label');
   if(lbl)lbl.textContent=curFontSize;
 }
-// Inicializar ao carregar
+
 document.addEventListener('DOMContentLoaded',function(){
   initDark();
   initFontSize();
@@ -1308,19 +1329,7 @@ function setViewMode(mode){
   filterFiles();
 }
 
-// Inicializar mapa ao carregar (chamado no DOMContentLoaded junto com os outros)
-// loadEngMap() é chamado em initGoogle via showApp
-
-
-function fitemHtml(f){
-  return '<div class="fitem '+(curFileId===f.id?'active':'')+'" onclick="selectFile(''+f.id+'',''+esc(f.name)+'',''+esc(f.webViewLink||'')+'',' + "'" + (f.mimeType||'') + "'" + ')">'+
-    '<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'+
-    '<div class="finfo"><div class="fname">'+esc(f.name)+'</div><div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'+
-    '<div class="farrow">›</div></div>';
-}
-
 function renderFilesGrouped(){
-  // Agrupar por engenheiro
   const groups={};
   const UNKNOWN='— Não identificado';
   for(const f of filtFiles){
@@ -1328,7 +1337,6 @@ function renderFilesGrouped(){
     if(!groups[eng])groups[eng]=[];
     groups[eng].push(f);
   }
-  // Ordenar grupos: conhecidos primeiro (alfabético), desconhecidos por último
   const keys=Object.keys(groups).sort((a,b)=>{
     if(a===UNKNOWN)return 1;if(b===UNKNOWN)return -1;
     return a.localeCompare(b,'pt-BR');
@@ -1347,7 +1355,7 @@ function renderFilesGrouped(){
     const groupId='eg-'+btoa(encodeURIComponent(eng)).replace(/=/g,'').slice(0,12);
     const isOpen=sessionStorage.getItem('eg_'+groupId)!=='0';
     html+='<div class="eng-group'+(isUnknown?' eng-unknown':'')+' '+(isOpen?'open':'')+'" id="'+groupId+'">';
-    html+='<div class="eng-group-hd" onclick="toggleEngGroup(''+groupId+'')">';
+    html+='<div class="eng-group-hd" onclick="toggleEngGroup(\''+groupId+'\')">';
     html+='<div class="eng-group-avatar">'+initials+'</div>';
     html+='<div class="eng-group-info"><div class="eng-group-name">'+esc(eng)+'</div>';
     html+='<div class="eng-group-count">'+files.length+' planilha'+(files.length!==1?'s':'')+'</div></div>';
@@ -1364,7 +1372,6 @@ function toggleEngGroup(id){
   const isOpen=el.classList.toggle('open');
   sessionStorage.setItem('eg_'+id,isOpen?'1':'0');
 }
-
 </script>
 </body>
 </html>
