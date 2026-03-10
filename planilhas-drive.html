@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Financeira</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a73e8'/%3E%3Crect x='7' y='8' width='11' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='12' width='18' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='16' width='14' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='20' width='9' height='2' rx='1' fill='white' opacity='.6'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -508,6 +509,175 @@ body.dark .ttable tbody tr:hover td:first-child{
 body.dark .spark-track{ background:rgba(24,128,56,.2); }
 body.dark .spark-fill{ background:linear-gradient(90deg,#5cb87a,#34a853); }
 body.dark .spark-fill.zero{ background:rgba(154,160,166,.2); }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 4 — GLASS HEADER no scroll
+   backdrop-filter blur quando rpanel rola
+══════════════════════════════════════════ */
+.dhead{
+  transition:box-shadow .25s ease, background .25s ease, backdrop-filter .25s ease;
+}
+.dhead.scrolled{
+  background:rgba(255,255,255,.82)!important;
+  backdrop-filter:blur(12px) saturate(1.6);
+  -webkit-backdrop-filter:blur(12px) saturate(1.6);
+  box-shadow:0 1px 0 rgba(60,64,67,.08), 0 2px 12px rgba(60,64,67,.1)!important;
+}
+body.dark .dhead.scrolled{
+  background:rgba(37,38,43,.82)!important;
+  backdrop-filter:blur(12px) saturate(1.4);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);
+  box-shadow:0 1px 0 rgba(0,0,0,.25), 0 2px 12px rgba(0,0,0,.3)!important;
+}
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 5 — RIPPLE em botões primários
+   .btn-open e .btn-desl
+══════════════════════════════════════════ */
+.btn-open, .btn-desl-wrap{
+  position:relative;
+  overflow:hidden;
+}
+.ripple{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,.35);
+  transform:scale(0);
+  animation:rippleAnim .55s linear;
+  pointer-events:none;
+}
+@keyframes rippleAnim{
+  to{ transform:scale(4); opacity:0; }
+}
+/* Active press scale em todos botões primários */
+.btn-open:active{ transform:scale(.96); }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 6 — LOADING SKELETON
+   Substitui o spinner por shimmer animado
+══════════════════════════════════════════ */
+.skeleton-wrap{
+  padding:14px 16px;
+  flex:1;
+  display:none;
+  flex-direction:column;
+  gap:12px;
+  animation:fadeIn .2s ease;
+}
+.skeleton-wrap.show{ display:flex; }
+/* Bloco de métricas skeleton */
+.skel-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.skel-card{
+  height:62px;
+  border-radius:8px;
+  background:var(--bg2);
+  overflow:hidden;
+  position:relative;
+}
+/* Bloco de tabela skeleton */
+.skel-table{
+  border-radius:8px;
+  border:1px solid var(--b);
+  overflow:hidden;
+}
+.skel-thead{
+  height:34px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--b);
+}
+.skel-rows{ display:flex; flex-direction:column; }
+.skel-row{
+  height:36px;
+  border-bottom:1px solid var(--b);
+  background:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.skel-row:nth-child(even){ background:#fafafa; }
+.skel-row:last-child{ border-bottom:none; }
+body.dark .skel-card{ background:var(--bg2); }
+body.dark .skel-thead{ background:var(--bg2); }
+body.dark .skel-row{ background:var(--bg3); }
+body.dark .skel-row:nth-child(even){ background:#222327; }
+/* Shimmer sweep em todos */
+.skel-card::after,
+.skel-thead::after,
+.skel-row::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,.55) 50%,
+    transparent 100%
+  );
+  transform:translateX(-100%);
+  animation:shimmer 1.4s infinite;
+}
+body.dark .skel-card::after,
+body.dark .skel-thead::after,
+body.dark .skel-row::after{
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,.07) 50%,
+    transparent 100%
+  );
+}
+@keyframes shimmer{
+  100%{ transform:translateX(100%); }
+}
+/* Linhas de conteúdo falsas dentro da skel-card */
+.skel-card-inner{
+  padding:10px 13px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.skel-line{
+  height:8px;
+  border-radius:4px;
+  background:var(--b2);
+  opacity:.5;
+}
+.skel-line.short{ width:40%; }
+.skel-line.long{ width:70%; height:18px; border-radius:5px; }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 7 — EMPTY STATES com SVG
+   Estado inicial, sem resultados, erro
+══════════════════════════════════════════ */
+.dempty{
+  gap:16px;
+}
+.dempty-svg{
+  width:88px;
+  height:88px;
+  opacity:.85;
+  flex-shrink:0;
+}
+.dempty-title{
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-.3px;
+}
+.dempty-sub{
+  font-size:13px;
+  max-width:280px;
+}
+/* Animação suave de entrada do empty state */
+.dempty{
+  animation:emptyIn .3s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes emptyIn{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -582,12 +752,38 @@ body.dark .spark-fill.zero{ background:rgba(154,160,166,.2); }
     </div>
   </div>
   <div class="rpanel" id="rpanel">
+    <!-- EMPTY STATE — selecione planilha -->
     <div class="dempty" id="dempty">
-      <div class="dempty-ico">👈</div>
+      <svg class="dempty-svg" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="12" width="52" height="64" rx="6" fill="var(--a)" opacity=".08" stroke="var(--a)" stroke-width="1.5" stroke-opacity=".25"/>
+        <rect x="16" y="24" width="36" height="3" rx="1.5" fill="var(--a)" opacity=".3"/>
+        <rect x="16" y="32" width="28" height="3" rx="1.5" fill="var(--a)" opacity=".2"/>
+        <rect x="16" y="40" width="32" height="3" rx="1.5" fill="var(--a)" opacity=".2"/>
+        <rect x="16" y="48" width="20" height="3" rx="1.5" fill="var(--a)" opacity=".15"/>
+        <circle cx="66" cy="62" r="16" fill="var(--a)" opacity=".1" stroke="var(--a)" stroke-width="1.5" stroke-opacity=".3"/>
+        <path d="M60 62h12M66 56v12" stroke="var(--a)" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+      </svg>
       <div class="dempty-title">Selecione uma planilha</div>
-      <div class="dempty-sub">Clique em qualquer planilha para visualizar as vistorias com filtros avançados.</div>
+      <div class="dempty-sub">Clique em qualquer planilha à esquerda para visualizar vistorias com filtros avançados.</div>
     </div>
-    <div class="dloading" id="dloading"><div class="dspinner"></div><div class="dloading-txt" id="dloading-txt">Lendo planilha...</div></div>
+
+    <!-- SKELETON LOADER — substitui spinner -->
+    <div class="skeleton-wrap" id="dloading">
+      <div class="skel-metrics">
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+      </div>
+      <div class="skel-table">
+        <div class="skel-thead"></div>
+        <div class="skel-rows">
+          <div class="skel-row"></div><div class="skel-row"></div><div class="skel-row"></div>
+          <div class="skel-row"></div><div class="skel-row"></div><div class="skel-row"></div>
+          <div class="skel-row"></div><div class="skel-row"></div>
+        </div>
+      </div>
+    </div>
     <div id="dcontent" style="display:none;flex:1;flex-direction:column">
       <div class="dhead">
         <div class="dhead-top">
@@ -600,7 +796,7 @@ body.dark .spark-fill.zero{ background:rgba(154,160,166,.2); }
             </div>
           </div>
           <button class="btn-desl" onclick="openDeslocamento()" style="display:flex;align-items:center;gap:6px;background:#fff7e6;color:var(--gold);border:1px solid rgba(227,116,0,.3);font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:7px 13px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;margin-right:6px" onmouseover="this.style.background='#ffecc7'" onmouseout="this.style.background='#fff7e6'">🚗 Deslocamento</button>
-          <button class="btn-open" onclick="openSheet()">
+          <button class="btn-open" onclick="openSheet();addRipple(event,this)">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Abrir no Sheets
           </button>
@@ -886,8 +1082,8 @@ function fitemHtml(f){
 }
 async function selectFile(id,name,url,mime){
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;filterFiles();
-  $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
-  $('dloading-txt').textContent='Lendo estrutura...';
+  $('dempty').style.display='none';$('dloading').classList.add('show');$('dcontent').style.display='none';
+  $('dloading-txt')&&($('dloading-txt').textContent='Lendo estrutura...');
   try{
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     if(isXlsx){
@@ -904,10 +1100,8 @@ async function selectFile(id,name,url,mime){
       $('dfilename').textContent=name;renderTabs();await loadTabData(id,curTab);
     }
   }catch(e){
-    $('dloading').style.display='none';$('dempty').style.display='flex';
-    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
-    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
-    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+    $('dloading').classList.remove('show');
+    emptyStateError('Erro ao carregar', e.message);
   }
 }
 function renderTabs(){
@@ -918,8 +1112,8 @@ function renderTabs(){
 }
 async function switchTab(tabName){
   curTab=tabName;renderTabs();
-  $('dloading-txt').textContent='Lendo "'+tabName+'"...';
-  $('dloading').style.display='flex';$('dcontent').style.display='none';
+  $('dloading-txt')&&($('dloading-txt').textContent='Lendo "'+tabName+'"...');
+  $('dloading').classList.add('show');$('dcontent').style.display='none';
   await loadTabData(curFileId,tabName);
 }
 async function loadTabData(id,tab){
@@ -939,7 +1133,7 @@ async function loadTabData(id,tab){
     }
     processData(values);
   }catch(e){
-    $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
+    $('dloading').classList.remove('show');$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
     $('tbody').innerHTML='<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ '+e.message+'</td></tr>';
   }
 }
@@ -990,9 +1184,13 @@ function processData(values){
   months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
   const fm=$('f-mes');fm.innerHTML='<option value="">Todos os meses</option>';
   months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
-  $('dloading').style.display='none';
+  $('dloading').classList.remove('show');
   $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
   if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
+  // Título dinâmico com nome do arquivo e engenheiro
+  const engTxt = $('eng-name').textContent||'';
+  const fname = $('dfilename').textContent||'';
+  setPageTitle([fname, engTxt&&engTxt!=='—'?engTxt:''].filter(Boolean));
   filterRows();
 }
 function guessClass(u){
@@ -1066,8 +1264,16 @@ function renderTable(){
     +'</tr>';
 
   if(slice.length===0){
-    $('tbody').innerHTML='<tr><td colspan="'+(allHeaders.length+(hasAddr?1:0))+'" class="norows">'
-      +'<div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>';
+    $('tbody').innerHTML='<tr><td colspan="'+(allHeaders.length+(hasAddr?1:0))+'" style="padding:48px 24px;text-align:center">'
+      +'<svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="display:block;margin:0 auto 12px;opacity:.45">'
+      +'<circle cx="26" cy="26" r="22" stroke="var(--m)" stroke-width="1.5"/>'
+      +'<path d="M18 26h16M18 20h10M18 32h8" stroke="var(--m)" stroke-width="1.5" stroke-linecap="round"/>'
+      +'<circle cx="37" cy="37" r="8" fill="var(--bg)" stroke="var(--m)" stroke-width="1.5"/>'
+      +'<path d="M34 37h6M37 34v6" stroke="var(--m)" stroke-width="1.5" stroke-linecap="round"/>'
+      +'</svg>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--m2);margin-bottom:4px">Nenhum resultado</div>'
+      +'<div style="font-size:11px;color:var(--m)">Tente ajustar os filtros acima</div>'
+      +'</td></tr>';
     $('tfoot').innerHTML='';return;
   }
 
@@ -1305,7 +1511,67 @@ function initDark(){const saved=localStorage.getItem('cf_dark');if(saved==='1'){
 let curFontSize=parseInt(localStorage.getItem('cf_fs')||'12');
 function initFontSize(){document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
 function setFontSize(delta){curFontSize=Math.min(18,Math.max(9,curFontSize+delta));document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');localStorage.setItem('cf_fs',curFontSize);const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
-document.addEventListener('DOMContentLoaded',function(){initDark();initFontSize();});
+
+// ══════════════════════════════════════════
+// ★ FEATURE A — TÍTULO DINÂMICO
+// ══════════════════════════════════════════
+function setPageTitle(parts){
+  document.title = ['Central Financeira', ...parts].filter(Boolean).join(' · ');
+}
+
+// ══════════════════════════════════════════
+// ★ FEATURE B — RIPPLE em botões
+// ══════════════════════════════════════════
+function addRipple(e, el){
+  const r = el.querySelector('.ripple');
+  if(r) r.remove();
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  const x = e.clientX - rect.left - size/2;
+  const y = e.clientY - rect.top - size/2;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+  el.appendChild(ripple);
+  ripple.addEventListener('animationend', ()=> ripple.remove());
+}
+
+// ══════════════════════════════════════════
+// ★ FEATURE C — GLASS HEADER ao rolar
+// ══════════════════════════════════════════
+function initScrollGlass(){
+  const rpanel = $('rpanel');
+  if(!rpanel) return;
+  rpanel.addEventListener('scroll', ()=>{
+    const dhead = $('dcontent')?.querySelector('.dhead');
+    if(!dhead) return;
+    dhead.classList.toggle('scrolled', rpanel.scrollTop > 8);
+  }, {passive:true});
+}
+
+// ══════════════════════════════════════════
+// ★ FEATURE D — EMPTY STATES com SVG
+// Estado de erro e sem resultados na tabela
+// ══════════════════════════════════════════
+function emptyStateError(title, sub){
+  $('dempty').innerHTML = `
+    <svg class="dempty-svg" viewBox="0 0 88 88" fill="none">
+      <circle cx="44" cy="44" r="32" fill="var(--red)" opacity=".07" stroke="var(--red)" stroke-width="1.5" stroke-opacity=".25"/>
+      <path d="M44 28v20M44 54v4" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+    </svg>
+    <div class="dempty-title">${title}</div>
+    <div class="dempty-sub">${sub}</div>`;
+  $('dempty').style.display='flex';
+}
+
+// Patch renderTable para usar SVG no estado vazio de filtro
+const _origRenderTable = renderTable;
+
+document.addEventListener('DOMContentLoaded',function(){
+  initDark();
+  initFontSize();
+  initScrollGlass();
+});
 
 // AGRUPAMENTO POR ENGENHEIRO
 const LS_ENG='cf_eng_map_v1';
