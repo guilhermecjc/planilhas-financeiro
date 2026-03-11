@@ -997,7 +997,7 @@ let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
-let gAddrIdx=-1,gCityIdx=-1,gPropIdx=-1;
+let gAddrIdx=-1,gCityIdx=-1,gPropIdx=-1,gValIdx=-1;
 let dpage=1;
 const RPP=50;
 
@@ -1246,16 +1246,34 @@ function processData(values){
     const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;
     if(sc>best){best=sc;hIdx=i;}
   }
-  allHeaders=(values[hIdx]||[]).map((h,i)=>({label:h||'Col '+(i+1),idx:i,cls:guessClass(String(h||'').toUpperCase())}));
+  const rawHeaders=(values[hIdx]||[]).map((h,i)=>({label:String(h||'').trim(),idx:i}));
+  // Remove colunas cujo cabeçalho é vazio E todas as linhas de dados também são vazias
+  const dataRows=values.slice(hIdx+1).filter(r=>r&&r.some(c=>String(c||'').trim()!==''));
+  allHeaders=rawHeaders
+    .filter(h=>{
+      // Mantém se tem label, ou se alguma linha tem dado nessa posição
+      const hasLabel=h.label!=='';
+      const hasData=dataRows.some(r=>String((r||[])[h.idx]||'').trim()!=='');
+      return hasLabel||hasData;
+    })
+    .map(h=>({...h, label:h.label||'Col '+(h.idx+1), cls:guessClass(h.label.toUpperCase())}));
   while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim())allHeaders.pop();
   const hU=allHeaders.map(h=>String(h.label).toUpperCase());
-  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
-  gPropIdx=find('PROPOSTA','N°','NUMERO','NUM');
-  const propIdx=gPropIdx;
-  const dateIdx=find('DATA');
-  const valIdx=find('VALOR');
-  gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
-  gCityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
+  // find retorna o h.idx (índice na planilha original), não a posição em allHeaders
+  const findIdx=(...kws)=>{
+    const pos=hU.findIndex(h=>kws.some(k=>h.includes(k)));
+    return pos>=0?allHeaders[pos].idx:-1;
+  };
+  // findPos retorna a posição em allHeaders (para sticky e vci)
+  const findPos=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
+
+  gPropIdx=findPos('PROPOSTA','N°','NUMERO','NUM','Nº');
+  const propIdx=findIdx('PROPOSTA','N°','NUMERO','NUM','Nº');
+  const dateIdx=findIdx('DATA');
+  gValIdx=findPos('VALOR');
+  const valIdx=findIdx('VALOR');
+  gAddrIdx=findIdx('ENDEREÇO','ENDERECO','END','LOGRADOURO');
+  gCityIdx=findIdx('CIDADE','MUNICIPIO','MUNICÍPIO');
   allRows=(values.slice(hIdx+1)||[])
     .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
     .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):'',endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',cidade:gCityIdx>=0?(r[gCityIdx]||''):''}));
@@ -1332,10 +1350,11 @@ function renderTable(){
   const start=(dpage-1)*RPP, slice=filtRows.slice(start,start+RPP);
   const hasAddr=gAddrIdx>=0||gCityIdx>=0;
 
-  // ── Sparkbar: calcula max valor da página atual ──
-  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
-  const pageVals=slice.map(r=>parseVal(r.valor));
-  const maxVal=Math.max(...pageVals, 0);
+  // ── Sparkbar: usa índice EXATO da coluna de valor (detectado no processData) ──
+  // gValIdx é salvo globalmente para evitar falso-positivo por classe
+  const vci = gValIdx; // índice real da coluna valor
+  const pageVals=vci>=0 ? slice.map(r=>parseVal(r.valor)) : [];
+  const maxVal=pageVals.length>0 ? Math.max(...pageVals, 0) : 0;
 
   // ── Cabeçalho — sticky na coluna de proposta pelo índice real ──
   $('thead').innerHTML='<tr>'
