@@ -16,7 +16,7 @@
   --gold:#e37400;--red:#d93025;
   --sh:0 1px 3px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.1);
   --sh2:0 2px 6px rgba(60,64,67,.2),0 1px 3px rgba(60,64,67,.15);
-  --tbl-fs:12px;
+  --tbl-fs:14px;
 }
 body.dark{
   --bg:#1a1b1e;--bg2:#25262b;--bg3:#2c2d32;
@@ -171,34 +171,34 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .tscroll{overflow-x:auto}
 .tscroll::-webkit-scrollbar{height:4px}
 .tscroll::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
-.ttable{width:100%;border-collapse:collapse;min-width:500px;font-size:12px}
+.ttable{width:100%;border-collapse:collapse;min-width:500px;font-size:var(--tbl-fs)}
 .ttable thead tr{background:var(--bg2);border-bottom:1px solid var(--b)}
-.ttable thead th{padding:7px 10px;font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-right:1px solid var(--b);user-select:none}
+.ttable thead th{padding:10px 14px;font-size:11px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;text-align:left;white-space:nowrap;border-right:1px solid var(--b);user-select:none}
 .ttable thead th:last-child{border-right:none}
-.ttable thead th.th-rota{text-align:center;width:52px}
+.ttable thead th.th-rota{text-align:center;width:64px}
 .ttable tbody tr{border-bottom:1px solid var(--b);transition:background .08s;cursor:default}
 .ttable tbody tr:last-child{border-bottom:none}
 .ttable tbody tr:hover{background:#f8f9fa}
 .ttable tbody tr:nth-child(even){background:#fafafa}
 .ttable tbody tr:nth-child(even):hover{background:#f1f3f4}
 .ttable tbody tr.gs-hl{background:#e6f4ea!important;border-left:3px solid var(--a3)}
-.ttable tbody td{padding:6px 10px;color:var(--t);border-right:1px solid rgba(0,0,0,.06);vertical-align:middle;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ttable tbody td{padding:10px 14px;color:var(--t);border-right:1px solid rgba(0,0,0,.06);vertical-align:middle;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--tbl-fs);line-height:1.4}
 .ttable tbody td:last-child{border-right:none}
-.ttable tbody td.td-rota{text-align:center;padding:5px 6px;width:52px}
-.c-prop{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--a);font-weight:600}
-.c-date{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--m)}
-.c-text{color:var(--t);font-size:12px}
-.c-val{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--a3);font-weight:700}
-.c-eng{color:var(--gold);font-size:11.5px;font-weight:600}
-.c-addr{color:var(--m);font-size:11px}
-.c-num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--m)}
-.btn-rota{display:inline-flex;align-items:center;justify-content:center;gap:3px;background:rgba(24,128,56,.08);border:1px solid rgba(24,128,56,.25);color:var(--a3);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:3px 7px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
+.ttable tbody td.td-rota{text-align:center;padding:6px 8px;width:64px}
+.c-prop{font-family:'JetBrains Mono',monospace;font-size:var(--tbl-fs);color:var(--a);font-weight:600}
+.c-date{font-family:'JetBrains Mono',monospace;font-size:var(--tbl-fs);color:var(--m2);font-weight:500}
+.c-text{color:var(--t);font-size:var(--tbl-fs);font-weight:500}
+.c-val{font-family:'JetBrains Mono',monospace;font-size:var(--tbl-fs);color:var(--a3);font-weight:700}
+.c-eng{color:var(--gold);font-size:var(--tbl-fs);font-weight:600}
+.c-addr{color:var(--m2);font-size:var(--tbl-fs);font-weight:400}
+.c-num{font-family:'JetBrains Mono',monospace;font-size:var(--tbl-fs);color:var(--m2);font-weight:500}
+.btn-rota{display:inline-flex;align-items:center;justify-content:center;gap:3px;background:rgba(24,128,56,.08);border:1px solid rgba(24,128,56,.25);color:var(--a3);font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:4px 9px;border-radius:5px;cursor:pointer;transition:all .12s;white-space:nowrap}
 .btn-rota:hover{background:rgba(24,128,56,.16);border-color:rgba(24,128,56,.4);box-shadow:0 1px 4px rgba(24,128,56,.15)}
 .btn-rota.no-addr{opacity:.35;cursor:not-allowed}
 .btn-rota.no-addr:hover{background:rgba(24,128,56,.08);border-color:rgba(24,128,56,.25);box-shadow:none}
 .ttable tfoot tr{background:var(--bg2);border-top:1px solid var(--b)}
-.ttable tfoot td{padding:6px 10px;font-weight:700;font-size:11px;color:var(--m2)}
-.total-val{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:800}
+.ttable tfoot td{padding:9px 14px;font-weight:700;font-size:13px;color:var(--m2)}
+.total-val{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800}
 .norows{text-align:center;padding:48px;color:var(--m)}
 .norows-ico{font-size:32px;margin-bottom:8px;opacity:.5}
 .norows-txt{font-size:13px;font-weight:500;color:var(--m2)}
@@ -395,68 +395,34 @@ body.dark .ttable tbody tr:hover::before{ background:#8ab4f8; }
    ★ FEATURE 2 — STICKY FIRST COLUMN
    Nº Proposta sempre visível no scroll H
 ══════════════════════════════════════════ */
-/* A primeira célula de cada linha fica fixada */
-.ttable thead th:first-child,
-.ttable tbody td:first-child,
-.ttable tfoot td:first-child{
-  position:sticky;
-  left:0;
-  z-index:2;
-  /* herda o bg da linha — definido explicitamente abaixo */
-  background:#fff;
-}
-.ttable thead th:first-child{ z-index:3; background:var(--bg2); }
-.ttable tbody tr:nth-child(even) td:first-child{ background:#fafafa; }
-.ttable tfoot td:first-child{ background:var(--bg2); }
+/* Sticky aplicada via JS: classe .col-sticky no índice real da proposta */
+.ttable thead th.col-sticky{ position:sticky; left:0; z-index:3; background:var(--bg2); overflow:visible; }
+.ttable tbody td.col-sticky{ position:sticky; left:0; z-index:2; background:#fff; overflow:visible; }
+.ttable tbody tr:nth-child(even) td.col-sticky{ background:#fafafa; }
+.ttable tfoot td.col-sticky{ position:sticky; left:0; z-index:2; background:var(--bg2); overflow:visible; }
 
-/* Dark mode sticky backgrounds */
-body.dark .ttable thead th:first-child{ background:var(--bg2); }
-body.dark .ttable tbody td:first-child{ background:var(--bg3); }
-body.dark .ttable tbody tr:nth-child(even) td:first-child{ background:#222327; }
-body.dark .ttable tfoot td:first-child{ background:var(--bg2); }
+body.dark .ttable thead th.col-sticky{ background:var(--bg2); }
+body.dark .ttable tbody td.col-sticky{ background:var(--bg3); }
+body.dark .ttable tbody tr:nth-child(even) td.col-sticky{ background:#222327; }
+body.dark .ttable tfoot td.col-sticky{ background:var(--bg2); }
 
-/* Hover deve atualizar o bg sticky também */
-.ttable tbody tr:hover td:first-child{
-  background:linear-gradient(
-    90deg,
-    rgba(26,115,232,.1) 0%,
-    rgba(26,115,232,.05) 100%
-  )!important;
+.ttable tbody tr:hover td.col-sticky{
+  background:linear-gradient(90deg,rgba(26,115,232,.1),rgba(26,115,232,.05))!important;
 }
-body.dark .ttable tbody tr:hover td:first-child{
-  background:linear-gradient(
-    90deg,
-    rgba(138,180,248,.15) 0%,
-    rgba(138,180,248,.07) 100%
-  )!important;
+body.dark .ttable tbody tr:hover td.col-sticky{
+  background:linear-gradient(90deg,rgba(138,180,248,.15),rgba(138,180,248,.07))!important;
 }
-.ttable tbody tr.gs-hl td:first-child{ background:#e6f4ea!important; }
+.ttable tbody tr.gs-hl td.col-sticky{ background:#e6f4ea!important; }
 
-/* Separador: sombra fina à direita da coluna sticky */
-.ttable thead th:first-child::after,
-.ttable tbody td:first-child::after,
-.ttable tfoot td:first-child::after{
-  content:'';
-  position:absolute;
-  top:0; right:-1px; bottom:0;
-  width:1px;
-  background:var(--b);
-  pointer-events:none;
+.ttable th.col-sticky::after, .ttable td.col-sticky::after{
+  content:''; position:absolute; top:0; right:-1px; bottom:0;
+  width:1px; background:var(--b); pointer-events:none;
 }
-/* Sombra difusa quando há scroll (sempre visível, discreta) */
-.ttable thead th:first-child::before,
-.ttable tbody td:first-child::before,
-.ttable tfoot td:first-child::before{
-  content:'';
-  position:absolute;
-  top:0; right:-9px; bottom:0;
-  width:9px;
-  background:linear-gradient(90deg,rgba(60,64,67,.07),transparent);
-  pointer-events:none;
-  z-index:0;
+.ttable th.col-sticky::before, .ttable td.col-sticky::before{
+  content:''; position:absolute; top:0; right:-9px; bottom:0;
+  width:9px; background:linear-gradient(90deg,rgba(60,64,67,.07),transparent);
+  pointer-events:none; z-index:0;
 }
-/* Evita que o ::before da linha de hover conflite com o ::before da sticky */
-.ttable tbody td:first-child{ overflow:visible; }
 
 /* ══════════════════════════════════════════
    ★ FEATURE 3 — SPARKBAR (mini barra inline)
@@ -471,7 +437,7 @@ body.dark .ttable tbody tr:hover td:first-child{
 }
 .spark-val{
   font-family:'JetBrains Mono',monospace;
-  font-size:11px;
+  font-size:var(--tbl-fs);
   font-weight:700;
   color:var(--a3);
   white-space:nowrap;
@@ -791,7 +757,7 @@ body.dark .skel-row::after{
     <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
     <div style="display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:3px 5px">
       <button onclick="setFontSize(-1)" title="Diminuir fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A−</button>
-      <span id="fs-label" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--m);min-width:24px;text-align:center">12</span>
+      <span id="fs-label" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--m);min-width:24px;text-align:center">14</span>
       <button onclick="setFontSize(1)" title="Aumentar fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A+</button>
     </div>
     <button id="dark-btn" onclick="toggleDark()" title="Alternar modo escuro" style="background:none;border:1px solid var(--b);color:var(--m);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">🌙</button>
@@ -1031,7 +997,7 @@ let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
-let gAddrIdx=-1,gCityIdx=-1;
+let gAddrIdx=-1,gCityIdx=-1,gPropIdx=-1;
 let dpage=1;
 const RPP=50;
 
@@ -1284,7 +1250,8 @@ function processData(values){
   while(allHeaders.length>0&&!String(allHeaders[allHeaders.length-1].label).trim())allHeaders.pop();
   const hU=allHeaders.map(h=>String(h.label).toUpperCase());
   const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
-  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
+  gPropIdx=find('PROPOSTA','N°','NUMERO','NUM');
+  const propIdx=gPropIdx;
   const dateIdx=find('DATA');
   const valIdx=find('VALOR');
   gAddrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
@@ -1306,12 +1273,13 @@ function processData(values){
   filterRows();
 }
 function guessClass(u){
-  if(u.includes('PROPOSTA')||u.includes('N°')||u.includes('NUMERO'))return'c-prop';
+  // Ordem importa: mais específico primeiro
+  if(u==='VALOR'||u==='VALOR DA VISTORIA'||u==='VALOR VISTORIA'||u==='VLR'||(u.startsWith('VALOR')&&u.length<20))return'c-val';
+  if(u.includes('PROPOSTA')||u==='N°'||u==='Nº'||u==='N DA PROPOSTA'||u==='NUMERO DA PROPOSTA'||u==='Nº DA PROPOSTA')return'c-prop';
   if(u.includes('DATA'))return'c-date';
-  if(u.includes('VALOR'))return'c-val';
   if(u.includes('ENGENHEIRO')||u.includes('PROFISSIONAL')||u.includes('RESPONSAVEL'))return'c-eng';
-  if(u.includes('ENDEREÇO')||u.includes('ENDERECO')||u.includes('END'))return'c-addr';
-  if(u.includes('CPF')||u.includes('CEP')||u.includes('CNPJ'))return'c-num';
+  if(u.includes('ENDEREÇO')||u.includes('ENDERECO')||u==='END'||u==='LOGRADOURO')return'c-addr';
+  if(u==='CPF'||u==='CEP'||u==='CNPJ'||u==='RG')return'c-num';
   return'c-text';
 }
 function extractMY(d){
@@ -1369,9 +1337,9 @@ function renderTable(){
   const pageVals=slice.map(r=>parseVal(r.valor));
   const maxVal=Math.max(...pageVals, 0);
 
-  // ── Cabeçalho ──
+  // ── Cabeçalho — sticky na coluna de proposta pelo índice real ──
   $('thead').innerHTML='<tr>'
-    + allHeaders.map(h=>'<th>'+esc(h.label)+'</th>').join('')
+    + allHeaders.map((h,i)=>'<th class="'+(i===gPropIdx?'col-sticky':'')+'">'+esc(h.label)+'</th>').join('')
     + (hasAddr?'<th class="th-rota">Rota</th>':'')
     +'</tr>';
 
@@ -1401,14 +1369,15 @@ function renderTable(){
     // Delay escalonado para a animação da sparkbar (50 ms por linha)
     const delay=i*30;
 
-    const cells=allHeaders.map(h=>{
+    const cells=allHeaders.map((h,ci)=>{
       const raw=r.raw[h.idx]||'';
-      // ── SPARKBAR: substitui conteúdo da coluna de valor ──
-      if(h.cls==='c-val' && vci>=0){
+      const stickyClass=ci===gPropIdx?' col-sticky':'';
+      // ── SPARKBAR: APENAS na coluna exata de valor (ci===vci) ──
+      if(ci===vci && vci>=0){
         const v=parseVal(raw);
         const pct=maxVal>0?Math.max(2,Math.round((v/maxVal)*100)):0;
         const zeroClass=v===0?' zero':'';
-        return '<td class="'+h.cls+'" title="'+esc(raw)+'">'
+        return '<td class="c-val'+stickyClass+'" title="'+esc(raw)+'">'
           +'<div class="spark-wrap">'
           +'<span class="spark-val">'+esc(raw||'—')+'</span>'
           +'<span class="spark-track">'
@@ -1417,7 +1386,7 @@ function renderTable(){
           +'</div>'
           +'</td>';
       }
-      return '<td class="'+h.cls+'" title="'+esc(raw)+'">'+esc(raw)+'</td>';
+      return '<td class="'+h.cls+stickyClass+'" title="'+esc(raw)+'">'+esc(raw)+'</td>';
     }).join('');
 
     return '<tr class="'+(isHL?'gs-hl':'')+'">'+ cells + rota +'</tr>';
@@ -1427,9 +1396,10 @@ function renderTable(){
   if(vci>=0){
     const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
     $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
-      if(i===0)return'<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — '+filtRows.length+' registros</td>';
-      if(i===vci)return'<td class="total-val">'+fmtBRL(total)+'</td>';
-      return'<td></td>';
+      const stickyClass=i===gPropIdx?' col-sticky':'';
+      if(i===0)return'<td class="'+stickyClass+'" style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — '+filtRows.length+' registros</td>';
+      if(i===vci)return'<td class="'+stickyClass+'"><span class="total-val">'+fmtBRL(total)+'</span></td>';
+      return'<td class="'+stickyClass+'"></td>';
     }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
   }else $('tfoot').innerHTML='';
 }
@@ -1620,9 +1590,9 @@ function toggleDark(){const isDark=document.body.classList.toggle('dark');localS
 function initDark(){const saved=localStorage.getItem('cf_dark');if(saved==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}}
 
 // FONT SIZE
-let curFontSize=parseInt(localStorage.getItem('cf_fs')||'12');
+let curFontSize=parseInt(localStorage.getItem('cf_fs')||'14');
 function initFontSize(){document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
-function setFontSize(delta){curFontSize=Math.min(18,Math.max(9,curFontSize+delta));document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');localStorage.setItem('cf_fs',curFontSize);const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
+function setFontSize(delta){curFontSize=Math.min(20,Math.max(10,curFontSize+delta));document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');localStorage.setItem('cf_fs',curFontSize);const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
 
 // ══════════════════════════════════════════
 // ★ FEATURE A — TÍTULO DINÂMICO
