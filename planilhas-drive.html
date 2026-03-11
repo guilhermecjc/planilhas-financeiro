@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Central Financeira</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a73e8'/%3E%3Crect x='7' y='8' width='11' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='12' width='18' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='16' width='14' height='2' rx='1' fill='white' opacity='.9'/%3E%3Crect x='7' y='20' width='9' height='2' rx='1' fill='white' opacity='.6'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
@@ -327,6 +328,460 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .eng-group-files{display:none;padding-left:8px}
 .eng-group.open .eng-group-files{display:block}
 .eng-unknown .eng-group-avatar{background:linear-gradient(135deg,var(--m),var(--b2))}
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 1 — ANIMATED ROW HOVER
+   Borda lateral deslizante + wash de cor
+══════════════════════════════════════════ */
+.ttable tbody tr{
+  position:relative;
+  /* override a transição simples por uma mais elegante */
+  transition:background .15s ease!important;
+}
+/* Pseudo-elemento = barra lateral azul que "escorrega" */
+.ttable tbody tr::before{
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:0;
+  background:var(--a);
+  border-radius:0 2px 2px 0;
+  transition:width .2s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+  z-index:1;
+}
+.ttable tbody tr:hover::before{ width:3px; }
+
+/* Bg wash azul suave no hover */
+.ttable tbody tr:hover{
+  background:linear-gradient(
+    90deg,
+    rgba(26,115,232,.07) 0%,
+    rgba(26,115,232,.025) 55%,
+    transparent 100%
+  )!important;
+}
+.ttable tbody tr:nth-child(even):hover{
+  background:linear-gradient(
+    90deg,
+    rgba(26,115,232,.09) 0%,
+    rgba(26,115,232,.03) 55%,
+    transparent 100%
+  )!important;
+}
+body.dark .ttable tbody tr:hover{
+  background:linear-gradient(
+    90deg,
+    rgba(138,180,248,.12) 0%,
+    rgba(138,180,248,.04) 55%,
+    transparent 100%
+  )!important;
+}
+body.dark .ttable tbody tr:hover::before{ background:#8ab4f8; }
+
+/* gs-hl (found result) mantém verde e troca barra para verde */
+.ttable tbody tr.gs-hl{ background:#e6f4ea!important; border-left:none; }
+.ttable tbody tr.gs-hl::before{ background:var(--a3)!important; width:3px!important; }
+.ttable tbody tr.gs-hl:hover{
+  background:linear-gradient(
+    90deg,
+    rgba(24,128,56,.14) 0%,
+    rgba(24,128,56,.05) 55%,
+    #e6f4ea 100%
+  )!important;
+}
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 2 — STICKY FIRST COLUMN
+   Nº Proposta sempre visível no scroll H
+══════════════════════════════════════════ */
+/* A primeira célula de cada linha fica fixada */
+.ttable thead th:first-child,
+.ttable tbody td:first-child,
+.ttable tfoot td:first-child{
+  position:sticky;
+  left:0;
+  z-index:2;
+  /* herda o bg da linha — definido explicitamente abaixo */
+  background:#fff;
+}
+.ttable thead th:first-child{ z-index:3; background:var(--bg2); }
+.ttable tbody tr:nth-child(even) td:first-child{ background:#fafafa; }
+.ttable tfoot td:first-child{ background:var(--bg2); }
+
+/* Dark mode sticky backgrounds */
+body.dark .ttable thead th:first-child{ background:var(--bg2); }
+body.dark .ttable tbody td:first-child{ background:var(--bg3); }
+body.dark .ttable tbody tr:nth-child(even) td:first-child{ background:#222327; }
+body.dark .ttable tfoot td:first-child{ background:var(--bg2); }
+
+/* Hover deve atualizar o bg sticky também */
+.ttable tbody tr:hover td:first-child{
+  background:linear-gradient(
+    90deg,
+    rgba(26,115,232,.1) 0%,
+    rgba(26,115,232,.05) 100%
+  )!important;
+}
+body.dark .ttable tbody tr:hover td:first-child{
+  background:linear-gradient(
+    90deg,
+    rgba(138,180,248,.15) 0%,
+    rgba(138,180,248,.07) 100%
+  )!important;
+}
+.ttable tbody tr.gs-hl td:first-child{ background:#e6f4ea!important; }
+
+/* Separador: sombra fina à direita da coluna sticky */
+.ttable thead th:first-child::after,
+.ttable tbody td:first-child::after,
+.ttable tfoot td:first-child::after{
+  content:'';
+  position:absolute;
+  top:0; right:-1px; bottom:0;
+  width:1px;
+  background:var(--b);
+  pointer-events:none;
+}
+/* Sombra difusa quando há scroll (sempre visível, discreta) */
+.ttable thead th:first-child::before,
+.ttable tbody td:first-child::before,
+.ttable tfoot td:first-child::before{
+  content:'';
+  position:absolute;
+  top:0; right:-9px; bottom:0;
+  width:9px;
+  background:linear-gradient(90deg,rgba(60,64,67,.07),transparent);
+  pointer-events:none;
+  z-index:0;
+}
+/* Evita que o ::before da linha de hover conflite com o ::before da sticky */
+.ttable tbody td:first-child{ overflow:visible; }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 3 — SPARKBAR (mini barra inline)
+   Na coluna de Valor, ao lado do texto
+══════════════════════════════════════════ */
+/* Container flex dentro da célula c-val */
+.spark-wrap{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.spark-val{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  font-weight:700;
+  color:var(--a3);
+  white-space:nowrap;
+  flex-shrink:0;
+}
+.spark-track{
+  flex:1;
+  min-width:20px;
+  max-width:52px;
+  height:4px;
+  background:rgba(24,128,56,.12);
+  border-radius:4px;
+  overflow:hidden;
+  position:relative;
+}
+.spark-fill{
+  position:absolute;
+  left:0; top:0; bottom:0;
+  border-radius:4px;
+  background:linear-gradient(90deg,#188038,#34a853);
+  /* Animação de entrada: expande da esquerda */
+  animation:sparkGrow .45s cubic-bezier(.4,0,.2,1) both;
+  animation-delay:var(--spark-delay,0ms);
+}
+@keyframes sparkGrow{
+  from{ width:0!important; opacity:.4; }
+  to{ opacity:1; }
+}
+/* Valor zero: barra cinza */
+.spark-fill.zero{
+  background:rgba(95,99,104,.2);
+  width:2px!important;
+  animation:none;
+}
+body.dark .spark-track{ background:rgba(24,128,56,.2); }
+body.dark .spark-fill{ background:linear-gradient(90deg,#5cb87a,#34a853); }
+body.dark .spark-fill.zero{ background:rgba(154,160,166,.2); }
+
+/* ══════════════════════════════════════════
+   ★ MODO FOCO — lpanel colapsa, tabela expande
+══════════════════════════════════════════ */
+
+/* Botão de foco no header direito */
+.btn-focus{
+  display:none; /* só aparece quando há planilha aberta */
+  align-items:center;gap:5px;
+  background:var(--bg);border:1px solid var(--b);
+  color:var(--m);font-family:'Outfit',sans-serif;
+  font-size:11px;font-weight:700;
+  padding:5px 10px;border-radius:7px;
+  cursor:pointer;transition:all .18s;
+  white-space:nowrap;flex-shrink:0;
+}
+.btn-focus:hover{border-color:var(--a);color:var(--a);background:#e8f0fe;}
+.btn-focus svg{transition:transform .3s cubic-bezier(.4,0,.2,1);}
+
+/* Estado ativo do foco */
+.app.focus-mode .lpanel{
+  width:0;
+  min-width:0;
+  padding:0;
+  border-right:none;
+  overflow:hidden;
+  /* Transição suave de colapso */
+  transition:width .32s cubic-bezier(.4,0,.2,1),
+             min-width .32s cubic-bezier(.4,0,.2,1),
+             border .32s ease;
+}
+.lpanel{
+  transition:width .32s cubic-bezier(.4,0,.2,1),
+             min-width .32s cubic-bezier(.4,0,.2,1);
+}
+
+/* Barra lateral fina clicável para sair do foco */
+.focus-hint{
+  position:fixed;
+  left:0;top:56px;bottom:0;
+  width:6px;
+  background:transparent;
+  cursor:pointer;
+  z-index:50;
+  display:none;
+  transition:background .2s;
+}
+.focus-hint:hover{
+  background:rgba(26,115,232,.18);
+}
+.app.focus-mode .focus-hint{ display:block; }
+
+/* Tooltip da barra lateral */
+.focus-hint::after{
+  content:'Sair do foco';
+  position:absolute;
+  left:10px;top:50%;
+  transform:translateY(-50%) rotate(0deg);
+  background:var(--t);color:var(--bg);
+  font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;
+  padding:4px 8px;border-radius:6px;
+  white-space:nowrap;pointer-events:none;
+  opacity:0;transition:opacity .15s;
+  letter-spacing:.3px;
+}
+.focus-hint:hover::after{ opacity:1; }
+
+/* Ícone do botão muda no modo foco */
+.app.focus-mode .btn-focus{
+  border-color:rgba(26,115,232,.35);
+  color:var(--a);
+  background:#e8f0fe;
+}
+.app.focus-mode .btn-focus .ico-expand{ display:none; }
+.app.focus-mode .btn-focus .ico-compress{ display:block; }
+.btn-focus .ico-compress{ display:none; }
+
+/* Animação de "pulso" no botão ao entrar no modo foco */
+@keyframes focusPop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.08)}
+  100%{transform:scale(1)}
+}
+.btn-focus.popping{ animation:focusPop .3s cubic-bezier(.4,0,.2,1); }
+
+/* Kbd hint discreto no rodapé da tabela */
+.focus-kbd-hint{
+  display:none;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  padding:6px 0 2px;
+  font-size:10px;color:var(--m);
+  font-family:'JetBrains Mono',monospace;
+  opacity:.6;
+}
+.app.focus-mode .focus-kbd-hint{ display:flex; }
+kbd{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--bg2);border:1px solid var(--b2);
+  border-radius:4px;padding:1px 5px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--m2);
+}
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 4 — GLASS HEADER no scroll
+   backdrop-filter blur quando rpanel rola
+══════════════════════════════════════════ */
+.dhead{
+  transition:box-shadow .25s ease, background .25s ease, backdrop-filter .25s ease;
+}
+.dhead.scrolled{
+  background:rgba(255,255,255,.82)!important;
+  backdrop-filter:blur(12px) saturate(1.6);
+  -webkit-backdrop-filter:blur(12px) saturate(1.6);
+  box-shadow:0 1px 0 rgba(60,64,67,.08), 0 2px 12px rgba(60,64,67,.1)!important;
+}
+body.dark .dhead.scrolled{
+  background:rgba(37,38,43,.82)!important;
+  backdrop-filter:blur(12px) saturate(1.4);
+  -webkit-backdrop-filter:blur(12px) saturate(1.4);
+  box-shadow:0 1px 0 rgba(0,0,0,.25), 0 2px 12px rgba(0,0,0,.3)!important;
+}
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 5 — RIPPLE em botões primários
+   .btn-open e .btn-desl
+══════════════════════════════════════════ */
+.btn-open, .btn-desl-wrap{
+  position:relative;
+  overflow:hidden;
+}
+.ripple{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,255,255,.35);
+  transform:scale(0);
+  animation:rippleAnim .55s linear;
+  pointer-events:none;
+}
+@keyframes rippleAnim{
+  to{ transform:scale(4); opacity:0; }
+}
+/* Active press scale em todos botões primários */
+.btn-open:active{ transform:scale(.96); }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 6 — LOADING SKELETON
+   Substitui o spinner por shimmer animado
+══════════════════════════════════════════ */
+.skeleton-wrap{
+  padding:14px 16px;
+  flex:1;
+  display:none;
+  flex-direction:column;
+  gap:12px;
+  animation:fadeIn .2s ease;
+}
+.skeleton-wrap.show{ display:flex; }
+/* Bloco de métricas skeleton */
+.skel-metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+}
+.skel-card{
+  height:62px;
+  border-radius:8px;
+  background:var(--bg2);
+  overflow:hidden;
+  position:relative;
+}
+/* Bloco de tabela skeleton */
+.skel-table{
+  border-radius:8px;
+  border:1px solid var(--b);
+  overflow:hidden;
+}
+.skel-thead{
+  height:34px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--b);
+}
+.skel-rows{ display:flex; flex-direction:column; }
+.skel-row{
+  height:36px;
+  border-bottom:1px solid var(--b);
+  background:#fff;
+  position:relative;
+  overflow:hidden;
+}
+.skel-row:nth-child(even){ background:#fafafa; }
+.skel-row:last-child{ border-bottom:none; }
+body.dark .skel-card{ background:var(--bg2); }
+body.dark .skel-thead{ background:var(--bg2); }
+body.dark .skel-row{ background:var(--bg3); }
+body.dark .skel-row:nth-child(even){ background:#222327; }
+/* Shimmer sweep em todos */
+.skel-card::after,
+.skel-thead::after,
+.skel-row::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,.55) 50%,
+    transparent 100%
+  );
+  transform:translateX(-100%);
+  animation:shimmer 1.4s infinite;
+}
+body.dark .skel-card::after,
+body.dark .skel-thead::after,
+body.dark .skel-row::after{
+  background:linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,.07) 50%,
+    transparent 100%
+  );
+}
+@keyframes shimmer{
+  100%{ transform:translateX(100%); }
+}
+/* Linhas de conteúdo falsas dentro da skel-card */
+.skel-card-inner{
+  padding:10px 13px;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+.skel-line{
+  height:8px;
+  border-radius:4px;
+  background:var(--b2);
+  opacity:.5;
+}
+.skel-line.short{ width:40%; }
+.skel-line.long{ width:70%; height:18px; border-radius:5px; }
+
+/* ══════════════════════════════════════════
+   ★ FEATURE 7 — EMPTY STATES com SVG
+   Estado inicial, sem resultados, erro
+══════════════════════════════════════════ */
+.dempty{
+  gap:16px;
+}
+.dempty-svg{
+  width:88px;
+  height:88px;
+  opacity:.85;
+  flex-shrink:0;
+}
+.dempty-title{
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-.3px;
+}
+.dempty-sub{
+  font-size:13px;
+  max-width:280px;
+}
+/* Animação suave de entrada do empty state */
+.dempty{
+  animation:emptyIn .3s cubic-bezier(.16,1,.3,1) both;
+}
+@keyframes emptyIn{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
 </style>
 </head>
 <body>
@@ -341,9 +796,16 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
     </div>
     <button id="dark-btn" onclick="toggleDark()" title="Alternar modo escuro" style="background:none;border:1px solid var(--b);color:var(--m);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:14px;line-height:1;transition:all .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">🌙</button>
     <div class="upill" id="upill"><img class="uavatar" id="uavatar" src="" alt=""/><span class="uname" id="uname"></span></div>
+    <button class="btn-focus" id="btn-focus" onclick="toggleFocus()" title="Modo foco (F)">
+      <svg class="ico-expand" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      <svg class="ico-compress" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+      <span id="focus-label">Foco</span>
+    </button>
     <button class="blogout" id="blogout" onclick="logout()">↩ Sair</button>
   </div>
 </header>
+<!-- Barra lateral para sair do foco arrastando -->
+<div class="focus-hint" onclick="toggleFocus()" title="Sair do modo foco"></div>
 <div class="login-wrap" id="login-wrap">
   <div class="login-card">
     <div class="lglyph">📊</div>
@@ -401,12 +863,38 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
     </div>
   </div>
   <div class="rpanel" id="rpanel">
+    <!-- EMPTY STATE — selecione planilha -->
     <div class="dempty" id="dempty">
-      <div class="dempty-ico">👈</div>
+      <svg class="dempty-svg" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="12" width="52" height="64" rx="6" fill="var(--a)" opacity=".08" stroke="var(--a)" stroke-width="1.5" stroke-opacity=".25"/>
+        <rect x="16" y="24" width="36" height="3" rx="1.5" fill="var(--a)" opacity=".3"/>
+        <rect x="16" y="32" width="28" height="3" rx="1.5" fill="var(--a)" opacity=".2"/>
+        <rect x="16" y="40" width="32" height="3" rx="1.5" fill="var(--a)" opacity=".2"/>
+        <rect x="16" y="48" width="20" height="3" rx="1.5" fill="var(--a)" opacity=".15"/>
+        <circle cx="66" cy="62" r="16" fill="var(--a)" opacity=".1" stroke="var(--a)" stroke-width="1.5" stroke-opacity=".3"/>
+        <path d="M60 62h12M66 56v12" stroke="var(--a)" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+      </svg>
       <div class="dempty-title">Selecione uma planilha</div>
-      <div class="dempty-sub">Clique em qualquer planilha para visualizar as vistorias com filtros avançados.</div>
+      <div class="dempty-sub">Clique em qualquer planilha à esquerda para visualizar vistorias com filtros avançados.</div>
     </div>
-    <div class="dloading" id="dloading"><div class="dspinner"></div><div class="dloading-txt" id="dloading-txt">Lendo planilha...</div></div>
+
+    <!-- SKELETON LOADER — substitui spinner -->
+    <div class="skeleton-wrap" id="dloading">
+      <div class="skel-metrics">
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+        <div class="skel-card"><div class="skel-card-inner"><div class="skel-line short"></div><div class="skel-line long"></div></div></div>
+      </div>
+      <div class="skel-table">
+        <div class="skel-thead"></div>
+        <div class="skel-rows">
+          <div class="skel-row"></div><div class="skel-row"></div><div class="skel-row"></div>
+          <div class="skel-row"></div><div class="skel-row"></div><div class="skel-row"></div>
+          <div class="skel-row"></div><div class="skel-row"></div>
+        </div>
+      </div>
+    </div>
     <div id="dcontent" style="display:none;flex:1;flex-direction:column">
       <div class="dhead">
         <div class="dhead-top">
@@ -419,7 +907,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
             </div>
           </div>
           <button class="btn-desl" onclick="openDeslocamento()" style="display:flex;align-items:center;gap:6px;background:#fff7e6;color:var(--gold);border:1px solid rgba(227,116,0,.3);font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:7px 13px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;margin-right:6px" onmouseover="this.style.background='#ffecc7'" onmouseout="this.style.background='#fff7e6'">🚗 Deslocamento</button>
-          <button class="btn-open" onclick="openSheet()">
+          <button class="btn-open" onclick="openSheet();addRipple(event,this)">
             <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             Abrir no Sheets
           </button>
@@ -440,6 +928,7 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
         </div>
         <div class="twrap"><div class="tscroll"><table class="ttable"><thead id="thead"><tr></tr></thead><tbody id="tbody"></tbody><tfoot id="tfoot"></tfoot></table></div></div>
         <div class="pager" id="dpager"></div>
+        <div class="focus-kbd-hint"><kbd>F</kbd> para sair do modo foco · <kbd>Esc</kbd> também funciona</div>
       </div>
     </div>
   </div>
@@ -532,7 +1021,6 @@ const FOLDER_ID='1xgSiwX9tT7Cg8pZJkqAr2_3e-gH7Jcau';
 const SCOPES='https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/spreadsheets.readonly';
 const PARALLEL=10;
 const LS_KEY='cf_gs_cache_v4';
-
 const FOLDER_SCAN_CONCURRENCY=8;
 const DRIVE_FILES_PAGE_SIZE=1000;
 
@@ -550,7 +1038,6 @@ const RPP=50;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// ─── FIX 1: initGoogle robusto, chamado tanto pelo onload quanto pelo doLogin ───
 function initGoogle(){
   try{
     tokenClient=google.accounts.oauth2.initTokenClient({
@@ -561,33 +1048,15 @@ function initGoogle(){
         await fetchUser();showApp();await loadFiles();
       }
     });
-  }catch(e){
-    console.error('initGoogle failed:',e);
-    tokenClient=null;
-  }
+  }catch(e){console.error('initGoogle failed:',e);tokenClient=null;}
 }
-
-// Chamado pelo script do Google quando ele termina de carregar
-window.onGoogleLibraryLoad=function(){
-  initGoogle();
-};
-
-// ─── FIX 2: doLogin com verificações robustas ───
+window.onGoogleLibraryLoad=function(){initGoogle();};
 function doLogin(){
-  if(typeof google==='undefined'||!google.accounts||!google.accounts.oauth2){
-    alert('O serviço do Google ainda está carregando. Aguarde um momento e tente novamente.');
-    return;
-  }
-  if(!tokenClient){
-    initGoogle();
-  }
-  if(!tokenClient){
-    alert('Erro ao inicializar a autenticação. Recarregue a página e tente novamente.');
-    return;
-  }
+  if(typeof google==='undefined'||!google.accounts||!google.accounts.oauth2){alert('O serviço do Google ainda está carregando. Aguarde um momento e tente novamente.');return;}
+  if(!tokenClient)initGoogle();
+  if(!tokenClient){alert('Erro ao inicializar a autenticação. Recarregue a página e tente novamente.');return;}
   tokenClient.requestAccessToken({prompt:'consent'});
 }
-
 function logout(){
   if(accessToken)google.accounts.oauth2.revoke(accessToken);
   accessToken=null;allFiles=[];filtFiles=[];
@@ -605,10 +1074,7 @@ async function fetchUser(){
     setOnline(true);
   }catch(e){console.error('fetchUser:',e);}
 }
-function setOnline(on){
-  $('cbadge').className='cbadge'+(on?' live':'');
-  $('clabel').textContent=on?'online':'offline';
-}
+function setOnline(on){$('cbadge').className='cbadge'+(on?' live':'');$('clabel').textContent=on?'online':'offline';}
 function showApp(){
   if(!tokenClient)initGoogle();
   $('login-wrap').style.display='none';
@@ -623,43 +1089,26 @@ async function loadFiles(){
   const seen=new Map();
   const dedup=arr=>{for(const f of(arr||[]))if(f&&f.id&&!seen.has(f.id))seen.set(f.id,f);};
   const update=txt=>{allFiles=[...seen.values()];filterFiles();setSyncState('loading',null,txt);};
-
   try{
-    const folderIds=await getAllSubfoldersFast(FOLDER_ID,(n)=>{
-      setSyncState('loading',null,'Mapeando pastas... '+n+' encontradas');
-    });
+    const folderIds=await getAllSubfoldersFast(FOLDER_ID,(n)=>{setSyncState('loading',null,'Mapeando pastas... '+n+' encontradas');});
     update(seen.size+' planilhas · '+folderIds.length+' pastas, buscando arquivos...');
-
     const MIME="(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')";
-    const BATCH=20,CONC=10;
-    const batches=[];
-    for(let bi=0;bi<folderIds.length;bi+=BATCH){
-      const chunk=folderIds.slice(bi,bi+BATCH);
-      batches.push(chunk.map(id=>"'"+id+"' in parents").join(' or '));
-    }
+    const BATCH=20,CONC=10;const batches=[];
+    for(let bi=0;bi<folderIds.length;bi+=BATCH){const chunk=folderIds.slice(bi,bi+BATCH);batches.push(chunk.map(id=>"'"+id+"' in parents").join(' or '));}
     let batchDone=0;
     for(let i=0;i<batches.length;i+=CONC){
       const round=batches.slice(i,i+CONC);
-      const results=await Promise.allSettled(
-        round.map(parents=>fetchAllPagesQuery(MIME+' and trashed=false and ('+parents+')'))
-      );
+      const results=await Promise.allSettled(round.map(parents=>fetchAllPagesQuery(MIME+' and trashed=false and ('+parents+')')));
       for(const r of results){if(r.status==='fulfilled')dedup(r.value);}
-      batchDone+=round.length;
-      update(seen.size+' planilhas · lotes '+batchDone+'/'+batches.length+'...');
+      batchDone+=round.length;update(seen.size+' planilhas · lotes '+batchDone+'/'+batches.length+'...');
     }
-
     update(seen.size+' planilhas · buscando compartilhados...');
     dedup(await fetchAllPagesQuery(MIME+' and trashed=false and sharedWithMe'));
-
     update(seen.size+' planilhas · buscando Shared Drives...');
     const sharedDrives=await listSharedDrives();
-    const driveResults=await Promise.allSettled(
-      sharedDrives.map(drv=>fetchAllPagesQuery(MIME+' and trashed=false',drv.id))
-    );
+    const driveResults=await Promise.allSettled(sharedDrives.map(drv=>fetchAllPagesQuery(MIME+' and trashed=false',drv.id)));
     for(const r of driveResults){if(r.status==='fulfilled')dedup(r.value);}
-
-    allFiles=[...seen.values()];
-    filterFiles();
+    allFiles=[...seen.values()];filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     setSyncState('done',100,allFiles.length+' planilhas · '+now);
   }catch(e){
@@ -668,96 +1117,58 @@ async function loadFiles(){
   }
   $('floading').style.display='none';
 }
-
 async function getAllSubfoldersFast(rootId,onProgress){
-  const seen=new Set([rootId]);
-  let frontier=[rootId];
+  const seen=new Set([rootId]);let frontier=[rootId];
   while(frontier.length>0){
     const nextFrontier=[];
     for(let i=0;i<frontier.length;i+=FOLDER_SCAN_CONCURRENCY){
       const batch=frontier.slice(i,i+FOLDER_SCAN_CONCURRENCY);
       const results=await Promise.allSettled(batch.map(pid=>listChildFolders(pid)));
-      for(const r of results){
-        if(r.status!=='fulfilled'||!Array.isArray(r.value))continue;
-        for(const id of r.value){if(id&&!seen.has(id)){seen.add(id);nextFrontier.push(id);}}
-      }
+      for(const r of results){if(r.status!=='fulfilled'||!Array.isArray(r.value))continue;for(const id of r.value){if(id&&!seen.has(id)){seen.add(id);nextFrontier.push(id);}}}
       if(onProgress)onProgress(seen.size);
     }
     frontier=nextFrontier;
   }
   return[...seen];
 }
-
 async function listChildFolders(parentId){
   const out=[];let pageToken=null;
   do{
     const q=encodeURIComponent("'"+parentId+"' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false");
-    let url='https://www.googleapis.com/drive/v3/files?q='+q
-      +'&fields=nextPageToken,files(id)'
-      +'&pageSize='+DRIVE_FILES_PAGE_SIZE
-      +'&supportsAllDrives=true&includeItemsFromAllDrives=true';
+    let url='https://www.googleapis.com/drive/v3/files?q='+q+'&fields=nextPageToken,files(id)&pageSize='+DRIVE_FILES_PAGE_SIZE+'&supportsAllDrives=true&includeItemsFromAllDrives=true';
     if(pageToken)url+='&pageToken='+encodeURIComponent(pageToken);
     const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok)break;
-    const d=await r.json();
-    (d.files||[]).forEach(f=>{if(f&&f.id)out.push(f.id);});
-    pageToken=d.nextPageToken||null;
-  }while(pageToken);
-  return out;
+    if(!r.ok)break;const d=await r.json();
+    (d.files||[]).forEach(f=>{if(f&&f.id)out.push(f.id);});pageToken=d.nextPageToken||null;
+  }while(pageToken);return out;
 }
-
 async function fetchAllPagesQuery(query,driveId=null){
   const files=[];let pageToken=null;
   do{
-    let url='https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(query)
-      +'&fields=nextPageToken,files(id,name,mimeType,modifiedTime,webViewLink)'
-      +'&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true';
+    let url='https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(query)+'&fields=nextPageToken,files(id,name,mimeType,modifiedTime,webViewLink)&pageSize=1000&supportsAllDrives=true&includeItemsFromAllDrives=true';
     if(driveId)url+='&corpora=drive&driveId='+driveId;
     if(pageToken)url+='&pageToken='+encodeURIComponent(pageToken);
-    try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)break;
-      const d=await r.json();
-      files.push(...(d.files||[]));
-      pageToken=d.nextPageToken||null;
-    }catch(e){break;}
-  }while(pageToken);
-  return files;
+    try{const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});if(!r.ok)break;const d=await r.json();files.push(...(d.files||[]));pageToken=d.nextPageToken||null;}catch(e){break;}
+  }while(pageToken);return files;
 }
-
 async function listSharedDrives(){
   const drives=[];let pageToken=null;
   do{
     let url='https://www.googleapis.com/drive/v3/drives?pageSize=100';
     if(pageToken)url+='&pageToken='+encodeURIComponent(pageToken);
-    try{
-      const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});
-      if(!r.ok)break;
-      const d=await r.json();
-      drives.push(...(d.drives||[]));
-      pageToken=d.nextPageToken||null;
-    }catch(e){break;}
-  }while(pageToken);
-  return drives;
+    try{const r=await fetch(url,{headers:{Authorization:'Bearer '+accessToken}});if(!r.ok)break;const d=await r.json();drives.push(...(d.drives||[]));pageToken=d.nextPageToken||null;}catch(e){break;}
+  }while(pageToken);return drives;
 }
-
 function setSyncState(state,pct,txt){
   $('sync-txt').textContent=txt;
   const prog=$('sync-prog'),fill=$('sync-prog-fill'),btn=$('sync-btn');
-  if(state==='loading'||state===null){
-    prog.classList.add('show');btn.classList.add('spin');
-    if(pct===null||pct===undefined){fill.style.width='60%';fill.style.opacity='.5';}
-    else{fill.style.width=pct+'%';fill.style.opacity='1';}
-  }else{
-    prog.classList.remove('show');btn.classList.remove('spin');fill.style.opacity='1';
-  }
+  if(state==='loading'||state===null){prog.classList.add('show');btn.classList.add('spin');if(pct===null||pct===undefined){fill.style.width='60%';fill.style.opacity='.5';}else{fill.style.width=pct+'%';fill.style.opacity='1';}}
+  else{prog.classList.remove('show');btn.classList.remove('spin');fill.style.opacity='1';}
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
-
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
-  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||
-    (engMap[f.id]||'').toLowerCase().includes(q));
+  filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||(engMap[f.id]||'').toLowerCase().includes(q));
   filtFiles.sort((a,b)=>{
     if(s==='name_az')return a.name.localeCompare(b.name,'pt-BR');
     if(s==='name_za')return b.name.localeCompare(a.name,'pt-BR');
@@ -766,14 +1177,9 @@ function filterFiles(){
     return 0;
   });
   $('fcount').innerHTML='<strong>'+filtFiles.length+'</strong> de '+allFiles.length+' planilhas';
-  if(viewMode==='eng'){
-    renderFilesGrouped();
-  }else{
-    $('fitems').innerHTML=filtFiles.map(f=>fitemHtml(f)).join('');
-  }
+  if(viewMode==='eng')renderFilesGrouped();
+  else $('fitems').innerHTML=filtFiles.map(f=>fitemHtml(f)).join('');
 }
-
-// ─── FIX 3: fitemHtml com template literal — sem quebra de string ───
 function fitemHtml(f){
   const id=f.id||'';
   const name=(f.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
@@ -786,34 +1192,28 @@ function fitemHtml(f){
     +'<div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'
     +'<div class="farrow">›</div></div>';
 }
-
 async function selectFile(id,name,url,mime){
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;filterFiles();
-  $('dempty').style.display='none';$('dloading').style.display='flex';$('dcontent').style.display='none';
-  $('dloading-txt').textContent='Lendo estrutura...';
+  $('dempty').style.display='none';$('dloading').classList.add('show');$('dcontent').style.display='none';
+  $('dloading-txt')&&($('dloading-txt').textContent='Lendo estrutura...');
   try{
     const isXlsx=curFileMime==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     if(isXlsx){
       $('dfilename').textContent=name;
       curXlsxWb=await loadXlsxWorkbook(id);
       if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
-      sheetTabs=curXlsxWb.SheetNames;
-      curTab=sheetTabs[0]||'Plan1';
+      sheetTabs=curXlsxWb.SheetNames;curTab=sheetTabs[0]||'Plan1';
       renderTabs();await loadTabData(id,curTab);
     }else{
       const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
       if(!metaR.ok)throw new Error('Não foi possível acessar esta planilha');
       const meta=await metaR.json();
-      sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);
-      curTab=sheetTabs[0]||'Plan1';
-      $('dfilename').textContent=name;
-      renderTabs();await loadTabData(id,curTab);
+      sheetTabs=(meta.sheets||[]).map(s=>s.properties.title);curTab=sheetTabs[0]||'Plan1';
+      $('dfilename').textContent=name;renderTabs();await loadTabData(id,curTab);
     }
   }catch(e){
-    $('dloading').style.display='none';$('dempty').style.display='flex';
-    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
-    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
-    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+    $('dloading').classList.remove('show');
+    emptyStateError('Erro ao carregar', e.message);
   }
 }
 function renderTabs(){
@@ -824,8 +1224,8 @@ function renderTabs(){
 }
 async function switchTab(tabName){
   curTab=tabName;renderTabs();
-  $('dloading-txt').textContent='Lendo "'+tabName+'"...';
-  $('dloading').style.display='flex';$('dcontent').style.display='none';
+  $('dloading-txt')&&($('dloading-txt').textContent='Lendo "'+tabName+'"...');
+  $('dloading').classList.add('show');$('dcontent').style.display='none';
   await loadTabData(curFileId,tabName);
 }
 async function loadTabData(id,tab){
@@ -837,11 +1237,7 @@ async function loadTabData(id,tab){
       if(!curXlsxWb)throw new Error('Não foi possível ler o arquivo .xlsx');
       const ws=curXlsxWb.Sheets[tab]||curXlsxWb.Sheets[curXlsxWb.SheetNames[0]];
       const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
-      values=data.map(row=>row.map(cell=>{
-        if(cell===null||cell===undefined||cell==='')return'';
-        if(typeof cell==='number'){return String(cell);}
-        return String(cell);
-      }));
+      values=data.map(row=>row.map(cell=>{if(cell===null||cell===undefined||cell==='')return'';if(typeof cell==='number')return String(cell);return String(cell);}));
     }else{
       const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+id+'/values/'+encodeURIComponent(tab)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
       if(!r.ok)throw new Error('Erro ao ler aba');
@@ -849,7 +1245,7 @@ async function loadTabData(id,tab){
     }
     processData(values);
   }catch(e){
-    $('dloading').style.display='none';$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
+    $('dloading').classList.remove('show');$('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
     $('tbody').innerHTML='<tr><td colspan="99" style="padding:48px;text-align:center;color:var(--m)">⚠️ '+e.message+'</td></tr>';
   }
 }
@@ -858,36 +1254,25 @@ async function ensureXLSX(){
   return new Promise((res,rej)=>{
     const s=document.createElement('script');
     s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-    s.onload=()=>res(true);
-    s.onerror=()=>rej(new Error('Falha ao carregar SheetJS'));
+    s.onload=()=>res(true);s.onerror=()=>rej(new Error('Falha ao carregar SheetJS'));
     document.head.appendChild(s);
   });
 }
 async function loadXlsxWorkbook(fileId){
   try{
-    const [_,r]=await Promise.all([
-      ensureXLSX(),
-      fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}})
-    ]);
+    const [_,r]=await Promise.all([ensureXLSX(),fetch('https://www.googleapis.com/drive/v3/files/'+fileId+'?alt=media',{headers:{Authorization:'Bearer '+accessToken}})]);
     if(!r.ok)return null;
-    const buf=await r.arrayBuffer();
-    const wb=XLSX.read(buf,{type:'array'});
-    return wb;
+    const buf=await r.arrayBuffer();return XLSX.read(buf,{type:'array'});
   }catch(e){console.error('loadXlsxWorkbook:',e);return null;}
 }
 function processData(values){
   let engineer='';
   for(let i=0;i<Math.min(values.length,6);i++){
-    for(const cell of(values[i]||[])){
-      const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);
-      if(cm){engineer=cm[1].trim();break;}
-    }
+    for(const cell of(values[i]||[])){const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);if(cm){engineer=cm[1].trim();break;}}
     if(engineer)break;
   }
-  if(engineer){
-    $('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;
-    if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();}
-  }else $('eng-badge').style.display='none';
+  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();}}
+  else $('eng-badge').style.display='none';
   const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
   let hIdx=0,best=-1;
   for(let i=0;i<Math.min(values.length,15);i++){
@@ -909,12 +1294,15 @@ function processData(values){
     .map(r=>({raw:r,proposta:propIdx>=0?(r[propIdx]||''):'',data:dateIdx>=0?(r[dateIdx]||''):'',valor:valIdx>=0?(r[valIdx]||''):'',endereco:gAddrIdx>=0?(r[gAddrIdx]||''):'',cidade:gCityIdx>=0?(r[gCityIdx]||''):''}));
   const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
   months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
-  const fm=$('f-mes');
-  fm.innerHTML='<option value="">Todos os meses</option>';
+  const fm=$('f-mes');fm.innerHTML='<option value="">Todos os meses</option>';
   months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
-  $('dloading').style.display='none';
+  $('dloading').classList.remove('show');
   $('dcontent').style.display='flex';$('dcontent').style.flexDirection='column';
   if(gsPendingProp){$('f-prop').value=gsPendingProp;gsPendingProp=null;}
+  // Título dinâmico com nome do arquivo e engenheiro
+  const engTxt = $('eng-name').textContent||'';
+  const fname = $('dfilename').textContent||'';
+  setPageTitle([fname, engTxt&&engTxt!=='—'?engTxt:''].filter(Boolean));
   filterRows();
 }
 function guessClass(u){
@@ -934,29 +1322,12 @@ function extractMY(d){
   return null;
 }
 function parseVal(v){
-  if(!v&&v!==0)return 0;
-  const s=String(v).trim();
-  if(!s)return 0;
-  // Já é número puro (xlsx raw)
-  const direct=parseFloat(s);
-  if(!isNaN(direct)&&!/[R$,]/.test(s))return direct;
-  // Formato BR: R$ 1.500,00 ou 1.500,00
-  const hasBrComma=s.includes(',');
-  const hasDot=s.includes('.');
+  if(!v&&v!==0)return 0;const s=String(v).trim();if(!s)return 0;
+  const direct=parseFloat(s);if(!isNaN(direct)&&!/[R$,]/.test(s))return direct;
+  const hasBrComma=s.includes(',');const hasDot=s.includes('.');
   let n=s.replace(/[R$\s]/g,'');
-  if(hasBrComma){
-    // ponto=milhar, vírgula=decimal
-    n=n.replace(/\./g,'').replace(',','.');
-  }else if(hasDot){
-    // pode ser separador decimal anglo (100.00) ou milhar (1.000)
-    const parts=n.split('.');
-    if(parts.length===2&&parts[1].length<=2){
-      // decimal anglo: 100.00 -> 100
-    }else{
-      // milhar: 1.000 -> 1000
-      n=n.replace(/\./g,'');
-    }
-  }
+  if(hasBrComma){n=n.replace(/\./g,'').replace(',','.');}
+  else if(hasDot){const parts=n.split('.');if(parts.length===2&&parts[1].length<=2){}else{n=n.replace(/\./g,'');}}
   const p=parseFloat(n);return isNaN(p)?0:p;
 }
 function fmtBRL(n){return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
@@ -978,34 +1349,81 @@ function filterRows(){
 }
 function buildAddress(row){
   const addr=String(row.endereco||'').trim(),city=String(row.cidade||'').trim();
-  if(!addr&&!city)return'';
-  return[addr,city].filter(Boolean).join(', ');
+  if(!addr&&!city)return'';return[addr,city].filter(Boolean).join(', ');
 }
 function openRota(idx){
   const r=filtRows[idx];if(!r)return;
   const dest=buildAddress(r);if(!dest)return;
   window.open('https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(dest)+'&travelmode=driving','_blank');
 }
+
+// ══════════════════════════════════════════
+// ★ renderTable — com SPARKBAR + STICKY COL
+// ══════════════════════════════════════════
 function renderTable(){
-  const start=(dpage-1)*RPP,slice=filtRows.slice(start,start+RPP);
+  const start=(dpage-1)*RPP, slice=filtRows.slice(start,start+RPP);
   const hasAddr=gAddrIdx>=0||gCityIdx>=0;
-  $('thead').innerHTML='<tr>'+allHeaders.map(h=>'<th>'+esc(h.label)+'</th>').join('')+(hasAddr?'<th class="th-rota">Rota</th>':'')+'</tr>';
+
+  // ── Sparkbar: calcula max valor da página atual ──
+  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
+  const pageVals=slice.map(r=>parseVal(r.valor));
+  const maxVal=Math.max(...pageVals, 0);
+
+  // ── Cabeçalho ──
+  $('thead').innerHTML='<tr>'
+    + allHeaders.map(h=>'<th>'+esc(h.label)+'</th>').join('')
+    + (hasAddr?'<th class="th-rota">Rota</th>':'')
+    +'</tr>';
+
   if(slice.length===0){
-    $('tbody').innerHTML='<tr><td colspan="'+(allHeaders.length+(hasAddr?1:0))+'" class="norows"><div class="norows-ico">🔍</div><div class="norows-txt">Nenhuma vistoria encontrada</div></td></tr>';
+    $('tbody').innerHTML='<tr><td colspan="'+(allHeaders.length+(hasAddr?1:0))+'" style="padding:48px 24px;text-align:center">'
+      +'<svg width="52" height="52" viewBox="0 0 52 52" fill="none" style="display:block;margin:0 auto 12px;opacity:.45">'
+      +'<circle cx="26" cy="26" r="22" stroke="var(--m)" stroke-width="1.5"/>'
+      +'<path d="M18 26h16M18 20h10M18 32h8" stroke="var(--m)" stroke-width="1.5" stroke-linecap="round"/>'
+      +'<circle cx="37" cy="37" r="8" fill="var(--bg)" stroke="var(--m)" stroke-width="1.5"/>'
+      +'<path d="M34 37h6M37 34v6" stroke="var(--m)" stroke-width="1.5" stroke-linecap="round"/>'
+      +'</svg>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--m2);margin-bottom:4px">Nenhum resultado</div>'
+      +'<div style="font-size:11px;color:var(--m)">Tente ajustar os filtros acima</div>'
+      +'</td></tr>';
     $('tfoot').innerHTML='';return;
   }
+
   const hl=gsLastFoundProp?gsLastFoundProp.toLowerCase():'';
+
   $('tbody').innerHTML=slice.map((r,i)=>{
     const isHL=hl&&String(r.proposta).toLowerCase()===hl;
     const dest=buildAddress(r);
     const rota=hasAddr?(dest
       ?'<td class="td-rota"><button class="btn-rota" onclick="openRota('+(start+i)+')" title="'+esc(dest)+'">🗺 Rota</button></td>'
       :'<td class="td-rota"><button class="btn-rota no-addr" disabled>🗺</button></td>'):'';
-    return'<tr class="'+(isHL?'gs-hl':'')+'">'+
-      allHeaders.map(h=>'<td class="'+h.cls+'" title="'+esc(r.raw[h.idx]||'')+'">'+esc(r.raw[h.idx]||'')+'</td>').join('')+rota+
-    '</tr>';
+
+    // Delay escalonado para a animação da sparkbar (50 ms por linha)
+    const delay=i*30;
+
+    const cells=allHeaders.map(h=>{
+      const raw=r.raw[h.idx]||'';
+      // ── SPARKBAR: substitui conteúdo da coluna de valor ──
+      if(h.cls==='c-val' && vci>=0){
+        const v=parseVal(raw);
+        const pct=maxVal>0?Math.max(2,Math.round((v/maxVal)*100)):0;
+        const zeroClass=v===0?' zero':'';
+        return '<td class="'+h.cls+'" title="'+esc(raw)+'">'
+          +'<div class="spark-wrap">'
+          +'<span class="spark-val">'+esc(raw||'—')+'</span>'
+          +'<span class="spark-track">'
+          +'<span class="spark-fill'+zeroClass+'" style="width:'+pct+'%;--spark-delay:'+delay+'ms"></span>'
+          +'</span>'
+          +'</div>'
+          +'</td>';
+      }
+      return '<td class="'+h.cls+'" title="'+esc(raw)+'">'+esc(raw)+'</td>';
+    }).join('');
+
+    return '<tr class="'+(isHL?'gs-hl':'')+'">'+ cells + rota +'</tr>';
   }).join('');
-  const vci=allHeaders.findIndex(h=>h.cls==='c-val');
+
+  // ── Rodapé ──
   if(vci>=0){
     const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);
     $('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{
@@ -1015,6 +1433,7 @@ function renderTable(){
     }).join('')+(hasAddr?'<td></td>':'')+'</tr>';
   }else $('tfoot').innerHTML='';
 }
+
 function renderPager(){
   const total=Math.ceil(filtRows.length/RPP),c=$('dpager');
   if(total<=1){c.innerHTML='';return;}
@@ -1047,110 +1466,71 @@ async function gsLoadFile(file,cache){
     const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     let values,tabName='Plan1';
     if(isXlsx){
-      const wb=await loadXlsxWorkbook(file.id);
-      if(!wb)return null;
+      const wb=await loadXlsxWorkbook(file.id);if(!wb)return null;
       const allProposals=[];
       for(const shName of wb.SheetNames){
         const ws=wb.Sheets[shName];
         const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
         const rows=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
         let hIdx=0,best=-1;
-        for(let i=0;i<Math.min(rows.length,15);i++){
-          const row=(rows[i]||[]).map(c=>c.toUpperCase());
-          const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;
-          if(sc>best){best=sc;hIdx=i;}
-        }
+        for(let i=0;i<Math.min(rows.length,15);i++){const row=(rows[i]||[]).map(c=>c.toUpperCase());const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;if(sc>best){best=sc;hIdx=i;}}
         const hU=(rows[hIdx]||[]).map(c=>String(c||'').toUpperCase());
-        const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));
-        if(propIdx<0)continue;
-        for(let ri=hIdx+1;ri<rows.length;ri++){
-          const v=String((rows[ri]||[])[propIdx]||'').trim();
-          if(v)allProposals.push(v);
-        }
+        const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));if(propIdx<0)continue;
+        for(let ri=hIdx+1;ri<rows.length;ri++){const v=String((rows[ri]||[])[propIdx]||'').trim();if(v)allProposals.push(v);}
       }
-      const result={tabName:wb.SheetNames[0],proposals:allProposals};
-      cache[cacheKey]=result;
-      return{cached:false,data:result};
+      const result={tabName:wb.SheetNames[0],proposals:allProposals};cache[cacheKey]=result;return{cached:false,data:result};
     }else{
       const metaR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
-      if(!metaR.ok)return null;
-      const meta=await metaR.json();
+      if(!metaR.ok)return null;const meta=await metaR.json();
       tabName=((meta.sheets||[])[0]||{}).properties?.title||'Plan1';
       const dataR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
-      if(!dataR.ok)return null;
-      values=(await dataR.json()).values||[];
+      if(!dataR.ok)return null;values=(await dataR.json()).values||[];
     }
     let hIdx=0,best=-1;
-    for(let i=0;i<Math.min(values.length,15);i++){
-      const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
-      const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;
-      if(sc>best){best=sc;hIdx=i;}
-    }
+    for(let i=0;i<Math.min(values.length,15);i++){const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());const sc=row.filter(c=>c.trim()).length+row.filter(c=>HDR_KW.some(k=>c.includes(k))).length*3;if(sc>best){best=sc;hIdx=i;}}
     const hU=(values[hIdx]||[]).map(c=>String(c||'').toUpperCase());
-    const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));
-    if(propIdx<0)return null;
+    const propIdx=hU.findIndex(h=>PROP_KW.some(k=>h.includes(k)));if(propIdx<0)return null;
     const proposals=[];
-    for(let ri=hIdx+1;ri<values.length;ri++){
-      const v=String((values[ri]||[])[propIdx]||'').trim();
-      if(v)proposals.push(v);
-    }
-    const result={tabName,proposals};
-    cache[cacheKey]=result;
-    return{cached:false,data:result};
+    for(let ri=hIdx+1;ri<values.length;ri++){const v=String((values[ri]||[])[propIdx]||'').trim();if(v)proposals.push(v);}
+    const result={tabName,proposals};cache[cacheKey]=result;return{cached:false,data:result};
   }catch{return null;}
 }
 async function runGlobalSearch(query,searchId){
-  const q=query.toLowerCase().trim();
-  const files=allFiles;
+  const q=query.toLowerCase().trim();const files=allFiles;
   if(!files.length){$('gs-status-txt').textContent='Nenhuma planilha carregada';return;}
-  const cache=lsLoad();
-  let cacheHits=0,fetched=0,done=0,found=false;
-  const t0=Date.now();
-  $('gs-spinner').style.display='block';
-  $('gs-prog-wrap').classList.add('show');
-  $('gs-prog-fill').style.width='0%';
-  $('gs-found').classList.remove('show');
-  $('gs-notfound').classList.remove('show');
-  $('gs-cache-info').classList.remove('show');
+  const cache=lsLoad();let cacheHits=0,fetched=0,done=0,found=false;const t0=Date.now();
+  $('gs-spinner').style.display='block';$('gs-prog-wrap').classList.add('show');$('gs-prog-fill').style.width='0%';
+  $('gs-found').classList.remove('show');$('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
   for(let i=0;i<files.length&&!found;i+=PARALLEL){
     if(gsSearchId!==searchId)return;
     const batch=files.slice(i,i+PARALLEL);
     const results=await Promise.allSettled(batch.map(f=>gsLoadFile(f,cache)));
     for(let j=0;j<results.length;j++){
-      if(gsSearchId!==searchId)return;
-      done++;
-      const r=results[j];
+      if(gsSearchId!==searchId)return;done++;const r=results[j];
       if(r.status!=='fulfilled'||!r.value)continue;
-      const{cached,data}=r.value;
-      if(cached)cacheHits++;else fetched++;
+      const{cached,data}=r.value;if(cached)cacheHits++;else fetched++;
       const match=data.proposals.find(p=>p.toLowerCase()===q||p.toLowerCase().includes(q));
       if(match){found=true;gsFoundResult={file:batch[j],tabName:data.tabName,proposta:match};break;}
     }
     const pct=Math.round((done/files.length)*100);
-    $('gs-prog-fill').style.width=pct+'%';
-    $('gs-prog-label').textContent=done+' / '+files.length;
-    $('gs-prog-pct').textContent=pct+'%';
+    $('gs-prog-fill').style.width=pct+'%';$('gs-prog-label').textContent=done+' / '+files.length;$('gs-prog-pct').textContent=pct+'%';
     $('gs-status-txt').textContent=found?'Encontrado!':'Buscando... '+cacheHits+' cache · '+fetched+' baixadas';
     $('gs-status-file').textContent=!found?(batch[batch.length-1]?.name||''):'';
     if(found)break;
   }
   if(gsSearchId!==searchId)return;
-  lsSave(cache);
-  $('gs-prog-fill').style.width='100%';
-  $('gs-spinner').style.display='none';
+  lsSave(cache);$('gs-prog-fill').style.width='100%';$('gs-spinner').style.display='none';
   const elapsed=((Date.now()-t0)/1000).toFixed(1);
   if(cacheHits>0){$('gs-cache-info').textContent='⚡ '+cacheHits+' do cache';$('gs-cache-info').classList.add('show');}
   if(found){
     $('gs-status-txt').textContent='Encontrado!';$('gs-status-file').textContent='';
     $('gs-found-title').textContent='Proposta '+gsFoundResult.proposta;
     $('gs-found-sub').textContent='📄 '+gsFoundResult.file.name+' · '+gsFoundResult.tabName;
-    $('gs-found').classList.add('show');
-    $('gs-footer-txt').textContent=elapsed+'s · '+done+' planilhas';
+    $('gs-found').classList.add('show');$('gs-footer-txt').textContent=elapsed+'s · '+done+' planilhas';
   }else{
     $('gs-status-txt').textContent='Não encontrado';
     $('gs-notfound').querySelector('.gs-notfound-txt').textContent='"'+query+'" não encontrado em '+files.length+' planilhas';
-    $('gs-notfound').classList.add('show');
-    $('gs-footer-txt').textContent=files.length+' planilhas · '+elapsed+'s';
+    $('gs-notfound').classList.add('show');$('gs-footer-txt').textContent=files.length+' planilhas · '+elapsed+'s';
   }
 }
 function openGlobalSearch(){$('gs-overlay').classList.add('open');gsResetUI();setTimeout(()=>$('gs-input').focus(),80);document.addEventListener('keydown',gsEscListener);}
@@ -1161,25 +1541,21 @@ function gsKeyDown(e){if(e.key==='Escape'){closeGlobalSearch();return;}if(e.key=
 function gsResetUI(){
   $('gs-input').value='';$('gs-spinner').style.display='none';
   $('gs-status-txt').textContent='Digite o número da proposta para buscar em todas as planilhas';
-  $('gs-status-file').textContent='';$('gs-prog-wrap').classList.remove('show');
-  $('gs-prog-fill').style.width='0%';$('gs-found').classList.remove('show');
-  $('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
+  $('gs-status-file').textContent='';$('gs-prog-wrap').classList.remove('show');$('gs-prog-fill').style.width='0%';
+  $('gs-found').classList.remove('show');$('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
   $('gs-footer-txt').textContent='';gsFoundResult=null;
 }
 function gsOnInput(){
-  clearTimeout(gsDebounce);
-  const q=$('gs-input').value.trim();
+  clearTimeout(gsDebounce);const q=$('gs-input').value.trim();
   $('gs-found').classList.remove('show');$('gs-notfound').classList.remove('show');$('gs-cache-info').classList.remove('show');
   gsSearchId++;gsFoundResult=null;
   if(q.length<3){$('gs-spinner').style.display='none';$('gs-prog-wrap').classList.remove('show');$('gs-status-txt').textContent='Digite pelo menos 3 caracteres';$('gs-status-file').textContent='';return;}
-  $('gs-status-txt').textContent='Aguardando...';
-  const sid=++gsSearchId;
+  $('gs-status-txt').textContent='Aguardando...';const sid=++gsSearchId;
   gsDebounce=setTimeout(()=>runGlobalSearch(q,sid),380);
 }
 async function gsOpenFound(){
   if(!gsFoundResult)return;
-  const{file,tabName,proposta}=gsFoundResult;
-  gsLastFoundProp=proposta;gsPendingProp=proposta;
+  const{file,tabName,proposta}=gsFoundResult;gsLastFoundProp=proposta;gsPendingProp=proposta;
   closeGlobalSearch();
   await selectFile(file.id,file.name,file.webViewLink||'',file.mimeType||'');
   if(tabName&&sheetTabs.includes(tabName)&&tabName!==curTab)await switchTab(tabName);
@@ -1189,216 +1565,204 @@ async function gsOpenFound(){
 // DESLOCAMENTO
 const DESL_LS='cf_desl_origem';
 function openDeslocamento(){
-  const overlay=$('desl-overlay');
-  overlay.classList.add('open');
+  const overlay=$('desl-overlay');overlay.classList.add('open');
   document.addEventListener('keydown',deslEscListener);
-  const saved=localStorage.getItem(DESL_LS)||'';
-  $('desl-origem').value=saved;
+  $('desl-origem').value=localStorage.getItem(DESL_LS)||'';
   deslPopularVistorias();
 }
-function closeDeslocamento(){
-  $('desl-overlay').classList.remove('open');
-  document.removeEventListener('keydown',deslEscListener);
-}
+function closeDeslocamento(){$('desl-overlay').classList.remove('open');document.removeEventListener('keydown',deslEscListener);}
 function deslEscListener(e){if(e.key==='Escape')closeDeslocamento();}
 function deslOverlayClick(e){if(e.target===$('desl-overlay'))closeDeslocamento();}
 function deslSaveOrigem(){localStorage.setItem(DESL_LS,$('desl-origem').value);}
-
 function deslPopularVistorias(){
-  const wrap=$('desl-vistorias');
-  const rows=filtRows.length>0?filtRows:allRows;
-  if(!rows||rows.length===0){
-    wrap.innerHTML='<div class="desl-empty">Nenhuma vistoria carregada.<br>Abra uma planilha primeiro.</div>';
-    $('desl-resultado-wrap').style.display='none';
-    return;
-  }
+  const wrap=$('desl-vistorias');const rows=filtRows.length>0?filtRows:allRows;
+  if(!rows||rows.length===0){wrap.innerHTML='<div class="desl-empty">Nenhuma vistoria carregada.<br>Abra uma planilha primeiro.</div>';$('desl-resultado-wrap').style.display='none';return;}
   wrap.innerHTML=rows.map((r,i)=>{
-    const prop=String(r.proposta||'').trim()||'—';
-    const addr=buildAddress(r)||String(r.raw[0]||'');
+    const prop=String(r.proposta||'').trim()||'—';const addr=buildAddress(r)||String(r.raw[0]||'');
     const addrEsc=addr.replace(/'/g,"\'").replace(/"/g,'&quot;');
     return '<div class="desl-vitem" id="dvi-'+i+'">'
       +'<input type="checkbox" id="dvc-'+i+'" onchange="deslCheck('+i+')">'
       +'<div class="desl-vinfo"><div class="desl-vprop">'+esc(prop)+'</div><div class="desl-vaddr" title="'+addrEsc+'">'+esc(addr||'Sem endereço')+'</div></div>'
       +'<div class="desl-km-wrap"><input class="desl-km" id="dvk-'+i+'" type="number" min="0" step="0.1" placeholder="0" oninput="deslAtualizarKmTotal()" title="KM ida e volta"/><span class="desl-km-lbl">km</span></div>'
-      +'<div class="desl-km-total" id="dvt-'+i+'">—</div>'
-    +'</div>';
+      +'<div class="desl-km-total" id="dvt-'+i+'">—</div></div>';
   }).join('');
   $('desl-resultado-wrap').style.display='none';
 }
-
-function deslCheck(i){
-  const cb=document.getElementById('dvc-'+i);
-  const item=document.getElementById('dvi-'+i);
-  if(cb&&item)item.className='desl-vitem'+(cb.checked?' checked':'');
-}
-
-function deslSelectAll(){
-  const rows=filtRows.length>0?filtRows:allRows;
-  rows.forEach((_,i)=>{
-    const cb=document.getElementById('dvc-'+i);
-    if(cb){cb.checked=true;deslCheck(i);}
-  });
-}
-
-function deslAtualizarKmTotal(){
-  const rows=filtRows.length>0?filtRows:allRows;
-  rows.forEach((_,i)=>{
-    const cb=document.getElementById('dvc-'+i);
-    const km=parseFloat(document.getElementById('dvk-'+i)?.value)||0;
-    const el=document.getElementById('dvt-'+i);
-    if(el)el.textContent=cb&&cb.checked&&km>0?(km+' km'):'—';
-  });
-}
-
+function deslCheck(i){const cb=document.getElementById('dvc-'+i);const item=document.getElementById('dvi-'+i);if(cb&&item)item.className='desl-vitem'+(cb.checked?' checked':'');}
+function deslSelectAll(){const rows=filtRows.length>0?filtRows:allRows;rows.forEach((_,i)=>{const cb=document.getElementById('dvc-'+i);if(cb){cb.checked=true;deslCheck(i);}});}
+function deslAtualizarKmTotal(){const rows=filtRows.length>0?filtRows:allRows;rows.forEach((_,i)=>{const cb=document.getElementById('dvc-'+i);const km=parseFloat(document.getElementById('dvk-'+i)?.value)||0;const el=document.getElementById('dvt-'+i);if(el)el.textContent=cb&&cb.checked&&km>0?(km+' km'):'—';});}
 function deslCalcular(){
-  const rows=filtRows.length>0?filtRows:allRows;
-  const selecionadas=[];
-  rows.forEach((r,i)=>{
-    const cb=document.getElementById('dvc-'+i);
-    if(cb&&cb.checked){
-      const km=parseFloat(document.getElementById('dvk-'+i)?.value)||0;
-      selecionadas.push({row:r,km,idx:i});
-    }
-  });
-  if(selecionadas.length===0){
-    alert('Selecione ao menos uma vistoria.');return;
-  }
-  const nVistorias=selecionadas.length;
-  const valorVistorias=nVistorias*100;
-  const kmTotal=selecionadas.reduce((s,v)=>s+v.km,0);
-  const kmCobrado=Math.max(0,kmTotal-15);
-  const valorDesl=kmCobrado*1;
-  const total=valorVistorias+valorDesl;
-  selecionadas.forEach(v=>{
-    const el=document.getElementById('dvt-'+v.idx);
-    if(el)el.textContent=v.km>0?(v.km+' km'):'0 km';
-  });
-  const wrap=$('desl-resultado-wrap');
-  const rows2=$('desl-res-rows');
-  let html='';
-  html+='<div class="desl-res-row"><span class="desl-res-lbl">✅ Vistorias ('+nVistorias+' × R$ 100,00)</span><span class="desl-res-val green">'+fmtBRL(valorVistorias)+'</span></div>';
+  const rows=filtRows.length>0?filtRows:allRows;const selecionadas=[];
+  rows.forEach((r,i)=>{const cb=document.getElementById('dvc-'+i);if(cb&&cb.checked){const km=parseFloat(document.getElementById('dvk-'+i)?.value)||0;selecionadas.push({row:r,km,idx:i});}});
+  if(selecionadas.length===0){alert('Selecione ao menos uma vistoria.');return;}
+  const nVistorias=selecionadas.length,valorVistorias=nVistorias*100;
+  const kmTotal=selecionadas.reduce((s,v)=>s+v.km,0),kmCobrado=Math.max(0,kmTotal-15),valorDesl=kmCobrado*1,total=valorVistorias+valorDesl;
+  selecionadas.forEach(v=>{const el=document.getElementById('dvt-'+v.idx);if(el)el.textContent=v.km>0?(v.km+' km'):'0 km';});
+  let html='<div class="desl-res-row"><span class="desl-res-lbl">✅ Vistorias ('+nVistorias+' × R$ 100,00)</span><span class="desl-res-val green">'+fmtBRL(valorVistorias)+'</span></div>';
   html+='<div class="desl-res-row"><span class="desl-res-lbl">📍 KM total informado (ida+volta)</span><span class="desl-res-val">'+kmTotal.toFixed(1)+' km</span></div>';
-  if(kmTotal>0){
-    html+='<div class="desl-res-row"><span class="desl-res-lbl">📐 KM cobrado ('+kmTotal.toFixed(1)+' − 15 = '+kmCobrado.toFixed(1)+' km)</span><span class="desl-res-val gold">'+fmtBRL(valorDesl)+'</span></div>';
-  }
-  rows2.innerHTML=html;
-  $('desl-total').textContent=fmtBRL(total);
+  if(kmTotal>0)html+='<div class="desl-res-row"><span class="desl-res-lbl">📐 KM cobrado ('+kmTotal.toFixed(1)+' − 15 = '+kmCobrado.toFixed(1)+' km)</span><span class="desl-res-val gold">'+fmtBRL(valorDesl)+'</span></div>';
+  $('desl-res-rows').innerHTML=html;$('desl-total').textContent=fmtBRL(total);
   let regraHtml='⚠️ Regra: R$ 100,00 por vistoria';
-  if(kmTotal>0&&kmTotal<=15){
-    regraHtml+=' · Deslocamento de '+kmTotal.toFixed(1)+'km não ultrapassa 15km — sem cobrança adicional.';
-  }else if(kmTotal>15){
-    regraHtml+=' · Deslocamento: '+kmTotal.toFixed(1)+'km − 15km = '+kmCobrado.toFixed(1)+'km × R$ 1,00 = '+fmtBRL(valorDesl)+'.';
-  }
+  if(kmTotal>0&&kmTotal<=15)regraHtml+=' · Deslocamento de '+kmTotal.toFixed(1)+'km não ultrapassa 15km — sem cobrança adicional.';
+  else if(kmTotal>15)regraHtml+=' · Deslocamento: '+kmTotal.toFixed(1)+'km − 15km = '+kmCobrado.toFixed(1)+'km × R$ 1,00 = '+fmtBRL(valorDesl)+'.';
   $('desl-regra-txt').textContent=regraHtml;
-  wrap.style.display='block';
-  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+  $('desl-resultado-wrap').style.display='block';
+  $('desl-resultado-wrap').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-
 function deslLimpar(){
   const rows=filtRows.length>0?filtRows:allRows;
-  rows.forEach((_,i)=>{
-    const cb=document.getElementById('dvc-'+i);
-    const km=document.getElementById('dvk-'+i);
-    const tot=document.getElementById('dvt-'+i);
-    const item=document.getElementById('dvi-'+i);
-    if(cb)cb.checked=false;
-    if(km)km.value='';
-    if(tot)tot.textContent='—';
-    if(item)item.className='desl-vitem';
-  });
+  rows.forEach((_,i)=>{const cb=document.getElementById('dvc-'+i);const km=document.getElementById('dvk-'+i);const tot=document.getElementById('dvt-'+i);const item=document.getElementById('dvi-'+i);if(cb)cb.checked=false;if(km)km.value='';if(tot)tot.textContent='—';if(item)item.className='desl-vitem';});
   $('desl-resultado-wrap').style.display='none';
 }
 
 // DARK MODE
-function toggleDark(){
-  const isDark=document.body.classList.toggle('dark');
-  localStorage.setItem('cf_dark',isDark?'1':'0');
-  document.getElementById('dark-btn').textContent=isDark?'☀️':'🌙';
-}
-function initDark(){
-  const saved=localStorage.getItem('cf_dark');
-  if(saved==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}
-}
+function toggleDark(){const isDark=document.body.classList.toggle('dark');localStorage.setItem('cf_dark',isDark?'1':'0');document.getElementById('dark-btn').textContent=isDark?'☀️':'🌙';}
+function initDark(){const saved=localStorage.getItem('cf_dark');if(saved==='1'){document.body.classList.add('dark');document.getElementById('dark-btn').textContent='☀️';}}
 
 // FONT SIZE
 let curFontSize=parseInt(localStorage.getItem('cf_fs')||'12');
-function initFontSize(){
-  document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');
-  const lbl=document.getElementById('fs-label');
-  if(lbl)lbl.textContent=curFontSize;
+function initFontSize(){document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
+function setFontSize(delta){curFontSize=Math.min(18,Math.max(9,curFontSize+delta));document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');localStorage.setItem('cf_fs',curFontSize);const lbl=document.getElementById('fs-label');if(lbl)lbl.textContent=curFontSize;}
+
+// ══════════════════════════════════════════
+// ★ FEATURE A — TÍTULO DINÂMICO
+// ══════════════════════════════════════════
+function setPageTitle(parts){
+  document.title = ['Central Financeira', ...parts].filter(Boolean).join(' · ');
 }
-function setFontSize(delta){
-  curFontSize=Math.min(18,Math.max(9,curFontSize+delta));
-  document.documentElement.style.setProperty('--tbl-fs',curFontSize+'px');
-  localStorage.setItem('cf_fs',curFontSize);
-  const lbl=document.getElementById('fs-label');
-  if(lbl)lbl.textContent=curFontSize;
+
+// ══════════════════════════════════════════
+// ★ FEATURE B — RIPPLE em botões
+// ══════════════════════════════════════════
+function addRipple(e, el){
+  const r = el.querySelector('.ripple');
+  if(r) r.remove();
+  const rect = el.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  const x = e.clientX - rect.left - size/2;
+  const y = e.clientY - rect.top - size/2;
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.cssText = `width:${size}px;height:${size}px;left:${x}px;top:${y}px`;
+  el.appendChild(ripple);
+  ripple.addEventListener('animationend', ()=> ripple.remove());
 }
+
+// ══════════════════════════════════════════
+// ★ FEATURE C — GLASS HEADER ao rolar
+// ══════════════════════════════════════════
+function initScrollGlass(){
+  const rpanel = $('rpanel');
+  if(!rpanel) return;
+  rpanel.addEventListener('scroll', ()=>{
+    const dhead = $('dcontent')?.querySelector('.dhead');
+    if(!dhead) return;
+    dhead.classList.toggle('scrolled', rpanel.scrollTop > 8);
+  }, {passive:true});
+}
+
+// ══════════════════════════════════════════
+// ★ FEATURE D — EMPTY STATES com SVG
+// Estado de erro e sem resultados na tabela
+// ══════════════════════════════════════════
+function emptyStateError(title, sub){
+  $('dempty').innerHTML = `
+    <svg class="dempty-svg" viewBox="0 0 88 88" fill="none">
+      <circle cx="44" cy="44" r="32" fill="var(--red)" opacity=".07" stroke="var(--red)" stroke-width="1.5" stroke-opacity=".25"/>
+      <path d="M44 28v20M44 54v4" stroke="var(--red)" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>
+    </svg>
+    <div class="dempty-title">${title}</div>
+    <div class="dempty-sub">${sub}</div>`;
+  $('dempty').style.display='flex';
+}
+
+// Patch renderTable para usar SVG no estado vazio de filtro
+const _origRenderTable = renderTable;
 
 document.addEventListener('DOMContentLoaded',function(){
   initDark();
   initFontSize();
+  initScrollGlass();
 });
 
 // AGRUPAMENTO POR ENGENHEIRO
 const LS_ENG='cf_eng_map_v1';
-
-function loadEngMap(){
-  try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}
-}
-function saveEngMap(){
-  try{localStorage.setItem(LS_ENG,JSON.stringify(engMap));}catch{}
-}
-function setViewMode(mode){
-  viewMode=mode;
-  $('vt-all').className='vtbtn'+(mode==='all'?' on':'');
-  $('vt-eng').className='vtbtn'+(mode==='eng'?' on':'');
-  filterFiles();
-}
-
+function loadEngMap(){try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}}
+function saveEngMap(){try{localStorage.setItem(LS_ENG,JSON.stringify(engMap));}catch{}}
+function setViewMode(mode){viewMode=mode;$('vt-all').className='vtbtn'+(mode==='all'?' on':'');$('vt-eng').className='vtbtn'+(mode==='eng'?' on':'');filterFiles();}
 function renderFilesGrouped(){
-  const groups={};
-  const UNKNOWN='— Não identificado';
-  for(const f of filtFiles){
-    const eng=engMap[f.id]||UNKNOWN;
-    if(!groups[eng])groups[eng]=[];
-    groups[eng].push(f);
-  }
-  const keys=Object.keys(groups).sort((a,b)=>{
-    if(a===UNKNOWN)return 1;if(b===UNKNOWN)return -1;
-    return a.localeCompare(b,'pt-BR');
-  });
+  const groups={};const UNKNOWN='— Não identificado';
+  for(const f of filtFiles){const eng=engMap[f.id]||UNKNOWN;if(!groups[eng])groups[eng]=[];groups[eng].push(f);}
+  const keys=Object.keys(groups).sort((a,b)=>{if(a===UNKNOWN)return 1;if(b===UNKNOWN)return -1;return a.localeCompare(b,'pt-BR');});
   const knownCount=keys.filter(k=>k!==UNKNOWN).length;
   let html='';
-  if(knownCount===0){
-    html='<div style="padding:16px 8px;text-align:center;font-size:11px;color:var(--m)">'+
-      '👤 Abra planilhas para identificar os engenheiros.<br><br>'+
-      '<span style="color:var(--a);font-weight:600">'+filtFiles.length+' planilhas</span> ainda não identificadas.</div>';
-  }
+  if(knownCount===0)html='<div style="padding:16px 8px;text-align:center;font-size:11px;color:var(--m)">👤 Abra planilhas para identificar os engenheiros.<br><br><span style="color:var(--a);font-weight:600">'+filtFiles.length+' planilhas</span> ainda não identificadas.</div>';
   for(const eng of keys){
-    const files=groups[eng];
-    const isUnknown=eng===UNKNOWN;
+    const files=groups[eng];const isUnknown=eng===UNKNOWN;
     const initials=isUnknown?'?':eng.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
     const groupId='eg-'+btoa(encodeURIComponent(eng)).replace(/=/g,'').slice(0,12);
     const isOpen=sessionStorage.getItem('eg_'+groupId)!=='0';
     html+='<div class="eng-group'+(isUnknown?' eng-unknown':'')+' '+(isOpen?'open':'')+'" id="'+groupId+'">';
     html+='<div class="eng-group-hd" onclick="toggleEngGroup(\''+groupId+'\')">';
     html+='<div class="eng-group-avatar">'+initials+'</div>';
-    html+='<div class="eng-group-info"><div class="eng-group-name">'+esc(eng)+'</div>';
-    html+='<div class="eng-group-count">'+files.length+' planilha'+(files.length!==1?'s':'')+'</div></div>';
+    html+='<div class="eng-group-info"><div class="eng-group-name">'+esc(eng)+'</div><div class="eng-group-count">'+files.length+' planilha'+(files.length!==1?'s':'')+'</div></div>';
     html+='<div class="eng-group-arrow">›</div></div>';
-    html+='<div class="eng-group-files">'+files.map(f=>fitemHtml(f)).join('')+'</div>';
-    html+='</div>';
+    html+='<div class="eng-group-files">'+files.map(f=>fitemHtml(f)).join('')+'</div></div>';
   }
   $('fitems').innerHTML=html;
 }
+function toggleEngGroup(id){const el=document.getElementById(id);if(!el)return;const isOpen=el.classList.toggle('open');sessionStorage.setItem('eg_'+id,isOpen?'1':'0');}
 
-function toggleEngGroup(id){
-  const el=document.getElementById(id);
-  if(!el)return;
-  const isOpen=el.classList.toggle('open');
-  sessionStorage.setItem('eg_'+id,isOpen?'1':'0');
+// ══════════════════════════════════════════
+// ★ MODO FOCO
+// ══════════════════════════════════════════
+let isFocusMode = false;
+
+function toggleFocus(){
+  isFocusMode = !isFocusMode;
+  const app = $('app');
+  const btn = $('btn-focus');
+  const lbl = $('focus-label');
+
+  app.classList.toggle('focus-mode', isFocusMode);
+
+  // Animação no botão
+  btn.classList.remove('popping');
+  void btn.offsetWidth; // reflow para reiniciar animação
+  btn.classList.add('popping');
+  btn.addEventListener('animationend', ()=> btn.classList.remove('popping'), {once:true});
+
+  lbl.textContent = isFocusMode ? 'Sair' : 'Foco';
+
+  // Rola ao topo quando entra no foco
+  if(isFocusMode) $('rpanel').scrollTop = 0;
+
+  // Salva preferência
+  localStorage.setItem('cf_focus', isFocusMode ? '1' : '0');
 }
+
+// Mostra botão foco apenas quando planilha está aberta
+function showFocusBtn(show){
+  $('btn-focus').style.display = show ? 'flex' : 'none';
+}
+
+// Tecla F ativa/desativa foco; ESC sai do foco
+document.addEventListener('keydown', e => {
+  // ignora se estiver em input
+  if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
+  if(e.key === 'f' || e.key === 'F'){
+    // só funciona se planilha estiver aberta
+    if($('dcontent').style.display !== 'none') toggleFocus();
+  }
+  if(e.key === 'Escape' && isFocusMode) toggleFocus();
+});
+
+// Hook: mostrar botão ao abrir planilha
+const _origSelectFile = selectFile;
+window.selectFile = async function(...args){
+  await _origSelectFile(...args);
+  showFocusBtn(true);
+};
 </script>
 </body>
 </html>
