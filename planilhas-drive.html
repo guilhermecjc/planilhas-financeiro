@@ -129,6 +129,18 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .fmeta{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .1s;font-size:11px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
+.fitem-cb{width:13px;height:13px;accent-color:var(--a);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .12s;margin-right:-2px}
+.fitem:hover .fitem-cb,.fitem.sel .fitem-cb{opacity:1}
+.fitem.sel{background:#e8f0fe;border-color:rgba(26,115,232,.25)}
+body.dark .fitem.sel{background:#1c2c4a;border-color:rgba(26,115,232,.4)}
+.sel-bar{display:none;align-items:center;gap:7px;padding:7px 10px;background:#e8f0fe;border-bottom:1px solid rgba(26,115,232,.2);flex-shrink:0}
+.sel-bar.show{display:flex}
+body.dark .sel-bar{background:#1c2c4a;border-color:rgba(26,115,232,.3)}
+.sel-bar-txt{flex:1;font-size:11px;font-weight:600;color:var(--a)}
+.sel-bar-open{background:var(--a);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .12s}
+.sel-bar-open:hover{background:var(--a2)}
+.sel-bar-clr{background:none;border:1px solid rgba(26,115,232,.3);color:var(--a);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 8px;border-radius:6px;cursor:pointer;transition:all .12s}
+.sel-bar-clr:hover{border-color:var(--red);color:var(--red)}
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
@@ -641,6 +653,7 @@ let viewMode='all';
 let engMap={};
 let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
+let selFiles=new Set();
 
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
@@ -846,6 +859,80 @@ function setSyncState(state,pct,txt){
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
 
+async function selLoadJuntas(){
+  if(selFiles.size===0) return;
+  const ids=[...selFiles];
+  const filesInfo=ids.map(id=>allFiles.find(f=>f.id===id)).filter(Boolean);
+  curFileId=null; curXlsxWb=null;
+  payStatusMap={}; payLoaded=false; payLoading=false;
+  $('pay-status-bar').classList.remove('show'); $('pay-legend').style.display='none'; $('metrics-pay').style.display='none';
+  $('dempty').style.display='none'; $('dloading').style.display='flex'; $('dcontent').style.display='none';
+  $('dloading-txt').textContent='Carregando '+filesInfo.length+' planilhas...';
+  filterFiles();
+  try{
+    const results=await Promise.allSettled(filesInfo.map(f=>selLoadOne(f)));
+    let mergedRows=[],mergedHeaders=null;
+    for(let i=0;i<results.length;i++){
+      if(results[i].status!=='fulfilled'||!results[i].value) continue;
+      const {rows,headers}=results[i].value;
+      if(!mergedHeaders) mergedHeaders=headers;
+      const label=engMap[filesInfo[i].id]||filesInfo[i].name;
+      rows.forEach(r=>mergedRows.push({...r,_src:label,raw:[label,...(r.raw||[])]}));
+    }
+    if(!mergedHeaders||!mergedRows.length) throw new Error('Nenhum dado encontrado');
+    allHeaders=[{label:'Engenheiro',idx:'_src',cls:'c-eng'},...mergedHeaders];
+    allRows=mergedRows;
+    gAddrIdx=allHeaders.findIndex(h=>['ENDEREÇO','ENDERECO','END','LOGRADOURO'].some(k=>String(h.label).toUpperCase().includes(k)));
+    gCityIdx=allHeaders.findIndex(h=>['CIDADE','MUNICIPIO','MUNICÍPIO'].some(k=>String(h.label).toUpperCase().includes(k)));
+    $('dfilename').textContent=filesInfo.length+' planilhas abertas juntas';
+    $('dbadge').textContent='📋 '+filesInfo.length+' planilhas';
+    $('eng-badge').style.display='none';
+    $('tabs-row').innerHTML='';
+    const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))].sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
+    const fm=$('f-mes');fm.innerHTML='<option value="">Todos os meses</option>';
+    months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
+    $('dloading').style.display='none'; $('dcontent').style.display='flex'; $('dcontent').style.flexDirection='column';
+    filterRows();
+  }catch(e){
+    $('dloading').style.display='none'; $('dempty').style.display='flex';
+    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
+    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
+    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+  }
+}
+async function selLoadOne(file){
+  const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  let values=[];
+  if(isXlsx){
+    const wb=await loadXlsxWorkbook(file.id); if(!wb) return null;
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    values=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false}).map(r=>r.map(c=>c===null||c===undefined?'':String(c)));
+  }else{
+    const tabR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!tabR.ok) return null;
+    const tabMeta=await tabR.json();
+    const tabName=((tabMeta.sheets||[])[0]||{}).properties?.title||'Plan1';
+    const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok) return null;
+    values=(await r.json()).values||[];
+  }
+  // detectar engenheiro
+  for(let i=0;i<Math.min(values.length,6);i++){for(const cell of(values[i]||[])){const m=String(cell||'').match(/Profissional[:\s]+(.+)/i);if(m&&!engMap[file.id]){engMap[file.id]=m[1].trim();saveEngMap();break;}}}
+  // detectar header
+  const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF'];
+  let hIdx=0,best=-1;
+  for(let i=0;i<Math.min(values.length,15);i++){const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;if(sc>best){best=sc;hIdx=i;}}
+  const headers=(values[hIdx]||[]).map((h,i)=>({label:h||'Col '+(i+1),idx:i,cls:guessClass(String(h||'').toUpperCase())}));
+  const hU=headers.map(h=>String(h.label).toUpperCase());
+  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
+  const propIdx=find('PROPOSTA','N°','NUMERO','NUM'),dateIdx=find('DATA'),valIdx=find('VALOR');
+  const addrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO'),cityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
+  const rows=(values.slice(hIdx+1)||[]).filter(r=>r&&r.some(c=>String(c||'').trim()!=='')).map(r=>({
+    raw:r, proposta:propIdx>=0?(r[propIdx]||''):'', data:dateIdx>=0?(r[dateIdx]||''):'',
+    valor:valIdx>=0?(r[valIdx]||''):'', endereco:addrIdx>=0?(r[addrIdx]||''):'', cidade:cityIdx>=0?(r[cityIdx]||''):''
+  }));
+  return {rows,headers};
+}
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
   filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||(engMap[f.id]||'').toLowerCase().includes(q));
@@ -863,12 +950,32 @@ function filterFiles(){
 function fitemHtml(f){
   const id=f.id||'';const name=(f.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   const url=(f.webViewLink||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const mime=(f.mimeType||'').replace(/'/g,"\\'");const active=curFileId===f.id?'active':'';
-  return'<div class="fitem '+active+'" onclick="selectFile(\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
+  const mime=(f.mimeType||'').replace(/'/g,"\\'");
+  const active=curFileId===f.id&&selFiles.size===0?'active':'';
+  const sel=selFiles.has(f.id)?'sel':'';
+  const chk=selFiles.has(f.id)?'checked':'';
+  return'<div class="fitem '+active+' '+sel+'" onclick="fitemClick(event,\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
+    +'<input type="checkbox" class="fitem-cb" '+chk+' onclick="event.stopPropagation();selToggle(\''+id+'\')"/>'
     +'<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'
     +'<div class="finfo"><div class="fname">'+esc(f.name)+'</div>'
     +'<div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'
     +'<div class="farrow">›</div></div>';
+}
+function fitemClick(e,id,name,url,mime){
+  if(e.ctrlKey||e.metaKey||selFiles.size>0) selToggle(id);
+  else { selClear(); selectFile(id,name,url,mime); }
+}
+function selToggle(id){
+  if(selFiles.has(id)) selFiles.delete(id); else selFiles.add(id);
+  selUpdateBar(); filterFiles();
+}
+function selClear(){
+  selFiles.clear(); selUpdateBar(); filterFiles();
+}
+function selUpdateBar(){
+  const n=selFiles.size;
+  $('sel-bar').classList.toggle('show',n>0);
+  if(n>0) $('sel-bar-txt').textContent=n+' planilha'+(n>1?'s':'')+' selecionada'+(n>1?'s':'');
 }
 async function selectFile(id,name,url,mime){
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;
@@ -992,7 +1099,7 @@ function renderTable(){
     let payCell='';
     if(hasPay){const allIdx=allRows.indexOf(filtRows[globalIdx]);const status=payStatusMap[allIdx>=0?allIdx:globalIdx]||'naopago';payCell='<td class="td-pay">'+payBadgeHtml(status)+'</td>';}
     return'<tr class="'+(isHL?'gs-hl':'')+'">'
-      +allHeaders.map(h=>'<td class="'+h.cls+'" title="'+esc(r.raw[h.idx]||'')+'">'+esc(r.raw[h.idx]||'')+'</td>').join('')+rota+payCell+'</tr>';
+      +allHeaders.map(h=>{const v=h.idx==='_src'?(r._src||''):(r.raw[h.idx]||'');return'<td class="'+h.cls+'" title="'+esc(v)+'">'+esc(v)+'</td>';}).join('')+rota+payCell+'</tr>';
   }).join('');
   const vci=allHeaders.findIndex(h=>h.cls==='c-val');
   if(vci>=0){const total=filtRows.reduce((s,r)=>s+parseVal(r.valor),0);$('tfoot').innerHTML='<tr>'+allHeaders.map((h,i)=>{if(i===0)return'<td style="color:var(--m);font-size:10px;text-transform:uppercase;letter-spacing:.5px">Total — '+filtRows.length+' registros</td>';if(i===vci)return'<td class="total-val">'+fmtBRL(total)+'</td>';return'<td></td>';}).join('')+(hasAddr?'<td></td>':'')+(hasPay?'<td></td>':'')+'</tr>';}
