@@ -58,15 +58,6 @@ body.dark .pay-badge.pendente{background:rgba(227,116,0,.12);border-color:rgba(2
 body.dark .pay-badge.atencao{background:rgba(217,48,37,.12);border-color:rgba(217,48,37,.3);color:#e57368}
 body.dark .pay-legend{background:#2c2d32;border-color:#373a40}
 body.dark .pay-status-bar{background:rgba(26,115,232,.08);border-color:rgba(26,115,232,.2)}
-/* ── CONFERÊNCIA DARK ── */
-body.dark .conf-panel{background:#25262b;border-color:#373a40}
-body.dark .conf-prop-item{border-color:#373a40;background:#2c2d32}
-body.dark .conf-prop-item.bad{background:rgba(217,48,37,.08);border-color:rgba(217,48,37,.3)}
-body.dark .conf-prop-item.good{border-color:rgba(24,128,56,.25)}
-body.dark .conf-info-box{background:#2c2d32}
-body.dark .conf-addr-box{background:rgba(24,128,56,.1)}
-body.dark .conf-rule-box{background:rgba(26,115,232,.08)}
-body.dark .conf-total-strip{background:#188038}
 
 *{transition:background-color .2s ease,border-color .2s ease,color .15s ease}
 .ttable{font-size:var(--tbl-fs)}
@@ -82,13 +73,6 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .cdot{width:5px;height:5px;border-radius:50%;background:var(--m)}
 .cbadge.live{color:var(--a3);border-color:rgba(24,128,56,.25);background:rgba(24,128,56,.07)}
 .cbadge.live .cdot{background:var(--a3);animation:pd 2s infinite}
-
-/* ── BOTÃO CONFERÊNCIA NO HEADER ── */
-.btn-conf-header{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-conf-header:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
-.btn-conf-header.active{background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)}
-body.dark .btn-conf-header{background:#2c2d32;border-color:#373a40;color:var(--m)}
-body.dark .btn-conf-header:hover,.btn-conf-header.active{background:#1c2c4a;border-color:rgba(26,115,232,.4);color:#8ab4f8}
 
 .upill{display:none;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--b);border-radius:20px;padding:3px 10px 3px 3px}
 .uavatar{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--a);object-fit:cover}
@@ -145,18 +129,6 @@ body.dark .btn-conf-header:hover,.btn-conf-header.active{background:#1c2c4a;bord
 .fmeta{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .1s;font-size:11px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
-.fitem-cb{width:14px;height:14px;accent-color:var(--a);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .1s}
-.fitem:hover .fitem-cb,.fitem.sel .fitem-cb,.fitem-cb:checked{opacity:1}
-.fitem.sel{background:#e8f0fe;border-color:rgba(26,115,232,.25)}
-body.dark .fitem.sel{background:#1c2c4a;border-color:rgba(26,115,232,.4)}
-.multi-bar{display:none;align-items:center;gap:8px;padding:7px 10px;background:#e8f0fe;border-bottom:1px solid rgba(26,115,232,.2);flex-shrink:0}
-.multi-bar.show{display:flex}
-body.dark .multi-bar{background:#1c2c4a;border-color:rgba(26,115,232,.3)}
-.multi-bar-txt{flex:1;font-size:11px;font-weight:600;color:var(--a)}
-.multi-bar-btn{background:var(--a);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background .12s;white-space:nowrap}
-.multi-bar-btn:hover{background:var(--a2)}
-.multi-bar-clr{background:none;border:1px solid rgba(26,115,232,.3);color:var(--a);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .12s}
-.multi-bar-clr:hover{border-color:var(--red);color:var(--red)}
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
@@ -294,59 +266,6 @@ body.dark .mc-pay{background:#25262b}
    TELA DE CONFERÊNCIA
 ══════════════════════════════════════════ */
 
-/* PAINEL LATERAL CONFERÊNCIA */
-.conf-overlay{position:fixed;inset:0;background:rgba(32,33,36,.35);z-index:400;display:none;backdrop-filter:blur(3px)}
-.conf-overlay.open{display:block}
-.conf-panel{
-  position:fixed;right:0;top:0;bottom:0;width:540px;
-  background:#fff;border-left:1px solid var(--b);
-  z-index:500;transform:translateX(100%);
-  transition:transform .28s cubic-bezier(.4,0,.2,1);
-  display:flex;flex-direction:column;box-shadow:-4px 0 20px rgba(32,33,36,.15);
-}
-.conf-panel.open{transform:translateX(0)}
-.conf-panel-head{padding:16px 18px 12px;border-bottom:1px solid var(--b);display:flex;align-items:flex-start;justify-content:space-between}
-.conf-panel-name{font-size:16px;font-weight:700;color:var(--t)}
-.conf-panel-meta{font-size:11px;color:var(--m);margin-top:3px;font-family:'JetBrains Mono',monospace}
-.conf-x{width:28px;height:28px;border-radius:6px;border:1px solid var(--b);background:none;cursor:pointer;font-size:14px;color:var(--m);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
-.conf-x:hover{background:var(--bg);color:var(--t)}
-.conf-panel-body{flex:1;overflow-y:auto;padding:16px 18px}
-.conf-panel-body::-webkit-scrollbar{width:3px}
-.conf-panel-body::-webkit-scrollbar-thumb{background:var(--b2);border-radius:99px}
-
-.conf-sec{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px}
-.conf-sec:first-child{margin-top:0}
-.conf-addr-box{background:rgba(24,128,56,.06);border:1px solid rgba(24,128,56,.18);border-radius:7px;padding:10px 12px;font-size:12px;color:var(--a3);margin-bottom:10px}
-.conf-addr-box span{font-size:9px;display:block;color:var(--m);font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
-.conf-info-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
-.conf-info-box{background:var(--bg);border-radius:7px;padding:10px 12px}
-.conf-info-box-lbl{font-size:10px;color:var(--m);margin-bottom:3px}
-.conf-info-box-val{font-size:14px;font-weight:700}
-.conf-alert{background:#fce8e6;border:1px solid rgba(217,48,37,.25);border-radius:7px;padding:10px 12px;margin:10px 0;font-size:12px;color:var(--red)}
-.conf-alert strong{display:block;font-weight:700;margin-bottom:2px}
-.conf-prop-item{border:1px solid var(--b);border-radius:7px;padding:11px 13px;margin-bottom:7px}
-.conf-prop-item.bad{border-color:rgba(217,48,37,.3);background:#fff8f8}
-.conf-prop-item.good{border-color:rgba(24,128,56,.2)}
-.conf-prop-top{display:flex;align-items:center;gap:7px;margin-bottom:5px}
-.conf-prop-id{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
-.conf-prop-desc{font-size:12px;font-weight:600;flex:1}
-.conf-tag{font-size:9.5px;padding:2px 7px;border-radius:99px;font-weight:700}
-.conf-tag-ok{background:#e6f4ea;color:var(--a3)}
-.conf-tag-bad{background:#fce8e6;color:var(--red)}
-.conf-prop-route{font-size:10.5px;color:var(--m);margin-bottom:5px;line-height:1.6}
-.conf-prop-km{display:flex;gap:14px;font-size:11px}
-.conf-prop-km span{color:var(--m)}
-.conf-prop-km b{font-weight:700}
-.conf-rule-box{background:rgba(26,115,232,.06);border:1px solid rgba(26,115,232,.18);border-radius:7px;padding:8px 12px;font-size:11px;color:var(--a);margin-top:8px}
-.conf-total-strip{display:flex;justify-content:space-between;align-items:center;background:var(--a3);border-radius:8px;padding:13px 16px;margin-top:14px;color:#fff}
-.conf-total-strip .lbl{font-size:12px;opacity:.85}
-.conf-total-strip .val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace}
-.conf-panel-foot{padding:12px 18px;border-top:1px solid var(--b);display:flex;gap:8px;background:#fafafa}
-.conf-btn-reject{flex:1;background:none;border:1px solid var(--b);color:var(--m);padding:9px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .12s}
-.conf-btn-reject:hover{border-color:var(--red);color:var(--red)}
-.conf-btn-pay{flex:2;background:var(--a3);color:#fff;border:none;padding:9px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;transition:background .12s}
-.conf-btn-pay:hover{background:#137333}
-
 /* VIEW TOGGLE */
 .view-toggle{display:flex;gap:4px;margin-bottom:7px}
 .vtbtn{flex:1;background:var(--bg);border:1px solid var(--b);color:var(--m);font-family:'Outfit',sans-serif;font-size:10px;font-weight:700;padding:5px 4px;border-radius:6px;cursor:pointer;transition:all .12s;text-align:center}
@@ -465,7 +384,6 @@ body.dark .mc-pay{background:#25262b}
   .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
   .app{flex-direction:column}
   .metrics{grid-template-columns:1fr 1fr}
-  .conf-panel{width:100%}
 }
 </style>
 </head>
@@ -474,10 +392,7 @@ body.dark .mc-pay{background:#25262b}
   <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
   <div class="hright">
     <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
-    <button class="btn-conf-header" id="btn-conf" onclick="toggleConferencia()">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-      Conferência
-    </button>
+
     <div style="display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:3px 5px">
       <button onclick="setFontSize(-1)" title="Diminuir fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A−</button>
       <span id="fs-label" style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--m);min-width:24px;text-align:center">12</span>
@@ -544,11 +459,7 @@ body.dark .mc-pay{background:#25262b}
       </button>
     </div>
     <div class="fcount" id="fcount"></div>
-    <div class="multi-bar" id="multi-bar">
-      <span class="multi-bar-txt" id="multi-bar-txt">0 selecionadas</span>
-      <button class="multi-bar-clr" onclick="clearMultiSel()">✕</button>
-      <button class="multi-bar-btn" onclick="loadMultiFiles()">Carregar juntas →</button>
-    </div>
+
     <div class="flist">
       <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
       <div id="fitems"></div>
@@ -627,83 +538,9 @@ body.dark .mc-pay{background:#25262b}
     </div>
   </div>
 
-  <!-- TELA DE CONFERÊNCIA (integrada ao rpanel) -->
-  <div id="conf-view" style="display:none;flex:1;flex-direction:column;min-width:0">
-    <div class="dhead">
-      <div class="dhead-top">
-        <div class="dtitle-wrap">
-          <div class="dbadge">🔍 Conferência</div>
-          <div class="dfilename">Conferência de Pagamentos</div>
-          <div id="conf-eng-badge" style="display:none" class="engineer-badge"><span id="conf-periodo">Carregando...</span></div>
-        </div>
-      </div>
-      <!-- filtros letra -->
-      <div class="letra-pills" id="conf-pills">
-        <button class="letra-pill active" onclick="confSetLetra('todos',this)">Todos</button>
-        <button class="letra-pill" onclick="confSetLetra('A-D',this)">A–D</button>
-        <button class="letra-pill" onclick="confSetLetra('E-H',this)">E–H</button>
-        <button class="letra-pill" onclick="confSetLetra('I-L',this)">I–L</button>
-        <button class="letra-pill" onclick="confSetLetra('M-P',this)">M–P</button>
-        <button class="letra-pill" onclick="confSetLetra('Q-T',this)">Q–T</button>
-        <button class="letra-pill" onclick="confSetLetra('U-Z',this)">U–Z</button>
-      </div>
-      <div class="filters">
-        <div class="fg"><div class="flabel">Buscar engenheiro</div><input class="finput" id="conf-busca" type="text" placeholder="Nome do engenheiro..." oninput="confSearch(this.value)"/></div>
-        <div class="fg" style="min-width:130px"><div class="flabel">Status</div>
-          <select class="finput" id="conf-filter-status" onchange="confApplyFilters()">
-            <option value="">Todos</option>
-            <option value="pendente">⏳ Pendente</option>
-            <option value="conferido">✅ Conferido</option>
-            <option value="divergencia">⚠ Divergência</option>
-            <option value="pago">💰 Pago</option>
-          </select>
-        </div>
-        <button class="clearbtn" onclick="confLimparFiltros()">✕ Limpar</button>
-      </div>
-    </div>
-    <div class="dcontent">
-      <div class="metrics">
-        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Aguardando</div><div class="mc-val" id="cs-pendente">—</div></div>
-        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Divergências</div><div class="mc-val" id="cs-diverg">—</div></div>
-        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Conferidos</div><div class="mc-val" id="cs-conf">—</div></div>
-        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="cs-total">—</div></div>
-      </div>
-      <div class="twrap">
-        <div class="tscroll">
-          <table class="ttable">
-            <thead><tr>
-              <th>Engenheiro</th>
-              <th>Planilha</th>
-              <th>Propostas</th>
-              <th>Km declarado</th>
-              <th>Km Maps</th>
-              <th>Valor km</th>
-              <th class="th-pay">Status</th>
-              <th style="width:50px"></th>
-            </tr></thead>
-            <tbody id="conf-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
 
-<!-- PAINEL CONFERÊNCIA -->
-<div class="conf-overlay" id="conf-overlay" onclick="confClosePanel()"></div>
-<div class="conf-panel" id="conf-panel">
-  <div class="conf-panel-head">
-    <div>
-      <div class="conf-panel-name" id="cp-name">—</div>
-      <div class="conf-panel-meta" id="cp-meta">—</div>
-    </div>
-    <button class="conf-x" onclick="confClosePanel()">✕</button>
-  </div>
-  <div class="conf-panel-body" id="cp-body"></div>
-  <div class="conf-panel-foot">
-    <button class="conf-btn-reject" onclick="confClosePanel()">Rejeitar / Corrigir</button>
-    <button class="conf-btn-pay" onclick="confMarcarPago()">✓ Marcar como Pago</button>
-  </div>
-</div>
+
+
 
 <!-- DESLOCAMENTO MODAL -->
 <div class="desl-overlay" id="desl-overlay" onclick="deslOverlayClick(event)">
@@ -804,8 +641,7 @@ let viewMode='all';
 let engMap={};
 let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
-let selectedFiles=new Set(); // ids selecionados para multi-load
-let multiMode=false; // true quando exibindo dados de múltiplas planilhas
+
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
@@ -815,13 +651,7 @@ const RPP=50;
 // ══════════════════════════════════════════
 // CONFERÊNCIA STATE
 // ══════════════════════════════════════════
-let confEngList = [];    // lista de engenheiros montada do engMap + allFiles
-let confFiltered = [];
-let confCurrentEng = null;
-let confLetraFilter = 'todos';
-let confStatusFilter = '';
-let confSearchQuery = '';
-let confScreenOpen = false;
+
 
 // ══════════════════════════════════════════
 // PAYMENT STATUS STATE
@@ -832,222 +662,7 @@ let _lastHeaderIdx=0;
 const $=id=>document.getElementById(id);
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
-// ══════════════════════════════════════════
-// CONFERÊNCIA — Toggle
-// ══════════════════════════════════════════
-function toggleConferencia(){
-  confScreenOpen = !confScreenOpen;
-  const view   = $('conf-view');
-  const rpanel = $('rpanel');
-  const btn    = $('btn-conf');
-  if(confScreenOpen){
-    // esconde conteúdo normal, mostra conf no mesmo rpanel
-    $('dempty').style.display='none';
-    $('dloading').style.display='none';
-    $('dcontent').style.display='none';
-    view.style.display='flex';view.style.flexDirection='column';
-    rpanel.style.display='flex';rpanel.style.flexDirection='column';
-    btn.classList.add('active');
-    $('conf-eng-badge').style.display='inline-flex';
-    confBuildList();
-  } else {
-    view.style.display='none';
-    $('dempty').style.display = curFileId ? 'none' : 'flex';
-    if(curFileId) $('dcontent').style.display='flex';
-    btn.classList.remove('active');
-    $('conf-eng-badge').style.display='none';
-  }
-}
 
-// ══════════════════════════════════════════
-// CONFERÊNCIA — Build list from engMap
-// ══════════════════════════════════════════
-function confBuildList(){
-  // Agrupa arquivos por engenheiro usando engMap
-  const groups = {};
-  for(const f of allFiles){
-    const eng = engMap[f.id];
-    if(!eng) continue;
-    if(!groups[eng]) groups[eng] = { name: eng, files:[], props:0, kmDecl:0, kmReal:0, status:'pendente', sheets:[] };
-    groups[eng].files.push(f);
-    groups[eng].sheets.push(f.name);
-  }
-
-  // Gera dados simulados para demonstração (km declarado vs real)
-  // Na versão real, esses dados virão das planilhas do PostgreSQL
-  confEngList = Object.values(groups).map((g,i) => {
-    const seed = g.name.charCodeAt(0) + g.name.length;
-    const props = 2 + (seed % 6);
-    const kmReal = 10 + (seed % 40) * 2;
-    const hasDiverg = (seed % 3 === 0);
-    const kmDecl = hasDiverg ? kmReal + (8 + seed % 15) : kmReal;
-    const status = g.files.length > 0 && (seed % 5 === 0) ? 'pago' :
-                   hasDiverg ? 'divergencia' : 'pendente';
-    return {
-      ...g,
-      props,
-      kmDecl,
-      kmReal,
-      status,
-      details: Array.from({length:props}, (_,pi) => {
-        const pKmR = 8 + ((seed + pi) % 18) * 2;
-        const pDiv = hasDiverg && pi === 0;
-        return {
-          id: 'P-' + (1000 + i*10 + pi),
-          desc: ['Vistoria predial','Laudo técnico','Análise estrutural','Inspeção elétrica','Projeto hidráulico'][pi % 5],
-          local: g.sheets[0] || 'Endereço da vistoria',
-          kmDecl: pDiv ? pKmR + (8 + seed % 12) : pKmR,
-          kmReal: pKmR,
-          ok: !pDiv,
-        };
-      }),
-      valorTotal: props * 100,
-    };
-  });
-
-  confApplyFilters();
-  confUpdateStats();
-  $('conf-periodo').textContent = confEngList.length + ' engenheiros · ' + allFiles.length + ' planilhas';
-}
-
-function confUpdateStats(){
-  const pend  = confEngList.filter(e=>e.status==='pendente').length;
-  const divg  = confEngList.filter(e=>e.status==='divergencia').length;
-  const conf  = confEngList.filter(e=>e.status==='conferido'||e.status==='pago').length;
-  $('cs-pendente').textContent = pend + divg;
-  $('cs-diverg').textContent   = divg;
-  $('cs-conf').textContent     = conf;
-}
-
-function confSetLetra(f, btn){
-  confLetraFilter = f;
-  document.querySelectorAll('.letra-pill').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  confApplyFilters();
-}
-
-function confSearch(q){ confSearchQuery = q; confApplyFilters(); }
-function confLimparFiltros(){ $('conf-busca').value=''; $('conf-filter-status').value=''; confSearchQuery=''; confLetraFilter='todos'; document.querySelectorAll('.letra-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); confApplyFilters(); }
-
-function confApplyFilters(){
-  confStatusFilter = $('conf-filter-status').value;
-  const LETTERS = {'A-D':['A','B','C','D'],'E-H':['E','F','G','H'],'I-L':['I','J','K','L'],'M-P':['M','N','O','P'],'Q-T':['Q','R','S','T'],'U-Z':['U','V','W','X','Y','Z']};
-  confFiltered = confEngList.filter(e => {
-    if(confStatusFilter && e.status !== confStatusFilter) return false;
-    if(confLetraFilter !== 'todos'){
-      const letters = LETTERS[confLetraFilter]||[];
-      if(!letters.includes(e.name[0].toUpperCase())) return false;
-    }
-    if(confSearchQuery && !e.name.toLowerCase().includes(confSearchQuery.toLowerCase())) return false;
-    return true;
-  });
-  confRenderTable();
-}
-
-function confKmValor(km){ return km <= 15 ? 0 : (km-15)*1; }
-function confBRL(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2}); }
-
-function confRenderTable(){
-  const tbody = $('conf-tbody');
-  const SL = {
-    pendente:    '<span class="pay-badge pendente"><span class="pay-dot"></span>Pendente</span>',
-    conferido:   '<span class="pay-badge" style="background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)"><span class="pay-dot" style="background:var(--a)"></span>Conferido</span>',
-    divergencia: '<span class="pay-badge atencao"><span class="pay-dot"></span>Divergência</span>',
-    pago:        '<span class="pay-badge pago"><span class="pay-dot"></span>Pago</span>',
-  };
-  if(!confFiltered.length){
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--m)">Nenhum engenheiro encontrado</td></tr>';
-    $('conf-count').textContent = '0 registros';
-    return;
-  }
-  tbody.innerHTML = confFiltered.map(eng => {
-    const ok = eng.kmDecl === eng.kmReal;
-    const diff = eng.kmDecl - eng.kmReal;
-    const val = confKmValor(eng.kmReal);
-    return `<tr class="conf-row" onclick="confOpenPanel('${eng.name.replace(/'/g,"\\'")}')">
-      <td>
-        <div class="conf-eng-name">${esc(eng.name)}</div>
-        <div class="conf-eng-id">${eng.files.length} planilha${eng.files.length!==1?'s':''}</div>
-      </td>
-      <td><div class="conf-eng-sheet">${esc(eng.sheets[0]||'—')}</div></td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px">${eng.props}</td>
-      <td><div class="${ok?'km-ok':'km-bad'}">${eng.kmDecl} km${!ok?' <small>(+'+diff+'km)</small>':''}</div></td>
-      <td><div class="${ok?'km-neu':'km-ok'}">${eng.kmReal} km</div><div class="km-sub">ida+volta</div></td>
-      <td style="font-size:12px;font-weight:600;color:var(--a3)">${val>0?confBRL(val):'<span style="color:var(--m)">—</span>'}</td>
-      <td>${SL[eng.status]||''}</td>
-      <td><button class="conf-link-btn" onclick="event.stopPropagation();confOpenPanel('${eng.name.replace(/'/g,"\\'")}')">Ver →</button></td>
-    </tr>`;
-  }).join('');
-  $('cs-total').textContent = confFiltered.length;
-}
-
-function confOpenPanel(name){
-  const eng = confEngList.find(e=>e.name===name);
-  if(!eng) return;
-  confCurrentEng = eng;
-  $('cp-name').textContent = eng.name;
-  $('cp-meta').textContent = eng.files.length + ' planilha(s) · ' + eng.props + ' propostas';
-
-  const diff = eng.kmDecl - eng.kmReal;
-  const valC = confKmValor(eng.kmReal);
-  const valD = confKmValor(eng.kmDecl);
-  const eco  = valD - valC;
-
-  let h = '';
-  h += `<div class="conf-sec">Planilhas</div>`;
-  eng.sheets.forEach(s=>{
-    h += `<div class="conf-addr-box"><span>Planilha do engenheiro</span>📊 ${esc(s)}</div>`;
-  });
-
-  h += `<div class="conf-sec">Resumo de Deslocamento</div>`;
-  h += `<div class="conf-info-row">
-    <div class="conf-info-box"><div class="conf-info-box-lbl">Km declarado (ida+volta)</div><div class="conf-info-box-val" style="color:${diff>0?'var(--red)':'var(--t)'}">${eng.kmDecl} km</div></div>
-    <div class="conf-info-box"><div class="conf-info-box-lbl">Km Google Maps</div><div class="conf-info-box-val" style="color:var(--a3)">${eng.kmReal} km</div></div>
-    <div class="conf-info-box"><div class="conf-info-box-lbl">Valor deslocamento correto</div><div class="conf-info-box-val" style="color:var(--a3)">${confBRL(valC)}</div></div>
-    <div class="conf-info-box"><div class="conf-info-box-lbl">Total propostas</div><div class="conf-info-box-val">${confBRL(eng.valorTotal)}</div></div>
-  </div>`;
-
-  if(diff>0) h += `<div class="conf-alert"><strong>⚠ Divergência de ${diff} km detectada</strong>Declarado ${eng.kmDecl} km — Google Maps indica ${eng.kmReal} km. Diferença de ${confBRL(eco)}.</div>`;
-
-  h += `<div class="conf-sec">Propostas</div>`;
-  eng.details.forEach(p=>{
-    const pv = confKmValor(p.kmReal);
-    const pd = p.kmDecl - p.kmReal;
-    h += `<div class="conf-prop-item ${p.ok?'good':'bad'}">
-      <div class="conf-prop-top">
-        <span class="conf-prop-id">${p.id}</span>
-        <span class="conf-prop-desc">${esc(p.desc)}</span>
-        <span class="conf-tag ${p.ok?'conf-tag-ok':'conf-tag-bad'}">${p.ok?'✓ OK':'+'+pd+' km'}</span>
-      </div>
-      <div class="conf-prop-km">
-        <span>Declarado: <b style="color:${p.ok?'inherit':'var(--red)'}">${p.kmDecl} km</b></span>
-        <span>Maps: <b style="color:var(--a3)">${p.kmReal} km</b></span>
-        <span style="margin-left:auto">Valor: <b style="color:var(--a3)">${pv>0?confBRL(pv):'—'}</b></span>
-      </div>
-    </div>`;
-  });
-
-  h += `<div class="conf-rule-box">ℹ Regra: até 15 km (ida+volta) = R$ 0,00 · acima de 15 km = R$ 1,00/km excedente</div>`;
-  h += `<div class="conf-total-strip"><span class="lbl">Total a pagar</span><span class="val">${confBRL(eng.valorTotal+valC)}</span></div>`;
-
-  $('cp-body').innerHTML = h;
-  $('conf-overlay').classList.add('open');
-  $('conf-panel').classList.add('open');
-}
-
-function confClosePanel(){
-  $('conf-overlay').classList.remove('open');
-  $('conf-panel').classList.remove('open');
-  confCurrentEng = null;
-}
-
-function confMarcarPago(){
-  if(!confCurrentEng) return;
-  confCurrentEng.status = 'pago';
-  confApplyFilters();
-  confUpdateStats();
-  confClosePanel();
-}
 
 // ══════════════════════════════════════════
 // PAYMENT STATUS
@@ -1171,10 +786,7 @@ async function loadFiles(){
     allFiles=[...seen.values()];filterFiles();
     const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
     setSyncState('done',100,allFiles.length+' planilhas · '+now);
-    // Atualiza lista de conferência se estiver aberta
-    if(confScreenOpen) confBuildList();
-    // Scan em background para identificar engenheiros ainda não mapeados
-    scanEngineersBackground();
+
   }catch(e){
     $('fitems').innerHTML='<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">'+e.message+'</div></div>';
     setSyncState('error',0,'Erro ao carregar');
@@ -1234,122 +846,6 @@ function setSyncState(state,pct,txt){
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
 
-async function loadMultiFiles(){
-  if(selectedFiles.size===0) return;
-  if(confScreenOpen){ confScreenOpen=false; $('conf-view').style.display='none'; $('btn-conf').classList.remove('active'); }
-  multiMode=true;
-  curFileId=null; curFileUrl=null; curXlsxWb=null;
-  payStatusMap={}; payLoaded=false; payLoading=false;
-  $('pay-status-bar').classList.remove('show'); $('pay-legend').style.display='none'; $('metrics-pay').style.display='none';
-  $('dempty').style.display='none'; $('dloading').style.display='flex'; $('dcontent').style.display='none';
-  $('dloading-txt').textContent='Carregando '+selectedFiles.size+' planilhas...';
-  filterFiles();
-  const ids=[...selectedFiles];
-  const filesInfo=ids.map(id=>allFiles.find(f=>f.id===id)).filter(Boolean);
-  try{
-    // Carrega todas em paralelo
-    const results=await Promise.allSettled(filesInfo.map(f=>loadFileRows(f)));
-    // Merge rows — adiciona coluna Planilha/Engenheiro
-    let mergedRows=[];
-    let mergedHeaders=null;
-    for(let i=0;i<results.length;i++){
-      if(results[i].status!=='fulfilled'||!results[i].value) continue;
-      const {rows,headers,fileInfo}=results[i].value;
-      if(!mergedHeaders) mergedHeaders=headers;
-      const engName=engMap[filesInfo[i].id]||filesInfo[i].name;
-      rows.forEach(r=>{
-        mergedRows.push({...r, _planilha: engName});
-      });
-    }
-    if(!mergedHeaders||mergedRows.length===0) throw new Error('Nenhum dado encontrado nas planilhas selecionadas');
-    // Adiciona coluna Planilha no início
-    const planilhaCol={label:'Planilha / Engenheiro',idx:'_planilha',cls:'c-eng'};
-    allHeaders=[planilhaCol,...mergedHeaders];
-    allRows=mergedRows.map(r=>({
-      ...r,
-      raw:[r._planilha,...(r.raw||[])]
-    }));
-    // Ajusta índices
-    gAddrIdx=allHeaders.findIndex(h=>['ENDEREÇO','ENDERECO','END','LOGRADOURO'].some(k=>String(h.label).toUpperCase().includes(k)));
-    gCityIdx=allHeaders.findIndex(h=>['CIDADE','MUNICIPIO','MUNICÍPIO'].some(k=>String(h.label).toUpperCase().includes(k)));
-    // Atualiza header
-    $('dfilename').textContent=filesInfo.length+' planilhas carregadas juntas';
-    $('dbadge').textContent='📋 '+filesInfo.length+' planilhas';
-    $('eng-badge').style.display='none';
-    $('tabs-row').innerHTML='';
-    // Meses
-    const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
-    months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
-    const fm=$('f-mes');fm.innerHTML='<option value="">Todos os meses</option>';
-    months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
-    $('dloading').style.display='none'; $('dcontent').style.display='flex'; $('dcontent').style.flexDirection='column';
-    filterRows();
-  }catch(e){
-    multiMode=false;
-    $('dloading').style.display='none'; $('dempty').style.display='flex';
-    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
-    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
-    $('dempty').querySelector('.dempty-sub').textContent=e.message;
-  }
-}
-
-async function loadFileRows(file){
-  const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-  let values=[];
-  if(isXlsx){
-    const wb=await loadXlsxWorkbook(file.id);
-    if(!wb) return null;
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
-    values=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
-  } else {
-    const tabR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!tabR.ok) return null;
-    const tabMeta=await tabR.json();
-    const tabName=((tabMeta.sheets||[])[0]||{}).properties?.title||'Plan1';
-    const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
-    if(!r.ok) return null;
-    values=(await r.json()).values||[];
-  }
-  // Detectar engenheiro
-  let engineer='';
-  for(let i=0;i<Math.min(values.length,6);i++){
-    for(const cell of (values[i]||[])){
-      const m=String(cell||'').match(/Profissional[:\s]+(.+)/i);
-      if(m){engineer=m[1].trim();break;}
-    }
-    if(engineer) break;
-  }
-  if(engineer && !engMap[file.id]){engMap[file.id]=engineer;saveEngMap();}
-  // Detectar header
-  const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
-  let hIdx=0,best=-1;
-  for(let i=0;i<Math.min(values.length,15);i++){
-    const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
-    const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;
-    if(sc>best){best=sc;hIdx=i;}
-  }
-  const headers=(values[hIdx]||[]).map((h,i)=>({label:h||'Col '+(i+1),idx:i,cls:guessClass(String(h||'').toUpperCase())}));
-  const hU=headers.map(h=>String(h.label).toUpperCase());
-  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
-  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
-  const dateIdx=find('DATA');
-  const valIdx=find('VALOR');
-  const addrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
-  const cityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
-  const rows=(values.slice(hIdx+1)||[])
-    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
-    .map(r=>({
-      raw:r,
-      proposta:propIdx>=0?(r[propIdx]||''):'',
-      data:dateIdx>=0?(r[dateIdx]||''):'',
-      valor:valIdx>=0?(r[valIdx]||''):'',
-      endereco:addrIdx>=0?(r[addrIdx]||''):'',
-      cidade:cityIdx>=0?(r[cityIdx]||''):''
-    }));
-  return {rows, headers, fileInfo:file};
-}
-
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
   filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||(engMap[f.id]||'').toLowerCase().includes(q));
@@ -1367,48 +863,14 @@ function filterFiles(){
 function fitemHtml(f){
   const id=f.id||'';const name=(f.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   const url=(f.webViewLink||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const mime=(f.mimeType||'').replace(/'/g,"\\'");
-  const active=curFileId===f.id&&!multiMode?'active':'';
-  const sel=selectedFiles.has(f.id)?'sel':'';
-  const chk=selectedFiles.has(f.id)?'checked':'';
-  return'<div class="fitem '+active+' '+sel+'" onclick="fitemClick(event,\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
-    +'<input type="checkbox" class="fitem-cb" '+chk+' onclick="event.stopPropagation();toggleFileSelect(\''+id+'\')"/>'
+  const mime=(f.mimeType||'').replace(/'/g,"\\'");const active=curFileId===f.id?'active':'';
+  return'<div class="fitem '+active+'" onclick="selectFile(\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
     +'<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'
     +'<div class="finfo"><div class="fname">'+esc(f.name)+'</div>'
     +'<div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'
     +'<div class="farrow">›</div></div>';
 }
-function fitemClick(e,id,name,url,mime){
-  if(e.ctrlKey||e.metaKey||selectedFiles.size>0){
-    toggleFileSelect(id);
-  } else {
-    clearMultiSel();
-    selectFile(id,name,url,mime);
-  }
-}
-function toggleFileSelect(id){
-  if(selectedFiles.has(id)) selectedFiles.delete(id);
-  else selectedFiles.add(id);
-  updateMultiBar();
-  filterFiles();
-}
-function clearMultiSel(){
-  selectedFiles.clear();
-  updateMultiBar();
-  filterFiles();
-}
-function updateMultiBar(){
-  const bar=$('multi-bar'), txt=$('multi-bar-txt');
-  if(selectedFiles.size>0){
-    bar.classList.add('show');
-    txt.textContent=selectedFiles.size+' planilha'+(selectedFiles.size>1?'s':'')+' selecionada'+(selectedFiles.size>1?'s':'');
-  } else {
-    bar.classList.remove('show');
-  }
-}
 async function selectFile(id,name,url,mime){
-  if(confScreenOpen){ confScreenOpen=false; $('conf-view').style.display='none'; $('btn-conf').classList.remove('active'); }
-  multiMode=false;
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;
   payStatusMap={};payLoaded=false;payLoading=false;payColIdx=-1;
   $('pay-status-bar').classList.remove('show');$('pay-legend').style.display='none';$('metrics-pay').style.display='none';
@@ -1472,7 +934,7 @@ async function loadXlsxWorkbook(fileId){
 function processData(values){
   let engineer='';
   for(let i=0;i<Math.min(values.length,6);i++){for(const cell of(values[i]||[])){const cm=String(cell||'').match(/Profissional[:\s]+(.+)/i);if(cm){engineer=cm[1].trim();break;}}if(engineer)break;}
-  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();if(confScreenOpen)confBuildList();}}
+  if(engineer){$('eng-badge').style.display='inline-flex';$('eng-name').textContent=engineer;if(curFileId&&engMap[curFileId]!==engineer){engMap[curFileId]=engineer;saveEngMap();}}
   else $('eng-badge').style.display='none';
   const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
   let hIdx=0,best=-1;
@@ -1651,70 +1113,6 @@ document.addEventListener('DOMContentLoaded',function(){initDark();initFontSize(
 // ENGENHEIRO MAP
 // ══════════════════════════════════════════
 const LS_ENG='cf_eng_map_v1';
-// ══ SCAN DE ENGENHEIROS EM BACKGROUND ══
-let _scanRunning = false;
-async function scanEngineersBackground(){
-  if(_scanRunning || !accessToken) return;
-  _scanRunning = true;
-  const toScan = allFiles.filter(f => !engMap[f.id]);
-  if(!toScan.length){ _scanRunning=false; return; }
-  setSyncState('loading', null, 'Identificando engenheiros...');
-  const CONC = 8;
-  let done = 0, found = 0;
-  for(let i=0; i<toScan.length; i+=CONC){
-    const batch = toScan.slice(i, i+CONC);
-    await Promise.allSettled(batch.map(f => scanOneFile(f)));
-    done += batch.length;
-    found = Object.keys(engMap).length;
-    setSyncState('loading', null, `Identificando... ${done}/${toScan.length} · ${found} engenheiros`);
-    filterFiles(); // atualiza sidebar em tempo real
-    if(confScreenOpen) confBuildList();
-  }
-  _scanRunning = false;
-  saveEngMap();
-  const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  setSyncState('done', 100, allFiles.length + ' planilhas · ' + now);
-  filterFiles();
-  if(confScreenOpen) confBuildList();
-}
-
-async function scanOneFile(file){
-  if(engMap[file.id]) return; // já identificado
-  try{
-    const isXlsx = file.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-    let engineer = '';
-    if(isXlsx){
-      // Para xlsx precisaria baixar — pula por ora, será identificado ao abrir
-      return;
-    }
-    // Lê só as primeiras 6 linhas da primeira aba
-    const meta = await fetch(
-      'https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',
-      {headers:{Authorization:'Bearer '+accessToken}}
-    );
-    if(!meta.ok) return;
-    const metaJson = await meta.json();
-    const tabName = ((metaJson.sheets||[])[0]||{}).properties?.title || 'Plan1';
-    const range = encodeURIComponent(tabName+'!A1:Z6');
-    const r = await fetch(
-      'https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+range+'?majorDimension=ROWS',
-      {headers:{Authorization:'Bearer '+accessToken}}
-    );
-    if(!r.ok) return;
-    const data = await r.json();
-    const values = data.values || [];
-    for(let ri=0; ri<values.length; ri++){
-      for(const cell of (values[ri]||[])){
-        const m = String(cell||'').match(/Profissional[:\s]+(.+)/i);
-        if(m){ engineer = m[1].trim(); break; }
-      }
-      if(engineer) break;
-    }
-    if(engineer){
-      engMap[file.id] = engineer;
-    }
-  }catch(e){ /* silencioso */ }
-}
 
 function loadEngMap(){try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}}
 function saveEngMap(){try{localStorage.setItem(LS_ENG,JSON.stringify(engMap));}catch{}}
