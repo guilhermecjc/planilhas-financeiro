@@ -1154,6 +1154,8 @@ async function loadFiles(){
     setSyncState('done',100,allFiles.length+' planilhas · '+now);
     // Atualiza lista de conferência se estiver aberta
     if(confScreenOpen) confBuildList();
+    // Scan em background para identificar engenheiros ainda não mapeados
+    scanEngineersBackground();
   }catch(e){
     $('fitems').innerHTML='<div class="fstate"><div style="font-size:24px">⚠️</div><div class="fstate-txt">'+e.message+'</div></div>';
     setSyncState('error',0,'Erro ao carregar');
@@ -1482,6 +1484,71 @@ document.addEventListener('DOMContentLoaded',function(){initDark();initFontSize(
 // ENGENHEIRO MAP
 // ══════════════════════════════════════════
 const LS_ENG='cf_eng_map_v1';
+// ══ SCAN DE ENGENHEIROS EM BACKGROUND ══
+let _scanRunning = false;
+async function scanEngineersBackground(){
+  if(_scanRunning || !accessToken) return;
+  _scanRunning = true;
+  const toScan = allFiles.filter(f => !engMap[f.id]);
+  if(!toScan.length){ _scanRunning=false; return; }
+  setSyncState('loading', null, 'Identificando engenheiros...');
+  const CONC = 8;
+  let done = 0, found = 0;
+  for(let i=0; i<toScan.length; i+=CONC){
+    const batch = toScan.slice(i, i+CONC);
+    await Promise.allSettled(batch.map(f => scanOneFile(f)));
+    done += batch.length;
+    found = Object.keys(engMap).length;
+    setSyncState('loading', null, `Identificando... ${done}/${toScan.length} · ${found} engenheiros`);
+    filterFiles(); // atualiza sidebar em tempo real
+    if(confScreenOpen) confBuildList();
+  }
+  _scanRunning = false;
+  saveEngMap();
+  const now = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  setSyncState('done', 100, allFiles.length + ' planilhas · ' + now);
+  filterFiles();
+  if(confScreenOpen) confBuildList();
+}
+
+async function scanOneFile(file){
+  if(engMap[file.id]) return; // já identificado
+  try{
+    const isXlsx = file.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    let engineer = '';
+    if(isXlsx){
+      // Para xlsx precisaria baixar — pula por ora, será identificado ao abrir
+      return;
+    }
+    // Lê só as primeiras 6 linhas da primeira aba
+    const meta = await fetch(
+      'https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',
+      {headers:{Authorization:'Bearer '+accessToken}}
+    );
+    if(!meta.ok) return;
+    const metaJson = await meta.json();
+    const tabName = ((metaJson.sheets||[])[0]||{}).properties?.title || 'Plan1';
+    const range = encodeURIComponent(tabName+'!A1:Z6');
+    const r = await fetch(
+      'https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+range+'?majorDimension=ROWS',
+      {headers:{Authorization:'Bearer '+accessToken}}
+    );
+    if(!r.ok) return;
+    const data = await r.json();
+    const values = data.values || [];
+    for(let ri=0; ri<values.length; ri++){
+      for(const cell of (values[ri]||[])){
+        const m = String(cell||'').match(/Profissional[:\s]+(.+)/i);
+        if(m){ engineer = m[1].trim(); break; }
+      }
+      if(engineer) break;
+    }
+    if(engineer){
+      engMap[file.id] = engineer;
+    }
+  }catch(e){ /* silencioso */ }
+}
+
 function loadEngMap(){try{engMap=JSON.parse(localStorage.getItem(LS_ENG)||'{}');}catch{engMap={};}}
 function saveEngMap(){try{localStorage.setItem(LS_ENG,JSON.stringify(engMap));}catch{}}
 function setViewMode(mode){viewMode=mode;$('vt-all').className='vtbtn'+(mode==='all'?' on':'');$('vt-eng').className='vtbtn'+(mode==='eng'?' on':'');filterFiles();}
