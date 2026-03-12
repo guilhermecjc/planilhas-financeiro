@@ -59,10 +59,6 @@ body.dark .pay-badge.atencao{background:rgba(217,48,37,.12);border-color:rgba(21
 body.dark .pay-legend{background:#2c2d32;border-color:#373a40}
 body.dark .pay-status-bar{background:rgba(26,115,232,.08);border-color:rgba(26,115,232,.2)}
 /* ── CONFERÊNCIA DARK ── */
-body.dark .conf-card{background:#25262b;border-color:#373a40}
-body.dark .conf-table thead th{background:#2c2d32}
-body.dark .conf-table tbody tr:hover td{background:#2c2d32}
-body.dark .conf-stat{background:#25262b;border-color:#373a40}
 body.dark .conf-panel{background:#25262b;border-color:#373a40}
 body.dark .conf-prop-item{border-color:#373a40;background:#2c2d32}
 body.dark .conf-prop-item.bad{background:rgba(217,48,37,.08);border-color:rgba(217,48,37,.3)}
@@ -88,17 +84,11 @@ header{position:sticky;top:0;z-index:300;height:56px;display:flex;align-items:ce
 .cbadge.live .cdot{background:var(--a3);animation:pd 2s infinite}
 
 /* ── BOTÃO CONFERÊNCIA NO HEADER ── */
-.btn-conf-header{
-  display:flex;align-items:center;gap:6px;
-  background:linear-gradient(135deg,#e37400,#d93025);
-  color:#fff;border:none;
-  font-family:'Outfit',sans-serif;font-weight:700;font-size:12px;
-  padding:6px 14px;border-radius:8px;cursor:pointer;
-  transition:all .15s;white-space:nowrap;
-  box-shadow:0 1px 4px rgba(227,116,0,.3);
-}
-.btn-conf-header:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(227,116,0,.4)}
-.btn-conf-header.active{background:linear-gradient(135deg,#b45309,#b91c1c)}
+.btn-conf-header{display:flex;align-items:center;gap:5px;background:var(--bg);border:1px solid var(--b);color:var(--m2);font-family:'Outfit',sans-serif;font-weight:600;font-size:12px;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-conf-header:hover{border-color:var(--a);color:var(--a);background:#e8f0fe}
+.btn-conf-header.active{background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)}
+body.dark .btn-conf-header{background:#2c2d32;border-color:#373a40;color:var(--m)}
+body.dark .btn-conf-header:hover,.btn-conf-header.active{background:#1c2c4a;border-color:rgba(26,115,232,.4);color:#8ab4f8}
 
 .upill{display:none;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--b);border-radius:20px;padding:3px 10px 3px 3px}
 .uavatar{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--a);object-fit:cover}
@@ -291,80 +281,6 @@ body.dark .mc-pay{background:#25262b}
 /* ══════════════════════════════════════════
    TELA DE CONFERÊNCIA
 ══════════════════════════════════════════ */
-.conf-screen{
-  display:none;
-  flex:1;flex-direction:column;min-width:0;
-  background:var(--bg);overflow-y:auto;
-}
-.conf-screen.show{display:flex}
-.conf-screen::-webkit-scrollbar{width:6px}
-.conf-screen::-webkit-scrollbar-thumb{background:var(--b2);border-radius:4px}
-
-.conf-topbar{
-  padding:12px 20px;background:#fff;border-bottom:1px solid var(--b);
-  position:sticky;top:0;z-index:20;box-shadow:var(--sh);
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
-}
-.conf-topbar-left h2{font-size:15px;font-weight:700;color:var(--t)}
-.conf-topbar-left p{font-size:11px;color:var(--m);margin-top:1px}
-.conf-topbar-right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-
-.conf-pills{display:flex;gap:4px;flex-wrap:wrap;padding:10px 16px 6px}
-.conf-pill{padding:5px 13px;border-radius:99px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b);background:#fff;color:var(--m);font-family:'Outfit',sans-serif;transition:all .12s}
-.conf-pill:hover{border-color:var(--a);color:var(--a)}
-.conf-pill.active{background:var(--a);border-color:var(--a);color:#fff}
-
-.conf-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 12px}
-.conf-stat{background:#fff;border:1px solid var(--b);border-radius:8px;padding:10px 14px;box-shadow:var(--sh);position:relative;overflow:hidden}
-.conf-stat::before{content:'';position:absolute;left:0;top:15%;bottom:15%;width:2px;border-radius:0 2px 2px 0}
-.conf-stat:nth-child(1)::before{background:var(--a)}
-.conf-stat:nth-child(2)::before{background:var(--gold)}
-.conf-stat:nth-child(3)::before{background:var(--a3)}
-.conf-stat-lbl{font-size:9px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.conf-stat-val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;line-height:1}
-.conf-stat-sub{font-size:10px;color:var(--m);margin-top:2px}
-.conf-stat:nth-child(1) .conf-stat-val{color:var(--a)}
-.conf-stat:nth-child(2) .conf-stat-val{color:var(--gold)}
-.conf-stat:nth-child(3) .conf-stat-val{color:var(--a3)}
-
-.conf-card{background:#fff;border:1px solid var(--b);border-radius:8px;overflow:hidden;box-shadow:var(--sh);margin:0 16px 16px}
-.conf-card-head{padding:10px 14px;border-bottom:1px solid var(--b);display:flex;align-items:center;justify-content:space-between}
-.conf-card-title{font-size:12px;font-weight:700;color:var(--t)}
-.conf-card-count{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
-
-.conf-search{
-  background:var(--bg);border:1px solid var(--b);border-radius:6px;
-  color:var(--t);font-family:'Outfit',sans-serif;font-size:12px;
-  padding:5px 10px;outline:none;width:200px;transition:border .12s;
-}
-.conf-search:focus{border-color:var(--a);background:#fff}
-.conf-search::placeholder{color:var(--m)}
-
-.conf-table{width:100%;border-collapse:collapse;font-size:12px}
-.conf-table thead th{padding:7px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--m);text-transform:uppercase;letter-spacing:.6px;background:var(--bg2);border-bottom:1px solid var(--b);white-space:nowrap}
-.conf-table tbody td{padding:10px 12px;border-bottom:1px solid rgba(0,0,0,.05);vertical-align:middle}
-.conf-table tbody tr:last-child td{border-bottom:none}
-.conf-table tbody tr.conf-row{cursor:pointer;transition:background .08s}
-.conf-table tbody tr.conf-row:hover td{background:#f8f9fa}
-
-.conf-eng-name{font-weight:600;font-size:13px;color:var(--t)}
-.conf-eng-id{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace;margin-top:1px}
-.conf-eng-sheet{font-size:10px;color:var(--a);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
-
-.conf-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:99px;font-size:10px;font-weight:700;border:1px solid;white-space:nowrap}
-.conf-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
-.conf-badge-pago{background:#e6f4ea;border-color:rgba(24,128,56,.3);color:#137333}
-.conf-badge-conferido{background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)}
-.conf-badge-divergencia{background:#fce8e6;border-color:rgba(217,48,37,.3);color:var(--red)}
-.conf-badge-pendente{background:#fef7e0;border-color:rgba(227,116,0,.35);color:var(--gold)}
-
-.km-ok{color:var(--a3);font-family:'JetBrains Mono',monospace;font-size:11px}
-.km-bad{color:var(--red);font-family:'JetBrains Mono',monospace;font-size:11px}
-.km-neu{color:var(--m);font-family:'JetBrains Mono',monospace;font-size:11px}
-.km-sub{font-size:10px;color:var(--m);margin-top:1px}
-
-.conf-link-btn{font-size:11px;color:var(--a);background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:600;text-decoration:underline;text-underline-offset:2px;padding:0}
-.conf-link-btn:hover{opacity:.7}
 
 /* PAINEL LATERAL CONFERÊNCIA */
 .conf-overlay{position:fixed;inset:0;background:rgba(32,33,36,.35);z-index:400;display:none;backdrop-filter:blur(3px)}
@@ -537,7 +453,6 @@ body.dark .mc-pay{background:#25262b}
   .lpanel{width:100%;border-right:none;border-bottom:1px solid var(--b);height:240px}
   .app{flex-direction:column}
   .metrics{grid-template-columns:1fr 1fr}
-  .conf-stats{grid-template-columns:1fr 1fr}
   .conf-panel{width:100%}
 }
 </style>
@@ -547,9 +462,9 @@ body.dark .mc-pay{background:#25262b}
   <div class="logo"><div class="logo-mark">📊</div>Central Financeira</div>
   <div class="hright">
     <div class="cbadge" id="cbadge"><div class="cdot"></div><span id="clabel">offline</span></div>
-    <!-- BOTÃO CONFERÊNCIA -->
     <button class="btn-conf-header" id="btn-conf" onclick="toggleConferencia()">
-      🔍 Conferência
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Conferência
     </button>
     <div style="display:flex;align-items:center;gap:4px;background:var(--bg);border:1px solid var(--b);border-radius:8px;padding:3px 5px">
       <button onclick="setFontSize(-1)" title="Diminuir fonte" style="background:none;border:none;cursor:pointer;color:var(--m);font-size:13px;padding:2px 5px;border-radius:4px;line-height:1;font-weight:700" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='none'">A−</button>
@@ -695,77 +610,66 @@ body.dark .mc-pay{background:#25262b}
     </div>
   </div>
 
-  <!-- TELA DE CONFERÊNCIA -->
-  <div class="conf-screen" id="conf-screen">
-    <div class="conf-topbar">
-      <div class="conf-topbar-left">
-        <h2>Conferência de Propostas</h2>
-        <p id="conf-periodo">Carregando dados das planilhas...</p>
+  <!-- TELA DE CONFERÊNCIA (integrada ao rpanel) -->
+  <div id="conf-view" style="display:none;flex:1;flex-direction:column;min-width:0">
+    <div class="dhead">
+      <div class="dhead-top">
+        <div class="dtitle-wrap">
+          <div class="dbadge">🔍 Conferência</div>
+          <div class="dfilename">Conferência de Pagamentos</div>
+          <div id="conf-eng-badge" style="display:none" class="engineer-badge"><span id="conf-periodo">Carregando...</span></div>
+        </div>
       </div>
-      <div class="conf-topbar-right">
-        <input class="conf-search" type="text" placeholder="🔍 Buscar engenheiro..." oninput="confSearch(this.value)">
-        <select class="finput" id="conf-filter-status" onchange="confApplyFilters()" style="width:auto;font-size:11px;padding:5px 8px">
-          <option value="">Todos os status</option>
-          <option value="pendente">⏳ Pendente</option>
-          <option value="conferido">✅ Conferido</option>
-          <option value="divergencia">⚠ Divergência</option>
-          <option value="pago">💰 Pago</option>
-        </select>
+      <!-- filtros letra -->
+      <div class="letra-pills" id="conf-pills">
+        <button class="letra-pill active" onclick="confSetLetra('todos',this)">Todos</button>
+        <button class="letra-pill" onclick="confSetLetra('A-D',this)">A–D</button>
+        <button class="letra-pill" onclick="confSetLetra('E-H',this)">E–H</button>
+        <button class="letra-pill" onclick="confSetLetra('I-L',this)">I–L</button>
+        <button class="letra-pill" onclick="confSetLetra('M-P',this)">M–P</button>
+        <button class="letra-pill" onclick="confSetLetra('Q-T',this)">Q–T</button>
+        <button class="letra-pill" onclick="confSetLetra('U-Z',this)">U–Z</button>
       </div>
-    </div>
-
-    <div class="conf-stats" id="conf-stats">
-      <div class="conf-stat">
-        <div class="conf-stat-lbl">Aguardando conferência</div>
-        <div class="conf-stat-val" id="cs-pendente">—</div>
-        <div class="conf-stat-sub">engenheiros</div>
-      </div>
-      <div class="conf-stat">
-        <div class="conf-stat-lbl">Divergências km</div>
-        <div class="conf-stat-val" id="cs-diverg">—</div>
-        <div class="conf-stat-sub">a revisar</div>
-      </div>
-      <div class="conf-stat">
-        <div class="conf-stat-lbl">Conferidos</div>
-        <div class="conf-stat-val" id="cs-conf">—</div>
-        <div class="conf-stat-sub">prontos</div>
+      <div class="filters">
+        <div class="fg"><div class="flabel">Buscar engenheiro</div><input class="finput" id="conf-busca" type="text" placeholder="Nome do engenheiro..." oninput="confSearch(this.value)"/></div>
+        <div class="fg" style="min-width:130px"><div class="flabel">Status</div>
+          <select class="finput" id="conf-filter-status" onchange="confApplyFilters()">
+            <option value="">Todos</option>
+            <option value="pendente">⏳ Pendente</option>
+            <option value="conferido">✅ Conferido</option>
+            <option value="divergencia">⚠ Divergência</option>
+            <option value="pago">💰 Pago</option>
+          </select>
+        </div>
+        <button class="clearbtn" onclick="confLimparFiltros()">✕ Limpar</button>
       </div>
     </div>
-
-    <!-- FILTRO A-D E-H etc -->
-    <div class="conf-pills" id="conf-pills">
-      <button class="conf-pill active" onclick="confSetLetra('todos',this)">Todos</button>
-      <button class="conf-pill" onclick="confSetLetra('A-D',this)">A — D</button>
-      <button class="conf-pill" onclick="confSetLetra('E-H',this)">E — H</button>
-      <button class="conf-pill" onclick="confSetLetra('I-L',this)">I — L</button>
-      <button class="conf-pill" onclick="confSetLetra('M-P',this)">M — P</button>
-      <button class="conf-pill" onclick="confSetLetra('Q-T',this)">Q — T</button>
-      <button class="conf-pill" onclick="confSetLetra('U-Z',this)">U — Z</button>
-    </div>
-
-    <div class="conf-card">
-      <div class="conf-card-head">
-        <span class="conf-card-title">Engenheiros identificados nas planilhas</span>
-        <span class="conf-card-count" id="conf-count">— registros</span>
+    <div class="dcontent">
+      <div class="metrics">
+        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Aguardando</div><div class="mc-val" id="cs-pendente">—</div></div>
+        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Divergências</div><div class="mc-val" id="cs-diverg">—</div></div>
+        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Conferidos</div><div class="mc-val" id="cs-conf">—</div></div>
+        <div class="mc"><div class="mc-line"></div><div class="mc-lbl">Total</div><div class="mc-val" id="cs-total">—</div></div>
       </div>
-      <table class="conf-table">
-        <thead>
-          <tr>
-            <th>Engenheiro</th>
-            <th>Planilha</th>
-            <th>Propostas</th>
-            <th>Km declarado</th>
-            <th>Km Maps</th>
-            <th>Valor km</th>
-            <th>Status</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="conf-tbody"></tbody>
-      </table>
+      <div class="twrap">
+        <div class="tscroll">
+          <table class="ttable">
+            <thead><tr>
+              <th>Engenheiro</th>
+              <th>Planilha</th>
+              <th>Propostas</th>
+              <th>Km declarado</th>
+              <th>Km Maps</th>
+              <th>Valor km</th>
+              <th class="th-pay">Status</th>
+              <th style="width:50px"></th>
+            </tr></thead>
+            <tbody id="conf-tbody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 
 <!-- PAINEL CONFERÊNCIA -->
 <div class="conf-overlay" id="conf-overlay" onclick="confClosePanel()"></div>
@@ -914,20 +818,25 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 // ══════════════════════════════════════════
 function toggleConferencia(){
   confScreenOpen = !confScreenOpen;
-  const screen = $('conf-screen');
+  const view   = $('conf-view');
   const rpanel = $('rpanel');
   const btn    = $('btn-conf');
   if(confScreenOpen){
-    screen.classList.add('show');
-    rpanel.style.display = 'none';
+    // esconde conteúdo normal, mostra conf no mesmo rpanel
+    $('dempty').style.display='none';
+    $('dloading').style.display='none';
+    $('dcontent').style.display='none';
+    view.style.display='flex';view.style.flexDirection='column';
+    rpanel.style.display='flex';rpanel.style.flexDirection='column';
     btn.classList.add('active');
-    btn.textContent = '✕ Fechar';
+    $('conf-eng-badge').style.display='inline-flex';
     confBuildList();
   } else {
-    screen.classList.remove('show');
-    rpanel.style.display = '';
+    view.style.display='none';
+    $('dempty').style.display = curFileId ? 'none' : 'flex';
+    if(curFileId) $('dcontent').style.display='flex';
     btn.classList.remove('active');
-    btn.textContent = '🔍 Conferência';
+    $('conf-eng-badge').style.display='none';
   }
 }
 
@@ -979,7 +888,7 @@ function confBuildList(){
 
   confApplyFilters();
   confUpdateStats();
-  $('conf-periodo').textContent = confEngList.length + ' engenheiros identificados nas planilhas';
+  $('conf-periodo').textContent = confEngList.length + ' engenheiros · ' + allFiles.length + ' planilhas';
 }
 
 function confUpdateStats(){
@@ -993,12 +902,13 @@ function confUpdateStats(){
 
 function confSetLetra(f, btn){
   confLetraFilter = f;
-  document.querySelectorAll('.conf-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.letra-pill').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   confApplyFilters();
 }
 
 function confSearch(q){ confSearchQuery = q; confApplyFilters(); }
+function confLimparFiltros(){ $('conf-busca').value=''; $('conf-filter-status').value=''; confSearchQuery=''; confLetraFilter='todos'; document.querySelectorAll('.letra-pill').forEach((b,i)=>b.classList.toggle('active',i===0)); confApplyFilters(); }
 
 function confApplyFilters(){
   confStatusFilter = $('conf-filter-status').value;
@@ -1021,10 +931,10 @@ function confBRL(v){ return 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigit
 function confRenderTable(){
   const tbody = $('conf-tbody');
   const SL = {
-    pendente:    '<span class="conf-badge conf-badge-pendente">Pendente</span>',
-    conferido:   '<span class="conf-badge conf-badge-conferido">Conferido</span>',
-    divergencia: '<span class="conf-badge conf-badge-divergencia">Divergência</span>',
-    pago:        '<span class="conf-badge conf-badge-pago">Pago</span>',
+    pendente:    '<span class="pay-badge pendente"><span class="pay-dot"></span>Pendente</span>',
+    conferido:   '<span class="pay-badge" style="background:#e8f0fe;border-color:rgba(26,115,232,.3);color:var(--a)"><span class="pay-dot" style="background:var(--a)"></span>Conferido</span>',
+    divergencia: '<span class="pay-badge atencao"><span class="pay-dot"></span>Divergência</span>',
+    pago:        '<span class="pay-badge pago"><span class="pay-dot"></span>Pago</span>',
   };
   if(!confFiltered.length){
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--m)">Nenhum engenheiro encontrado</td></tr>';
@@ -1049,7 +959,7 @@ function confRenderTable(){
       <td><button class="conf-link-btn" onclick="event.stopPropagation();confOpenPanel('${eng.name.replace(/'/g,"\\'")}')">Ver →</button></td>
     </tr>`;
   }).join('');
-  $('conf-count').textContent = confFiltered.length + ' registros';
+  $('cs-total').textContent = confFiltered.length;
 }
 
 function confOpenPanel(name){
@@ -1329,7 +1239,7 @@ function fitemHtml(f){
 }
 async function selectFile(id,name,url,mime){
   // Se conferência estiver aberta, fecha ela
-  if(confScreenOpen) toggleConferencia();
+  if(confScreenOpen){ confScreenOpen=false; $('conf-view').style.display='none'; $('btn-conf').classList.remove('active'); }
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;
   payStatusMap={};payLoaded=false;payLoading=false;payColIdx=-1;
   $('pay-status-bar').classList.remove('show');$('pay-legend').style.display='none';$('metrics-pay').style.display='none';
