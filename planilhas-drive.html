@@ -962,8 +962,10 @@ function fitemHtml(f){
     +'<div class="farrow">›</div></div>';
 }
 function fitemClick(e,id,name,url,mime){
-  if(e.ctrlKey||e.metaKey||selFiles.size>0) selToggle(id);
-  else { selClear(); selectFile(id,name,url,mime); }
+  if(e.target.type==='checkbox') return; // checkbox tem handler próprio
+  if(e.ctrlKey||e.metaKey) { selToggle(id); return; }
+  if(selFiles.size>0) { selToggle(id); return; }
+  selectFile(id,name,url,mime);
 }
 function selToggle(id){
   if(selFiles.has(id)) selFiles.delete(id); else selFiles.add(id);
