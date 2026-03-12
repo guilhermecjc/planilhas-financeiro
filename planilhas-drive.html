@@ -145,6 +145,18 @@ body.dark .btn-conf-header:hover,.btn-conf-header.active{background:#1c2c4a;bord
 .fmeta{font-size:10px;color:var(--m);font-family:'JetBrains Mono',monospace}
 .farrow{color:var(--m);opacity:0;transition:opacity .1s;font-size:11px;flex-shrink:0}
 .fitem:hover .farrow,.fitem.active .farrow{opacity:1;color:var(--a)}
+.fitem-cb{width:14px;height:14px;accent-color:var(--a);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity .1s}
+.fitem:hover .fitem-cb,.fitem.sel .fitem-cb,.fitem-cb:checked{opacity:1}
+.fitem.sel{background:#e8f0fe;border-color:rgba(26,115,232,.25)}
+body.dark .fitem.sel{background:#1c2c4a;border-color:rgba(26,115,232,.4)}
+.multi-bar{display:none;align-items:center;gap:8px;padding:7px 10px;background:#e8f0fe;border-bottom:1px solid rgba(26,115,232,.2);flex-shrink:0}
+.multi-bar.show{display:flex}
+body.dark .multi-bar{background:#1c2c4a;border-color:rgba(26,115,232,.3)}
+.multi-bar-txt{flex:1;font-size:11px;font-weight:600;color:var(--a)}
+.multi-bar-btn{background:var(--a);color:#fff;border:none;font-family:'Outfit',sans-serif;font-size:11px;font-weight:700;padding:5px 12px;border-radius:6px;cursor:pointer;transition:background .12s;white-space:nowrap}
+.multi-bar-btn:hover{background:var(--a2)}
+.multi-bar-clr{background:none;border:1px solid rgba(26,115,232,.3);color:var(--a);font-family:'Outfit',sans-serif;font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .12s}
+.multi-bar-clr:hover{border-color:var(--red);color:var(--red)}
 .fstate{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;gap:8px}
 .fspinner{width:22px;height:22px;border:2px solid var(--b2);border-top-color:var(--a);border-radius:50%;animation:rot .7s linear infinite}
 .fstate-txt{font-size:12px;font-weight:500;color:var(--m)}
@@ -532,6 +544,11 @@ body.dark .mc-pay{background:#25262b}
       </button>
     </div>
     <div class="fcount" id="fcount"></div>
+    <div class="multi-bar" id="multi-bar">
+      <span class="multi-bar-txt" id="multi-bar-txt">0 selecionadas</span>
+      <button class="multi-bar-clr" onclick="clearMultiSel()">✕</button>
+      <button class="multi-bar-btn" onclick="loadMultiFiles()">Carregar juntas →</button>
+    </div>
     <div class="flist">
       <div class="fstate" id="floading" style="display:none"><div class="fspinner"></div><div class="fstate-txt">Carregando...</div></div>
       <div id="fitems"></div>
@@ -787,6 +804,8 @@ let viewMode='all';
 let engMap={};
 let allFiles=[],filtFiles=[];
 let curFileId=null,curFileUrl=null,curFileMime=null,curXlsxWb=null;
+let selectedFiles=new Set(); // ids selecionados para multi-load
+let multiMode=false; // true quando exibindo dados de múltiplas planilhas
 let sheetTabs=[],curTab=null;
 let allRows=[],filtRows=[],allHeaders=[];
 let gAddrIdx=-1,gCityIdx=-1;
@@ -1215,6 +1234,122 @@ function setSyncState(state,pct,txt){
 }
 async function reload(){allFiles=[];filtFiles=[];await loadFiles();}
 
+async function loadMultiFiles(){
+  if(selectedFiles.size===0) return;
+  if(confScreenOpen){ confScreenOpen=false; $('conf-view').style.display='none'; $('btn-conf').classList.remove('active'); }
+  multiMode=true;
+  curFileId=null; curFileUrl=null; curXlsxWb=null;
+  payStatusMap={}; payLoaded=false; payLoading=false;
+  $('pay-status-bar').classList.remove('show'); $('pay-legend').style.display='none'; $('metrics-pay').style.display='none';
+  $('dempty').style.display='none'; $('dloading').style.display='flex'; $('dcontent').style.display='none';
+  $('dloading-txt').textContent='Carregando '+selectedFiles.size+' planilhas...';
+  filterFiles();
+  const ids=[...selectedFiles];
+  const filesInfo=ids.map(id=>allFiles.find(f=>f.id===id)).filter(Boolean);
+  try{
+    // Carrega todas em paralelo
+    const results=await Promise.allSettled(filesInfo.map(f=>loadFileRows(f)));
+    // Merge rows — adiciona coluna Planilha/Engenheiro
+    let mergedRows=[];
+    let mergedHeaders=null;
+    for(let i=0;i<results.length;i++){
+      if(results[i].status!=='fulfilled'||!results[i].value) continue;
+      const {rows,headers,fileInfo}=results[i].value;
+      if(!mergedHeaders) mergedHeaders=headers;
+      const engName=engMap[filesInfo[i].id]||filesInfo[i].name;
+      rows.forEach(r=>{
+        mergedRows.push({...r, _planilha: engName});
+      });
+    }
+    if(!mergedHeaders||mergedRows.length===0) throw new Error('Nenhum dado encontrado nas planilhas selecionadas');
+    // Adiciona coluna Planilha no início
+    const planilhaCol={label:'Planilha / Engenheiro',idx:'_planilha',cls:'c-eng'};
+    allHeaders=[planilhaCol,...mergedHeaders];
+    allRows=mergedRows.map(r=>({
+      ...r,
+      raw:[r._planilha,...(r.raw||[])]
+    }));
+    // Ajusta índices
+    gAddrIdx=allHeaders.findIndex(h=>['ENDEREÇO','ENDERECO','END','LOGRADOURO'].some(k=>String(h.label).toUpperCase().includes(k)));
+    gCityIdx=allHeaders.findIndex(h=>['CIDADE','MUNICIPIO','MUNICÍPIO'].some(k=>String(h.label).toUpperCase().includes(k)));
+    // Atualiza header
+    $('dfilename').textContent=filesInfo.length+' planilhas carregadas juntas';
+    $('dbadge').textContent='📋 '+filesInfo.length+' planilhas';
+    $('eng-badge').style.display='none';
+    $('tabs-row').innerHTML='';
+    // Meses
+    const months=[...new Set(allRows.map(r=>extractMY(r.data)).filter(Boolean))];
+    months.sort((a,b)=>{const[ma,ya]=a.split('/');const[mb,yb]=b.split('/');return new Date(ya,ma-1)-new Date(yb,mb-1);});
+    const fm=$('f-mes');fm.innerHTML='<option value="">Todos os meses</option>';
+    months.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;fm.appendChild(o);});
+    $('dloading').style.display='none'; $('dcontent').style.display='flex'; $('dcontent').style.flexDirection='column';
+    filterRows();
+  }catch(e){
+    multiMode=false;
+    $('dloading').style.display='none'; $('dempty').style.display='flex';
+    $('dempty').querySelector('.dempty-ico').textContent='⚠️';
+    $('dempty').querySelector('.dempty-title').textContent='Erro ao carregar';
+    $('dempty').querySelector('.dempty-sub').textContent=e.message;
+  }
+}
+
+async function loadFileRows(file){
+  const isXlsx=file.mimeType==='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  let values=[];
+  if(isXlsx){
+    const wb=await loadXlsxWorkbook(file.id);
+    if(!wb) return null;
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const data=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true,blankrows:false});
+    values=data.map(row=>row.map(cell=>cell===null||cell===undefined?'':String(cell)));
+  } else {
+    const tabR=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'?fields=sheets.properties',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!tabR.ok) return null;
+    const tabMeta=await tabR.json();
+    const tabName=((tabMeta.sheets||[])[0]||{}).properties?.title||'Plan1';
+    const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+file.id+'/values/'+encodeURIComponent(tabName)+'?majorDimension=ROWS',{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok) return null;
+    values=(await r.json()).values||[];
+  }
+  // Detectar engenheiro
+  let engineer='';
+  for(let i=0;i<Math.min(values.length,6);i++){
+    for(const cell of (values[i]||[])){
+      const m=String(cell||'').match(/Profissional[:\s]+(.+)/i);
+      if(m){engineer=m[1].trim();break;}
+    }
+    if(engineer) break;
+  }
+  if(engineer && !engMap[file.id]){engMap[file.id]=engineer;saveEngMap();}
+  // Detectar header
+  const KW=['PROPOSTA','DATA','VISTORIA','PROPONENTE','NOME','VALOR','CIDADE','ENDEREÇO','CPF','ENGENHEIRO','PROFISSIONAL'];
+  let hIdx=0,best=-1;
+  for(let i=0;i<Math.min(values.length,15);i++){
+    const row=(values[i]||[]).map(c=>String(c||'').toUpperCase());
+    const sc=row.filter(c=>c.trim()).length+row.filter(c=>KW.some(k=>c.includes(k))).length*3;
+    if(sc>best){best=sc;hIdx=i;}
+  }
+  const headers=(values[hIdx]||[]).map((h,i)=>({label:h||'Col '+(i+1),idx:i,cls:guessClass(String(h||'').toUpperCase())}));
+  const hU=headers.map(h=>String(h.label).toUpperCase());
+  const find=(...kws)=>hU.findIndex(h=>kws.some(k=>h.includes(k)));
+  const propIdx=find('PROPOSTA','N°','NUMERO','NUM');
+  const dateIdx=find('DATA');
+  const valIdx=find('VALOR');
+  const addrIdx=find('ENDEREÇO','ENDERECO','END','LOGRADOURO');
+  const cityIdx=find('CIDADE','MUNICIPIO','MUNICÍPIO');
+  const rows=(values.slice(hIdx+1)||[])
+    .filter(r=>r&&r.some(c=>c!==undefined&&c!==null&&String(c).trim()!==''))
+    .map(r=>({
+      raw:r,
+      proposta:propIdx>=0?(r[propIdx]||''):'',
+      data:dateIdx>=0?(r[dateIdx]||''):'',
+      valor:valIdx>=0?(r[valIdx]||''):'',
+      endereco:addrIdx>=0?(r[addrIdx]||''):'',
+      cidade:cityIdx>=0?(r[cityIdx]||''):''
+    }));
+  return {rows, headers, fileInfo:file};
+}
+
 function filterFiles(){
   const q=$('fq').value.toLowerCase().trim(),s=$('fsort').value;
   filtFiles=allFiles.filter(f=>!q||f.name.toLowerCase().includes(q)||(engMap[f.id]||'').toLowerCase().includes(q));
@@ -1232,16 +1367,48 @@ function filterFiles(){
 function fitemHtml(f){
   const id=f.id||'';const name=(f.name||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   const url=(f.webViewLink||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-  const mime=(f.mimeType||'').replace(/'/g,"\\'");const active=curFileId===f.id?'active':'';
-  return'<div class="fitem '+active+'" onclick="selectFile(\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
+  const mime=(f.mimeType||'').replace(/'/g,"\\'");
+  const active=curFileId===f.id&&!multiMode?'active':'';
+  const sel=selectedFiles.has(f.id)?'sel':'';
+  const chk=selectedFiles.has(f.id)?'checked':'';
+  return'<div class="fitem '+active+' '+sel+'" onclick="fitemClick(event,\''+id+'\',\''+name+'\',\''+url+'\',\''+mime+'\')">'
+    +'<input type="checkbox" class="fitem-cb" '+chk+' onclick="event.stopPropagation();toggleFileSelect(\''+id+'\')"/>'
     +'<div class="fico"><svg viewBox="0 0 24 24"><use href="#si"/></svg></div>'
     +'<div class="finfo"><div class="fname">'+esc(f.name)+'</div>'
     +'<div class="fmeta">'+new Date(f.modifiedTime).toLocaleDateString('pt-BR')+'</div></div>'
     +'<div class="farrow">›</div></div>';
 }
+function fitemClick(e,id,name,url,mime){
+  if(e.ctrlKey||e.metaKey||selectedFiles.size>0){
+    toggleFileSelect(id);
+  } else {
+    clearMultiSel();
+    selectFile(id,name,url,mime);
+  }
+}
+function toggleFileSelect(id){
+  if(selectedFiles.has(id)) selectedFiles.delete(id);
+  else selectedFiles.add(id);
+  updateMultiBar();
+  filterFiles();
+}
+function clearMultiSel(){
+  selectedFiles.clear();
+  updateMultiBar();
+  filterFiles();
+}
+function updateMultiBar(){
+  const bar=$('multi-bar'), txt=$('multi-bar-txt');
+  if(selectedFiles.size>0){
+    bar.classList.add('show');
+    txt.textContent=selectedFiles.size+' planilha'+(selectedFiles.size>1?'s':'')+' selecionada'+(selectedFiles.size>1?'s':'');
+  } else {
+    bar.classList.remove('show');
+  }
+}
 async function selectFile(id,name,url,mime){
-  // Se conferência estiver aberta, fecha ela
   if(confScreenOpen){ confScreenOpen=false; $('conf-view').style.display='none'; $('btn-conf').classList.remove('active'); }
+  multiMode=false;
   curFileId=id;curFileUrl=url;curFileMime=mime||'';curXlsxWb=null;
   payStatusMap={};payLoaded=false;payLoading=false;payColIdx=-1;
   $('pay-status-bar').classList.remove('show');$('pay-legend').style.display='none';$('metrics-pay').style.display='none';
