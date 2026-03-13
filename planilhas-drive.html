@@ -871,16 +871,42 @@ async function selLoadJuntas(){
   filterFiles();
   try{
     const results=await Promise.allSettled(filesInfo.map(f=>selLoadOne(f)));
-    let mergedRows=[],mergedHeaders=null;
+    // Coletar resultados válidos
+    const valid=[];
     for(let i=0;i<results.length;i++){
-      if(results[i].status!=='fulfilled'||!results[i].value) continue;
-      const {rows,headers}=results[i].value;
-      if(!mergedHeaders) mergedHeaders=headers;
-      const label=engMap[filesInfo[i].id]||filesInfo[i].name;
-      rows.forEach(r=>mergedRows.push({...r,_src:label,raw:[label,...(r.raw||[])]}));
+      if(results[i].status==='fulfilled'&&results[i].value){
+        valid.push({data:results[i].value, file:filesInfo[i]});
+      }
     }
-    if(!mergedHeaders||!mergedRows.length) throw new Error('Nenhum dado encontrado');
-    allHeaders=[{label:'Engenheiro',idx:'_src',cls:'c-eng'},...mergedHeaders];
+    if(!valid.length) throw new Error('Nenhuma planilha carregou com sucesso');
+    // Construir mapa de colunas unificado (união de todos os headers)
+    const colMap=new Map(); // label -> idx no raw final
+    colMap.set('_src',0);
+    valid.forEach(({data:{headers}})=>{
+      headers.forEach(h=>{
+        const key=String(h.label).trim();
+        if(key&&!colMap.has(key)) colMap.set(key,colMap.size);
+      });
+    });
+    const mergedHeaders=[...colMap.entries()].map(([label,idx])=>({
+      label, idx:label==='_src'?'_src':idx,
+      cls:label==='_src'?'c-eng':guessClass(label.toUpperCase())
+    }));
+    // Montar rows normalizadas — cada célula vai para a coluna certa pelo nome
+    const mergedRows=[];
+    valid.forEach(({data:{rows,headers},file})=>{
+      const label=engMap[file.id]||file.name;
+      // mapa local: índice no raw original -> índice no raw final
+      const localToFinal=headers.map(h=>colMap.get(String(h.label).trim())||0);
+      rows.forEach(r=>{
+        const finalRaw=new Array(colMap.size).fill('');
+        finalRaw[0]=label; // coluna Engenheiro
+        localToFinal.forEach((fi,li)=>{ if(r.raw[li]!==undefined) finalRaw[fi]=r.raw[li]; });
+        mergedRows.push({...r, _src:label, raw:finalRaw});
+      });
+    });
+    if(!mergedRows.length) throw new Error('Nenhum dado encontrado nas planilhas');
+    allHeaders=mergedHeaders;
     allRows=mergedRows;
     gAddrIdx=allHeaders.findIndex(h=>['ENDEREÇO','ENDERECO','END','LOGRADOURO'].some(k=>String(h.label).toUpperCase().includes(k)));
     gCityIdx=allHeaders.findIndex(h=>['CIDADE','MUNICIPIO','MUNICÍPIO'].some(k=>String(h.label).toUpperCase().includes(k)));
@@ -962,9 +988,8 @@ function fitemHtml(f){
     +'<div class="farrow">›</div></div>';
 }
 function fitemClick(e,id,name,url,mime){
-  if(e.target.type==='checkbox') return; // checkbox tem handler próprio
+  if(e.target.type==='checkbox') return;
   if(e.ctrlKey||e.metaKey) { selToggle(id); return; }
-  if(selFiles.size>0) { selToggle(id); return; }
   selectFile(id,name,url,mime);
 }
 function selToggle(id){
